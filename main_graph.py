@@ -10,16 +10,16 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.svm import SVC
 from sklearn.metrics import f1_score
 
-from graphmae.utils import (
+from src.utils import (
     build_args,
     create_optimizer,
     set_random_seed,
-    TBLogger,
+    WBLogger,
     get_current_lr,
     load_best_configs,
 )
-from graphmae.datasets.data_util import load_graph_classification_dataset
-from graphmae.models import build_model
+from src.datasets.data_util import load_graph_classification_dataset
+from src.models import build_model
 
 
 def graph_classification_evaluation(model, pooler, dataloader, num_classes, lr_f, weight_decay_f, max_epoch_f, device, mute=False):
@@ -147,7 +147,7 @@ def main(args):
         set_random_seed(seed)
 
         if logs:
-            logger = TBLogger(name=f"{dataset_name}_loss_{loss_fn}_rpr_{replace_rate}_nh_{num_hidden}_nl_{num_layers}_lr_{lr}_mp_{max_epoch}_mpf_{max_epoch_f}_wd_{weight_decay}_wdf_{weight_decay_f}_{encoder_type}_{decoder_type}")
+            logger = WBLogger(name=f"{dataset_name}_loss_{loss_fn}_rpr_{replace_rate}_nh_{num_hidden}_nl_{num_layers}_lr_{lr}_mp_{max_epoch}_mpf_{max_epoch_f}_wd_{weight_decay}_wdf_{weight_decay_f}_{encoder_type}_{decoder_type}")
         else:
             logger = None
 

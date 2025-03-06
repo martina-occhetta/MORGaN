@@ -9,7 +9,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch import optim as optim
-from tensorboardX import SummaryWriter
+import wandb
 
 
 
@@ -172,32 +172,25 @@ def load_best_configs(args, path):
 
 # ------ logging ------
 
-class TBLogger(object):
-    def __init__(self, log_path="./logging_data", name="run"):
-        super(TBLogger, self).__init__()
-
-        if not os.path.exists(log_path):
-            os.makedirs(log_path, exist_ok=True)
-
+class WBLogger(object):
+    def __init__(self, log_path="./logging_data", name="run", project='graphMAE'):
+        """
+        Initializes a Weights & Biases run. The log_path is ignored in wandb,
+        but kept for compatibility.
+        """
+        wandb.init(project=project, name=name)
         self.last_step = 0
-        self.log_path = log_path
-        raw_name = os.path.join(log_path, name)
-        name = raw_name
-        for i in range(1000):
-            name = raw_name + str(f"_{i}")
-            if not os.path.exists(name):
-                break
-        self.writer = SummaryWriter(logdir=name)
 
     def note(self, metrics, step=None):
         if step is None:
             step = self.last_step
-        for key, value in metrics.items():
-            self.writer.add_scalar(key, value, step)
+        # Optionally add step info to metrics.
+        metrics["step"] = step
+        wandb.log(metrics)
         self.last_step = step
 
     def finish(self):
-        self.writer.close()
+        wandb.finish()
 
 
 class NormLayer(nn.Module):
