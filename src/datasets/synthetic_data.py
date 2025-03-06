@@ -173,6 +173,6 @@ def generate_synthetic_graph(num_nodes=500,
 
 if __name__ == "__main__":
     # Generate the synthetic multiomic graph dataset and print its summary.
-    data = generate_synthetic_graph(multidim_edges=False)
+    data = generate_synthetic_graph(multidim_edges=True)
     print("Synthetic Multiomic Graph Data Summary:")
     print(data)
