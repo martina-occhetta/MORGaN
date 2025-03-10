@@ -10,9 +10,7 @@ from torch_geometric.nn.dense.linear import Linear
 from torch_geometric.typing import Adj, OptPairTensor, OptTensor, Size, SparseTensor
 from torch_geometric.utils import softmax
 
-
 from torch_geometric.nn.inits import glorot, zeros
-
 
 from src.utils import create_activation
 

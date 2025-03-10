@@ -8,6 +8,7 @@ import torch.nn as nn
 from .gat import GAT
 from .gin import GIN
 from .gcn import GCN
+from .rgcn import RGCN
 from .loss_func import sce_loss
 from src.utils import create_norm
 from torch_geometric.utils import dropout_edge
@@ -49,6 +50,19 @@ def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropo
             in_dim=int(in_dim),
             num_hidden=int(num_hidden),
             out_dim=int(out_dim),
+            num_layers=num_layers,
+            dropout=dropout,
+            activation=activation,
+            residual=residual,
+            norm=create_norm(norm),
+            encoding=(enc_dec == "encoding"),
+        )
+    elif m_type == "rgcn":
+        mod = RGCN(
+            in_channels=int(in_dim),
+            hidden_channels=int(num_hidden),
+            out_channels=int(out_dim),
+            num_relations=int(),# TODO),
             num_layers=num_layers,
             dropout=dropout,
             activation=activation,
