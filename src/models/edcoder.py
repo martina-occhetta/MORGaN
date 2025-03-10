@@ -15,7 +15,7 @@ from torch_geometric.utils import dropout_edge
 from torch_geometric.utils import add_self_loops, remove_self_loops
 
 
-def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropout, activation, residual, norm, nhead, nhead_out, attn_drop, negative_slope=0.2, concat_out=True) -> nn.Module:
+def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropout, activation, residual, norm, nhead, nhead_out, attn_drop, num_relations = 1, negative_slope=0.2, concat_out=True) -> nn.Module:
     if m_type == "gat":
         mod = GAT(
             in_dim=in_dim,
@@ -62,7 +62,7 @@ def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropo
             in_channels=int(in_dim),
             hidden_channels=int(num_hidden),
             out_channels=int(out_dim),
-            num_relations=int(),# TODO),
+            num_relations=int(num_relations),# TODO),
             num_layers=num_layers,
             dropout=dropout,
             activation=activation,
@@ -108,6 +108,7 @@ class PreModel(nn.Module):
             replace_rate: float = 0.1,
             alpha_l: float = 2,
             concat_hidden: bool = False,
+            num_relations: int = 1,
          ):
         super(PreModel, self).__init__()
         self._mask_rate = mask_rate
@@ -149,6 +150,7 @@ class PreModel(nn.Module):
             negative_slope=negative_slope,
             residual=residual,
             norm=norm,
+            num_relations=num_relations,
         )
 
         # build decoder for attribute prediction
@@ -168,6 +170,7 @@ class PreModel(nn.Module):
             residual=residual,
             norm=norm,
             concat_out=True,
+            num_relations=num_relations,
         )
 
         self.enc_mask_token = nn.Parameter(torch.zeros(1, in_dim))
