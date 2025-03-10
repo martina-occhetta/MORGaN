@@ -42,8 +42,8 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
             logger.note(loss_dict, step=epoch)
 
         if (epoch + 1) % 200 == 0:
-            node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob, mute=True)
-
+            acc, estp_acc = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob, mute=True)
+            logger.note(loss_dict, step=epoch, accuracy=acc, estp_accuracy=estp_acc)
     # return best_model
     return model
 
@@ -133,6 +133,6 @@ def main(args):
 if __name__ == "__main__":
     args = build_args()
     if args.use_cfg:
-        args = load_best_configs(args, "configs.yml")
+        args = load_best_configs(args, "configs/configs.yml")
     print(args)
     main(args)

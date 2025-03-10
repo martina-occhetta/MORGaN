@@ -72,47 +72,13 @@ class GCN(nn.Module):
         self.norms = None  # Not used here since each GraphConv handles normalization.
         self.head = nn.Identity()
 
-    def forward(self, data, feat=None, eweight=None, return_hidden=False, concat=False, datas=None, link_prediction=False):
-        """
-        data: PyG Data object (must contain at least data.edge_index, and optionally data.x).
-        feat: Node feature tensor; if None, data.x is used.
-        eweight: (Unused here) Edge weights.
-        return_hidden: If True, also return the list of hidden representations.
-        concat: If True, concatenate additional features (datas) with the final output.
-        link_prediction: If True, perform link prediction using a dot-product head.
-        """
-        # Use provided features or fall back to data.x.
-        if feat is None:
-            feat = data.x # Node features extracted from the PyG Data object.
-        h = feat
+    def forward(self, x, edge_index, return_hidden=False):
+        h = x
         hidden_list = []
         for l in range(self.num_layers):
             h = F.dropout(h, p=self.dropout, training=self.training)
-            h = self.gcn_layers[l](h, data.edge_index)
+            h = self.gcn_layers[l](h, edge_index)
             hidden_list.append(h)
-
-        # Optionally, if concatenating additional features.
-        if concat:
-            # Assumes that "datas" is provided.
-            h = torch.cat([h, datas], dim=1)
-            return self.head(h)
-
-        # If doing link prediction.
-        if link_prediction:
-            z = self.link_head(h)
-            pos_edge_index = data.edge_index
-            neg_edge_index = negative_sampling(edge_index=pos_edge_index, num_nodes=h.size(0))
-            
-            pos_score = (z[pos_edge_index[0]] * z[pos_edge_index[1]]).sum(dim=1)
-            neg_score = (z[neg_edge_index[0]] * z[neg_edge_index[1]]).sum(dim=1)
-            
-            pos_loss = -torch.log(torch.sigmoid(pos_score) + 1e-15).mean()
-            neg_loss = -torch.log(1 - torch.sigmoid(neg_score) + 1e-15).mean()
-            
-            r_loss = pos_loss + neg_loss
-            
-            return self.head(h), r_loss, self.c1, self.c2
-
         if return_hidden:
             return self.head(h), hidden_list
         else:

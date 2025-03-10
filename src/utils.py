@@ -86,7 +86,7 @@ def build_args():
     parser.add_argument("--load_model", action="store_true")
     parser.add_argument("--save_model", action="store_true")
     parser.add_argument("--use_cfg", action="store_true")
-    parser.add_argument("--logging", action="store_true")
+    parser.add_argument("--logging", action="store_true", default=True)
     parser.add_argument("--scheduler", action="store_true", default=False)
     parser.add_argument("--concat_hidden", action="store_true", default=False)
 
@@ -181,11 +181,20 @@ class WBLogger(object):
         wandb.init(project=project, name=name)
         self.last_step = 0
 
-    def note(self, metrics, step=None):
+    def note(self, metrics, step=None, accuracy=None, estp_accuracy= None, precision=None, recall=None, f1=None):
         if step is None:
             step = self.last_step
-        # Optionally add step info to metrics.
         metrics["step"] = step
+        if accuracy is not None:
+            metrics["accuracy"] = accuracy
+        if estp_accuracy is not None:
+            metrics["estp_accuracy"] = estp_accuracy
+        if precision is not None:
+            metrics["precision"] = precision
+        if recall is not None:
+            metrics["recall"] = recall
+        if f1 is not None:
+            metrics["f1"] = f1
         wandb.log(metrics)
         self.last_step = step
 

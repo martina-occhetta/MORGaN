@@ -3,7 +3,7 @@
 import numpy as np
 import networkx as nx
 import torch
-from torch_geometric.data import Data
+from torch_geometric.data import Data, HeteroData
 from torch_geometric.utils import from_networkx
 
 def generate_synthetic_graph(num_nodes=500,
@@ -129,39 +129,50 @@ def generate_synthetic_graph(num_nodes=500,
         # multidim_edges == True: generate multi-dimensional edges.
         # Start with base PPI edges from G.
         base_edges = list(G.edges())
-        edge_index_list = []
-        edge_type_list = []
-        # Add PPI edges (edge type 0); add both directions for undirected connectivity.
+        # Prepare a dictionary to store edges per type.
+        edge_index_by_type = {0: [], 1: [], 2: [], 3: [], 4: []}
+
+        # Add base PPI edges (edge type 0) in both directions for undirected connectivity.
         for u, v in base_edges:
-            edge_index_list.append([u, v])
-            edge_index_list.append([v, u])
-            edge_type_list.append(0)
-            edge_type_list.append(0)
-        
+            edge_index_by_type[0].extend([[u, v], [v, u]])
+
         # Define additional edge dimensions:
         # 1: Sequence similarity, 2: Semantic similarity, 3: Co-expression, 4: Pathway co-occurrence.
         additional_edge_types = [1, 2, 3, 4]
         additional_edge_prob = 0.05  # probability for generating extra edges in each additional dimension
-        
+
+        # Use combinations to iterate over unique node pairs (i, j) with i < j.
+        from itertools import combinations
         for etype in additional_edge_types:
-            # For each pair of nodes (i, j) with i < j, sample an edge.
-            for i in range(num_nodes):
-                for j in range(i + 1, num_nodes):
-                    if np.random.rand() < additional_edge_prob:
-                        edge_index_list.append([i, j])
-                        edge_index_list.append([j, i])
-                        edge_type_list.append(etype)
-                        edge_type_list.append(etype)
+            for i, j in combinations(range(num_nodes), 2):
+                if np.random.rand() < additional_edge_prob:
+                    # Add edge in both directions.
+                    edge_index_by_type[etype].extend([[i, j], [j, i]])
+
+        # Create the HeteroData object and assign node attributes under the "gene" node type.
+        data = HeteroData()
+        data['gene'].x = torch.tensor(raw_features, dtype=torch.float)
+        data['gene'].y = torch.tensor(labels, dtype=torch.long)
+        data['gene'].name = [f"GENE{i+1}" for i in range(num_nodes)]
+
+        # Mapping from numeric edge type to a relation name.
+        relation_mapping = {
+            0: "ppi",
+            1: "seq_sim",
+            2: "sem_sim",
+            3: "coexpr",
+            4: "pathway_cooc"
+        }
         
-        edge_index = torch.tensor(edge_index_list, dtype=torch.long).t().contiguous()
-        edge_type = torch.tensor(edge_type_list, dtype=torch.long)
-        # Create Data object manually.
-        data = Data(x=torch.tensor(raw_features, dtype=torch.float),
-                    y=torch.tensor(labels, dtype=torch.long),
-                    edge_index=edge_index,
-                    edge_type=edge_type)
-        # Save node names separately (Data objects do not support string tensors).
-        data.name = [f"GENE{i+1}" for i in range(num_nodes)]
+        # For each edge type, convert the list to a tensor and assign it under its relation key.
+        for etype, relation in relation_mapping.items():
+            edges = edge_index_by_type[etype]
+            if len(edges) > 0:
+                edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+            else:
+                # Create an empty edge index if no edges were sampled for this type.
+                edge_index = torch.empty((2, 0), dtype=torch.long)
+            data['gene', relation, 'gene'].edge_index = edge_index
     
     if multidim_edges:
         torch.save(data, 'data/synthetic/synthetic_graph_multidim.pt')
@@ -176,3 +187,7 @@ if __name__ == "__main__":
     data = generate_synthetic_graph(multidim_edges=True)
     print("Synthetic Multiomic Graph Data Summary:")
     print(data)
+    print(f"Number of nodes: {data.num_nodes}")
+    print(f"Number of edges: {data.num_edges}")
+    print(f"Number of features: {data.num_features}")
+    print(f"Edge types: {data.edge_types}")

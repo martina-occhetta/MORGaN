@@ -7,10 +7,12 @@ import torch.nn.functional as F
 import torch_geometric.transforms as T
 from torch_geometric.datasets import Planetoid, TUDataset
 from torch_geometric.utils import add_self_loops, remove_self_loops, to_undirected, degree
+from torch_geometric.data import Data, HeteroData
 
 from ogb.nodeproppred import PygNodePropPredDataset
 
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 
 
 def scale_feats(x):
@@ -20,6 +22,78 @@ def scale_feats(x):
     feats = torch.from_numpy(scaler.transform(feats)).float()
     return feats
 
+def load_processed_graph(filepath: str) -> Data:
+    """
+    Loads the PyTorch Geometric Data object from disk.
+    """
+    data = torch.load(filepath, weights_only = False)
+    if not isinstance(data, Data):
+        raise ValueError("Loaded object is not a torch_geometric.data.Data object.")
+    return data
+
+def load_processed_multidim_graph(filepath: str) -> Data:
+    """
+    Loads the PyTorch Geometric Data object from disk.
+    """
+    data = torch.load(filepath, weights_only = False)
+    if not isinstance(data, HeteroData):
+        raise ValueError("Loaded object is not a torch_geometric.data.HeteroDatas object.")
+    return data
+
+def train_val_test_split(data, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
+    """
+    Splits the nodes of a PyTorch Geometric Data object into train, validation,
+    and test sets using stratification based on data.y (labels).
+
+    Args:
+        data (torch_geometric.data.Data): The input graph data object.
+        train_ratio (float): Proportion of nodes to be used for training.
+        val_ratio (float): Proportion of nodes to be used for validation.
+        test_ratio (float): Proportion of nodes to be used for testing.
+
+    Returns:
+        train_mask (torch.BoolTensor): Boolean mask for training nodes.
+        val_mask (torch.BoolTensor): Boolean mask for validation nodes.
+        test_mask (torch.BoolTensor): Boolean mask for test nodes.
+    """
+    total = train_ratio + val_ratio + test_ratio
+    if not np.isclose(total, 1.0):
+        raise ValueError("train_ratio + val_ratio + test_ratio must equal 1.0")
+
+    # Determine the number of nodes
+    num_nodes = data.num_nodes if hasattr(data, 'num_nodes') else data.x.size(0)
+    indices = np.arange(num_nodes)
+
+    # Get labels as a 1D numpy array (squeeze in case data.y has an extra dim)
+    if torch.is_tensor(data.y):
+        labels = data.y.cpu().numpy().squeeze()
+    else:
+        labels = np.array(data.y).squeeze()
+
+    # First, split into (train + val) and test sets
+    train_val_indices, test_indices, train_val_labels, _ = train_test_split(
+        indices, labels, test_size=test_ratio, stratify=labels, random_state=42)
+
+    # Next, split the train_val_indices into training and validation sets.
+    # Calculate the relative validation ratio from the (train + val) split.
+    relative_val_ratio = val_ratio / (train_ratio + val_ratio)
+    train_indices, val_indices, _, _ = train_test_split(
+        train_val_indices, train_val_labels, test_size=relative_val_ratio, stratify=train_val_labels, random_state=42)
+
+    # Create boolean masks for each split
+    train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    val_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    train_mask[train_indices] = True
+    val_mask[val_indices] = True
+    test_mask[test_indices] = True
+
+    # Optionally, attach the masks to the data object for later use
+    data.train_mask = train_mask
+    data.val_mask = val_mask
+    data.test_mask = test_mask
+
+    return data
 
 def load_dataset(dataset_name):
     if dataset_name == "ogbn-arxiv":
@@ -41,14 +115,31 @@ def load_dataset(dataset_name):
         graph.train_mask, graph.val_mask, graph.test_mask = train_mask, val_mask, test_mask
         graph.y = graph.y.view(-1)
         graph.x = scale_feats(graph.x)
+        
+        num_features = dataset.num_features
+        num_classes = dataset.num_classes
+
+    elif dataset_name == "custom_synthetic":
+        graph = load_processed_graph("data/synthetic/synthetic_graph.pt")
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
+        graph = train_val_test_split(graph, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15)
+
+
+    elif dataset_name == "custom_synthetic_multidim":
+        graph = load_processed_multidim_graph("data/synthetic/synthetic_graph_multidim.pt")
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+    
     else:
         dataset = Planetoid("", dataset_name, transform=T.NormalizeFeatures())
         graph = dataset[0]
         graph.edge_index = remove_self_loops(graph.edge_index)[0]
         graph.edge_index = add_self_loops(graph.edge_index)[0]
 
-    num_features = dataset.num_features
-    num_classes = dataset.num_classes
+        num_features = dataset.num_features
+        num_classes = dataset.num_classes
     return graph, (num_features, num_classes)
 
 
