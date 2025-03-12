@@ -4,16 +4,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.init import xavier_uniform_, zeros_
 from torch_geometric.nn.conv import MessagePassing
+from src.utils import create_activation
 
 class RGCNConv(MessagePassing):
-    def __init__(self, in_channels, out_channels, num_relations, residual=False, norm=None, bias=True):
+    def __init__(self, in_channels, out_channels, num_edge_types, residual=False, norm=None, bias=True):
         """
         A relational graph convolution layer for homogeneous graphs with integer-encoded edge types.
         
         Args:
             in_channels (int): Dimension of input node features.
             out_channels (int): Dimension of output node features.
-            num_relations (int): Number of distinct relation types.
+            num_edge_types (int): Number of distinct relation types.
             residual (bool): Whether to use residual connection.
             norm (callable or None): Normalization layer constructor.
             bias (bool): Whether to include a bias term.
@@ -21,10 +22,10 @@ class RGCNConv(MessagePassing):
         super(RGCNConv, self).__init__(aggr='add')
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.num_relations = num_relations
+        self.num_edge_types = num_edge_types
         
         # Each relation type has its own weight matrix.
-        self.weight = nn.Parameter(torch.Tensor(num_relations, in_channels, out_channels))
+        self.weight = nn.Parameter(torch.Tensor(num_edge_types, in_channels, out_channels))
         # Self-loop (or root) transformation.
         self.self_weight = nn.Parameter(torch.Tensor(in_channels, out_channels))
         
@@ -60,7 +61,7 @@ class RGCNConv(MessagePassing):
         Args:
             x (Tensor): Node features of shape [N, in_channels].
             edge_index (LongTensor): Edge indices with shape [2, E].
-            edge_type (LongTensor): Edge type tensor with shape [E] and integer values in [0, num_relations-1].
+            edge_type (LongTensor): Edge type tensor with shape [E] and integer values in [0, num_edge_types-1].
             
         Returns:
             Tensor: Updated node features of shape [N, out_channels].
@@ -96,7 +97,7 @@ class RGCNConv(MessagePassing):
         return msg.squeeze(1)
 
 class RGCN(nn.Module):
-    def __init__(self, in_channels, hidden_channels, out_channels, num_relations, num_layers, dropout, activation, residual=True, norm=None, encoding=False):
+    def __init__(self, in_channels, hidden_channels, out_channels, num_edge_types, num_layers, dropout, activation, residual=True, norm=None, encoding=False):
         """
         A multi-layer RGCN model for homogeneous graphs with relation types encoded as integers.
         
@@ -104,7 +105,7 @@ class RGCN(nn.Module):
             in_channels (int): Input node feature dimension.
             hidden_channels (int): Hidden layer dimension.
             out_channels (int): Output node feature dimension.
-            num_relations (int): Number of distinct relation types.
+            num_edge_types (int): Number of distinct relation types.
             num_layers (int): Number of RGCN layers.
             dropout (float): Dropout probability.
             activation (callable): Activation function (e.g., torch.relu).
@@ -115,23 +116,22 @@ class RGCN(nn.Module):
         super(RGCN, self).__init__()
         self.num_layers = num_layers
         self.dropout = dropout
-        self.activation = activation
+        self.activation = create_activation(activation)
+        last_activation = create_activation(activation) if encoding else None
         self.encoding = encoding
         self.layers = nn.ModuleList()
         
         if num_layers == 1:
-            last_activation = activation if encoding else None
             last_residual = residual if encoding else False
             last_norm = norm if encoding else None
-            self.layers.append(RGCNConv(in_channels, out_channels, num_relations, residual=last_residual, norm=last_norm))
+            self.layers.append(RGCNConv(in_channels, out_channels, num_edge_types, residual=last_residual, norm=last_norm))
         else:
-            self.layers.append(RGCNConv(in_channels, hidden_channels, num_relations, residual=residual, norm=norm))          
+            self.layers.append(RGCNConv(in_channels, hidden_channels, num_edge_types, residual=residual, norm=norm))          
             for _ in range(num_layers - 2):
-                self.layers.append(RGCNConv(hidden_channels, hidden_channels, num_relations, residual=residual, norm=norm))
-            last_activation = activation if encoding else None
+                self.layers.append(RGCNConv(hidden_channels, hidden_channels, num_edge_types, residual=residual, norm=norm))
             last_residual = residual if encoding else False
             last_norm = norm if encoding else None
-            self.layers.append(RGCNConv(hidden_channels, out_channels, num_relations, residual=last_residual, norm=last_norm))       
+            self.layers.append(RGCNConv(hidden_channels, out_channels, num_edge_types, residual=last_residual, norm=last_norm))       
         self.head = nn.Identity()
     
     def forward(self, x, edge_index, edge_type, return_hidden=False):

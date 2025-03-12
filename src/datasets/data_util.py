@@ -128,9 +128,11 @@ def load_dataset(dataset_name):
 
 
     elif dataset_name == "custom_synthetic_multidim":
-        graph = load_processed_multidim_graph("data/synthetic/synthetic_graph_multidim.pt")
+        graph = load_processed_graph("data/synthetic/synthetic_graph_multidim.pt")
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
+
+        graph = train_val_test_split(graph, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15)
     
     else:
         dataset = Planetoid("", dataset_name, transform=T.NormalizeFeatures())

@@ -15,7 +15,7 @@ from torch_geometric.utils import dropout_edge
 from torch_geometric.utils import add_self_loops, remove_self_loops
 
 
-def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropout, activation, residual, norm, nhead, nhead_out, attn_drop, num_relations = 1, negative_slope=0.2, concat_out=True) -> nn.Module:
+def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropout, activation, residual, norm, nhead, nhead_out, attn_drop, num_edge_types=1, negative_slope=0.2, concat_out=True) -> nn.Module:
     if m_type == "gat":
         mod = GAT(
             in_dim=in_dim,
@@ -62,7 +62,7 @@ def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropo
             in_channels=int(in_dim),
             hidden_channels=int(num_hidden),
             out_channels=int(out_dim),
-            num_relations=int(num_relations),# TODO),
+            num_edge_types=int(num_edge_types),# TODO),
             num_layers=num_layers,
             dropout=dropout,
             activation=activation,
@@ -108,7 +108,7 @@ class PreModel(nn.Module):
             replace_rate: float = 0.1,
             alpha_l: float = 2,
             concat_hidden: bool = False,
-            num_relations: int = 1,
+            num_edge_types: int = 1,
          ):
         super(PreModel, self).__init__()
         self._mask_rate = mask_rate
@@ -150,7 +150,7 @@ class PreModel(nn.Module):
             negative_slope=negative_slope,
             residual=residual,
             norm=norm,
-            num_relations=num_relations,
+            num_edge_types=num_edge_types,
         )
 
         # build decoder for attribute prediction
@@ -170,7 +170,7 @@ class PreModel(nn.Module):
             residual=residual,
             norm=norm,
             concat_out=True,
-            num_relations=num_relations,
+            num_edge_types=num_edge_types,
         )
 
         self.enc_mask_token = nn.Parameter(torch.zeros(1, in_dim))
@@ -224,13 +224,13 @@ class PreModel(nn.Module):
 
         return out_x, (mask_nodes, keep_nodes)
 
-    def forward(self, x, edge_index):
+    def forward(self, x, edge_index, num_edge_types=None):
         # ---- attribute reconstruction ----
-        loss = self.mask_attr_prediction(x, edge_index)
+        loss = self.mask_attr_prediction(x, edge_index, num_edge_types)
         loss_item = {"loss": loss.item()}
         return loss, loss_item
     
-    def mask_attr_prediction(self, x, edge_index):
+    def mask_attr_prediction(self, x, edge_index, num_edge_types=None):
         use_x, (mask_nodes, keep_nodes) = self.encoding_mask_noise(x, self._mask_rate)
 
         if self._drop_edge_rate > 0:
@@ -239,7 +239,10 @@ class PreModel(nn.Module):
         else:
             use_edge_index = edge_index
 
-        enc_rep, all_hidden = self.encoder(use_x, use_edge_index, return_hidden=True)
+        if self._encoder_type == "rgcn":
+            enc_rep, all_hidden = self.encoder(use_x, use_edge_index, num_edge_types, return_hidden=True)
+        else:
+            enc_rep, all_hidden = self.encoder(use_x, use_edge_index, return_hidden=True)
         if self._concat_hidden:
             enc_rep = torch.cat(all_hidden, dim=1)
 
@@ -250,8 +253,10 @@ class PreModel(nn.Module):
             # * remask, re-mask
             rep[mask_nodes] = 0
 
-        if self._decoder_type in ("mlp", "linear") :
+        if self._decoder_type in ("mlp", "linear"):
             recon = self.decoder(rep)
+        elif self._decoder_type == "rgcn":
+            recon = self.decoder(rep, use_edge_index, num_edge_types)
         else:
             recon = self.decoder(rep, use_edge_index)
 

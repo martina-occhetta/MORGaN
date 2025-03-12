@@ -71,6 +71,7 @@ def build_args():
     parser.add_argument("--mask_rate", type=float, default=0.5)
     parser.add_argument("--drop_edge_rate", type=float, default=0.0)
     parser.add_argument("--replace_rate", type=float, default=0.0)
+    parser.add_argument("--num_edge_types", type=int, default=None)
 
     parser.add_argument("--encoder", type=str, default="gat")
     parser.add_argument("--decoder", type=str, default="gat")
@@ -173,7 +174,7 @@ def load_best_configs(args, path):
 # ------ logging ------
 
 class WBLogger(object):
-    def __init__(self, log_path="./logging_data", name="run", project='graphMAE'):
+    def __init__(self, log_path="./wandb", name="run", project='graphMAE'):
         """
         Initializes a Weights & Biases run. The log_path is ignored in wandb,
         but kept for compatibility.

@@ -312,3 +312,29 @@ custom_synthetic:
   alpha_l: 3
   scheduler: True
   logging: True
+custom_synthetic_multidim:
+  lr: 0.001
+  lr_f: 0.01
+  num_hidden: 32
+  num_heads: 4
+  num_layers: 2
+  weight_decay: 2e-4
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 50
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5 

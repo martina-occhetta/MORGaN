@@ -19,7 +19,7 @@ from src.models import build_model
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 
-def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_classes, lr_f, weight_decay_f, max_epoch_f, linear_prob, logger=None):
+def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_classes, lr_f, weight_decay_f, max_epoch_f, linear_prob, num_edge_types = 1, logger=None):
     logging.info("start training..")
     graph = graph.to(device)
     x = feat.to(device)
@@ -28,7 +28,10 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
 
     for epoch in epoch_iter:
         model.train()
-        loss, loss_dict = model(x, graph.edge_index)
+        if num_edge_types != 1:
+            loss, loss_dict = model(x, graph.edge_index, graph.edge_type)
+        else:
+            loss, loss_dict = model(x, graph.edge_index)
 
         optimizer.zero_grad()
         loss.backward()
@@ -59,6 +62,7 @@ def main(args):
     encoder_type = args.encoder
     decoder_type = args.decoder
     replace_rate = args.replace_rate
+    num_edge_types = args.num_edge_types if args.num_edge_types is not None else 1
 
     optim_type = args.optimizer 
     loss_fn = args.loss_fn
@@ -103,14 +107,14 @@ def main(args):
             
         x = graph.x
         if not load_model:
-            model = pretrain(model, graph, x, optimizer, max_epoch, device, scheduler, num_classes, lr_f, weight_decay_f, max_epoch_f, linear_prob, logger)
+            model = pretrain(model, graph, x, optimizer, max_epoch, device, scheduler, num_classes, lr_f, weight_decay_f, max_epoch_f, linear_prob, num_edge_types, logger)
             model = model.cpu()
 
         if load_model:
             logging.info("Loading Model ... ")
             model.load_state_dict(torch.load("checkpoint.pt"))
         if save_model:
-            logging.info("Saveing Model ...")
+            logging.info("Saving Model ...")
             torch.save(model.state_dict(), "checkpoint.pt")
         
         model = model.to(device)
@@ -129,7 +133,6 @@ def main(args):
     print(f"# early-stopping_acc: {estp_acc:.4f}±{estp_acc_std:.4f}")
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == "__main__":
     args = build_args()
     if args.use_cfg:

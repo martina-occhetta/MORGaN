@@ -16,10 +16,10 @@ def build_model(args):
     mask_rate = args.mask_rate
     drop_edge_rate = args.drop_edge_rate
     replace_rate = args.replace_rate
-    if args.num_relations is None:
-       num_relations = args.num_relations
+    if args.num_edge_types is not None:
+       num_edge_types = args.num_edge_types
     else:
-        num_relations = 1
+        num_edge_types = 1
 
     activation = args.activation
     loss_fn = args.loss_fn
@@ -48,6 +48,6 @@ def build_model(args):
         replace_rate=replace_rate,
         alpha_l=alpha_l,
         concat_hidden=concat_hidden,
-        num_relations = num_relations,
+        num_edge_types=num_edge_types,
     )
     return model
