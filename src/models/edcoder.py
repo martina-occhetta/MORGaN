@@ -266,8 +266,11 @@ class PreModel(nn.Module):
         loss = self.criterion(x_rec, x_init)
         return loss
 
-    def embed(self, x, edge_index):
-        rep = self.encoder(x, edge_index)
+    def embed(self, x, edge_index, num_edge_types=None):
+        if self._encoder_type == "rgcn":
+            rep = self.encoder(x, edge_index, num_edge_types)
+        else:
+            rep = self.encoder(x, edge_index)
         return rep
 
     @property

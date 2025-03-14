@@ -10,8 +10,12 @@ def node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_de
     model.eval()
     if linear_prob:
         with torch.no_grad():
-            x = model.embed(x.to(device), graph.edge_index.to(device))
-            in_feat = x.shape[1]
+            if graph.num_edge_types != 1:
+                x = model.embed(x.to(device), graph.edge_index.to(device), graph.edge_type.to(device))
+                in_feat = x.shape[1]
+            else:
+                x = model.embed(x.to(device), graph.edge_index.to(device))
+                in_feat = x.shape[1]
         encoder = LogisticRegression(in_feat, num_classes)
     else:
         encoder = model.encoder
@@ -49,10 +53,11 @@ def linear_probing_for_transductive_node_classiifcation(model, graph, feat, opti
 
     for epoch in epoch_iter:
         model.train()
-        if graph.num_edge_types != 1:
-            out = model(x, graph.edge_index, graph.edge_type)
-        else:
-            out = model(graph, x)
+        # if graph.num_edge_types != 1:
+        #     out = model(x, graph.edge_index, graph.edge_type)
+        # else:
+        #     out = model(graph, x)
+        out = model(graph, x)
         loss = criterion(out[train_mask], labels[train_mask])
         optimizer.zero_grad()
         loss.backward()
@@ -61,10 +66,11 @@ def linear_probing_for_transductive_node_classiifcation(model, graph, feat, opti
 
         with torch.no_grad():
             model.eval()
-            if graph.num_edge_types != 1:
-                pred = model(x, graph.edge_index, graph.edge_type)
-            else:
-                pred = model(graph, x)
+            # if graph.num_edge_types != 1:
+            #     pred = model(x, graph.edge_index, graph.edge_type)
+            # else:
+            #     pred = model(graph, x)
+            pred = model(graph, x)
             val_acc = accuracy(pred[val_mask], labels[val_mask])
             val_loss = criterion(pred[val_mask], labels[val_mask])
             test_acc = accuracy(pred[test_mask], labels[test_mask])
@@ -80,10 +86,10 @@ def linear_probing_for_transductive_node_classiifcation(model, graph, feat, opti
 
     best_model.eval()
     with torch.no_grad():
-        if graph.num_edge_types != 1:
-            pred = best_model(x, graph.edge_index, graph.edge_type)
-        else:
-            pred = best_model(graph, x)
+        # if graph.num_edge_types != 1:
+        #     pred = best_model(graph, x)
+        # else:
+        pred = best_model(graph, x)
         estp_test_acc = accuracy(pred[test_mask], labels[test_mask])
     if mute:
         print(f"# IGNORE: --- TestAcc: {test_acc:.4f}, early-stopping-TestAcc: {estp_test_acc:.4f}, Best ValAcc: {best_val_acc:.4f} in epoch {best_val_epoch} --- ")
@@ -100,5 +106,6 @@ class LogisticRegression(nn.Module):
         self.linear = nn.Linear(num_dim, num_class)
 
     def forward(self, g, x, *args):
+        x = x.float()  # Ensure the input is of type float
         logits = self.linear(x)
         return logits

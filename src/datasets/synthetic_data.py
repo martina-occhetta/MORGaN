@@ -179,40 +179,71 @@ def generate_synthetic_graph(num_nodes=500,
             # multidim_edges == True: generate multi-dimensional edges.
             # if hetero is == False, generate a Data object with multidimensional edges
             
-                # Define additional edge dimensions:
+            # --------------------------------------------------------
+            # DIMENSION 0: PPI edges (the base graph)
+            # --------------------------------------------------------
             base_edges = list(G.edges())
             edge_index_list = []
             edge_type_list = []
-            # Add PPI edges (edge type 0); add both directions for undirected connectivity.
+            
+            # Add base PPI edges as undirected (both directions)
             for u, v in base_edges:
                 edge_index_list.append([u, v])
                 edge_index_list.append([v, u])
+                edge_type_list.append(0)  # PPI edge type
                 edge_type_list.append(0)
-                edge_type_list.append(0)
-                
-            # 1: Sequence similarity, 2: Semantic similarity, 3: Co-expression, 4: Pathway co-occurrence.
-            additional_edge_types = [1, 2, 3, 4]
-            additional_edge_prob = 0.05  # probability for generating extra edges in each additional dimension
-            for etype in additional_edge_types:
-                # For each pair of nodes (i, j) with i < j, sample an edge.
+            
+            # --------------------------------------------------------
+            # Additional Dimensions & Their Probabilities
+            # --------------------------------------------------------
+            # Want the approximate order:
+            #   Domain similarity < Sequence similarity < Co-expression 
+            #   < Pathway co-occurrence < Semantic similarity
+            #
+            # Probabilities can be adjusted to get the 
+            # sparsity/density you want for ~500 nodes.
+            # --------------------------------------------------------
+            
+            # Dimension IDs
+            # DIM_DOMAIN = 1
+            DIM_SEQUENCE = 1
+            DIM_COEXPR = 2
+            DIM_PATHWAY = 3
+            DIM_SEMANTIC = 4
+            
+            # Probabilities for adding an undirected edge in each dimension
+            edge_probs = {
+                # DIM_DOMAIN:   0.002,  # Domain similarity   (very sparse)
+                DIM_SEQUENCE: 0.003,  # Sequence similarity (very sparse)
+                DIM_COEXPR:   0.01,   # Co-expression       (moderate)
+                DIM_PATHWAY:  0.02,   # Pathway co-occurrence
+                DIM_SEMANTIC: 0.04,   # Semantic similarity (largest)
+            }
+            
+            # For each dimension above, randomly sample edges
+            for etype, prob in edge_probs.items():
                 for i in range(num_nodes):
                     for j in range(i + 1, num_nodes):
-                        if np.random.rand() < additional_edge_prob:
+                        if np.random.rand() < prob:
                             edge_index_list.append([i, j])
                             edge_index_list.append([j, i])
                             edge_type_list.append(etype)
                             edge_type_list.append(etype)
             
+            # Create edge_index and edge_type tensors
             edge_index = torch.tensor(edge_index_list, dtype=torch.long).t().contiguous()
             edge_type = torch.tensor(edge_type_list, dtype=torch.long)
-            # Create Data object manually.
-            data = Data(x=torch.tensor(raw_features, dtype=torch.float),
-                        y=torch.tensor(labels, dtype=torch.long),
-                        edge_index=edge_index,
-                        edge_type=edge_type)
-            # Save node names separately (Data objects do not support string tensors).
+            
+            # Create the PyG Data object
+            data = Data(
+                x=torch.tensor(raw_features, dtype=torch.float),
+                y=torch.tensor(labels, dtype=torch.long),
+                edge_index=edge_index,
+                edge_type=edge_type
+            )
+            
+            # Optionally store node names (strings) in a list attribute
             data.name = [f"GENE{i+1}" for i in range(num_nodes)]
-
     
     if multidim_edges and hetero:
         torch.save(data, 'data/synthetic/synthetic_graph_multidim_hetero.pt')
@@ -235,7 +266,7 @@ def generate_synthetic_graph(num_nodes=500,
 
 if __name__ == "__main__":
     # Generate the synthetic multiomic graph dataset and print its summary.
-    data = generate_synthetic_graph(multidim_edges=False, hetero=False)
+    data = generate_synthetic_graph(multidim_edges=True, hetero=False)
     print("Synthetic Multiomic Graph Data Summary:")
     print(data)
     

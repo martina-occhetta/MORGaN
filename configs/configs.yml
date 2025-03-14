@@ -320,7 +320,7 @@ custom_synthetic_multidim:
   num_layers: 2
   weight_decay: 2e-4
   weight_decay_f: 1e-4
-  max_epoch: 100
+  max_epoch: 5
   max_epoch_f: 50
   mask_rate: 0.5
   num_layers: 2

@@ -15,9 +15,9 @@ python main_transductive.py \
 	--in_drop 0.2 \
 	--attn_drop 0.1 \
 	--num_layers 2 \
-	--num_hidden 64 \
+	--num_hidden 32 \
 	--num_heads 4 \
-	--max_epoch 100 \
+	--max_epoch 5 \
 	--max_epoch_f 300 \
 	--lr 0.001 \
 	--weight_decay 0 \
