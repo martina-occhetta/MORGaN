@@ -67,11 +67,13 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
 
     for epoch in epoch_iter:
         model.train().to(device)
-        # if graph.num_edge_types != 1:
-        #     out = model(x, graph.edge_index, graph.edge_type)
-        # else:
-        #     out = model(graph, x)
-        out = model(graph, x)
+        if graph.num_edge_types != 1:
+            out = model(graph, x, graph.num_edge_types)
+            out = out.squeeze(1) # TODO fix inside model
+            labels = labels.float()
+        else:
+            #     out = model(graph, x)
+            out = model(graph, x)
         loss = criterion(out[train_mask], labels[train_mask])
         optimizer.zero_grad()
         loss.backward()
@@ -80,11 +82,11 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
 
         with torch.no_grad():
             model.eval()
-            # if graph.num_edge_types != 1:
-            #     pred = model(x, graph.edge_index, graph.edge_type)
-            # else:
-            #     pred = model(graph, x)
-            pred = model(graph, x)
+            if graph.num_edge_types != 1:
+                pred = model(graph, x, graph.num_edge_types)
+                pred = pred.squeeze(1) # TODO fix inside model
+            else:
+                pred = model(graph, x)
             val_acc = accuracy(pred[val_mask], labels[val_mask])
             val_loss = criterion(pred[val_mask], labels[val_mask])
             val_auc, val_aupr, precision, recall = result(pred[val_mask].cpu(), labels[val_mask].cpu())
@@ -108,10 +110,11 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
 
     best_model.eval()
     with torch.no_grad():
-        # if graph.num_edge_types != 1:
-        #     pred = best_model(graph, x)
-        # else:
-        pred = best_model(graph, x)
+        if graph.num_edge_types != 1:
+            pred = best_model(graph, x, graph.num_edge_types)
+            pred = pred.squeeze(1) # TODO fix inside model
+        else:
+            pred = best_model(graph, x)
         estp_test_acc = accuracy(pred[test_mask], labels[test_mask])
         estp_test_auc, estp_test_aupr, precision_f, recall_f = result(pred[test_mask].cpu(), labels[test_mask].cpu())
     if mute:

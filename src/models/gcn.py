@@ -85,7 +85,7 @@ class GCN(nn.Module):
         else:
             return self.head(h)
 
-    def reset_classifier(self, num_classes, concat=False, datas_dim=16):
+    def reset_classifier(self, num_classes, concat=False, datas_dim=0):
         dtype = next(self.parameters()).dtype  # Get the current dtype.
         if concat:
             self.head = nn.Sequential(

@@ -13,6 +13,10 @@ import wandb
 
 from torch_geometric.utils import add_self_loops
 
+from math import floor, sqrt
+import random
+import torch
+
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 
@@ -72,6 +76,8 @@ def build_args():
     parser.add_argument("--drop_edge_rate", type=float, default=0.0)
     parser.add_argument("--replace_rate", type=float, default=0.0)
     parser.add_argument("--num_edge_types", type=int, default=None)
+    parser.add_argument("--weight_decomposition", type=str, default=None)
+    parser.add_argument("--vertical_stacking", type=bool, default=True)
 
     parser.add_argument("--encoder", type=str, default="gat")
     parser.add_argument("--decoder", type=str, default="gat")
@@ -284,3 +290,93 @@ class NormLayer(nn.Module):
         std = ((std.T / batch_list).T + 1e-6).sqrt()
         std = std.repeat_interleave(batch_list, dim=0)
         return self.weight * sub / std + self.bias
+
+#----------------------------------------
+# RGCN Utils
+
+
+def block_diag(m):
+    """
+    Source: https://gist.github.com/yulkang/2e4fc3061b45403f455d7f4c316ab168
+    Make a block diagonal matrix along dim=-3
+    EXAMPLE:
+    block_diag(torch.ones(4,3,2))
+    should give a 12 x 8 matrix with blocks of 3 x 2 ones.
+    Prepend batch dimensions if needed.
+    You can also give a list of matrices.
+    """
+
+    device = 'cuda' if m.is_cuda else 'cpu'  # Note: Using cuda status of m as proxy to decide device
+
+    if type(m) is list:
+        m = torch.cat([m1.unsqueeze(-3) for m1 in m], -3)
+
+    dim = m.dim()
+    n = m.shape[-3]
+
+    siz0 = m.shape[:-3]
+    siz1 = m.shape[-2:]
+
+    m2 = m.unsqueeze(-2)
+
+    eye = attach_dim(torch.eye(n, device=device).unsqueeze(-2), dim - 3, 1)
+
+    return (m2 * eye).reshape(
+        siz0 + torch.Size(torch.tensor(siz1) * n)
+    )
+
+def attach_dim(v, n_dim_to_prepend=0, n_dim_to_append=0):
+    return v.reshape(torch.Size([1] * n_dim_to_prepend) + v.shape + torch.Size([1] * n_dim_to_append))
+
+def stack_matrices(triples, num_nodes, num_rels, vertical_stacking=True, device='cpu'):
+    """
+    Computes a sparse adjacency matrix for the given graph (the adjacency matrices of all
+    relations are stacked vertically).
+    """
+    assert triples.dtype == torch.long
+
+    r, n = num_rels, num_nodes
+    size = (r * n, n) if vertical_stacking else (n, r * n)
+
+    fr, to = triples[:, 0], triples[:, 2]
+    offset = triples[:, 1] * n
+    if vertical_stacking:
+        fr = offset + fr
+    else:
+        to = offset + to
+
+    indices = torch.cat([fr[:, None], to[:, None]], dim=1).to(device)
+
+    assert indices.size(0) == triples.size(0)
+    assert indices[:, 0].max() < size[0], f'{indices[0, :].max()}, {size}, {r}'
+    assert indices[:, 1].max() < size[1], f'{indices[1, :].max()}, {size}, {r}'
+
+    return indices, size
+
+def sum_sparse(indices, values, size, row_normalisation=True, device='cpu'):
+    """
+    Sum the rows or columns of a sparse matrix, and redistribute the
+    results back to the non-sparse row/column entries
+    Arguments are interpreted as defining sparse matrix.
+
+    Source: https://github.com/pbloem/gated-rgcn/blob/1bde7f28af8028f468349b2d760c17d5c908b58b/kgmodels/util/util.py#L304
+    """
+
+    assert len(indices.size()) == len(values.size()) + 1
+
+    k, r = indices.size()
+
+    if not row_normalisation:
+        # Transpose the matrix for column-wise normalisation
+        indices = torch.cat([indices[:, 1:2], indices[:, 0:1]], dim=1)
+        size = size[1], size[0]
+
+    ones = torch.ones((size[1], 1), device=device)
+    if device == 'cuda':
+        values = torch.cuda.sparse.FloatTensor(indices.t(), values, torch.Size(size))
+    else:
+        values = torch.sparse.FloatTensor(indices.t(), values, torch.Size(size))
+    sums = torch.spmm(values, ones)
+    sums = sums[indices[:, 0], 0]
+
+    return sums.view(k)

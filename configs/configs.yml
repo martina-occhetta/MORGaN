@@ -49,6 +49,8 @@ custom_synthetic_multidim:
   scheduler: True
   logging: True
   num_edge_types: 5 
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
 CPDB:
   lr: 0.001
   lr_f: 0.01

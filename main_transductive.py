@@ -33,7 +33,7 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
     for epoch in epoch_iter:
         model.train()
         if num_edge_types != 1:
-            loss, loss_dict = model(x, graph.edge_index, graph.edge_type)
+            loss, loss_dict = model(graph, x, num_edge_types)
         else:
             loss, loss_dict = model(graph, x)
 

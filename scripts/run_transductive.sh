@@ -34,3 +34,5 @@ python main_transductive.py \
 	--scheduler \
 	--use_cfg \
 	--num_edge_types 5 \
+	--weight_decomposition "{'type': 'basis', 'num_bases': 2}" \
+  	--vertical_stacking "True" \

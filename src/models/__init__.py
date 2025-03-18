@@ -1,5 +1,5 @@
 from .edcoder import PreModel
-
+import json
 
 def build_model(args):
     num_heads = args.num_heads
@@ -16,6 +16,8 @@ def build_model(args):
     mask_rate = args.mask_rate
     drop_edge_rate = args.drop_edge_rate
     replace_rate = args.replace_rate
+    weight_decomposition = args.weight_decomposition
+    vertical_stacking = args.vertical_stacking
     if args.num_edge_types is not None:
        num_edge_types = args.num_edge_types
     else:
@@ -49,5 +51,7 @@ def build_model(args):
         alpha_l=alpha_l,
         concat_hidden=concat_hidden,
         num_edge_types=num_edge_types,
+        weight_decomposition=weight_decomposition,
+        vertical_stacking=vertical_stacking,
     )
     return model

@@ -15,7 +15,7 @@ from torch_geometric.utils import dropout_edge
 from torch_geometric.utils import add_self_loops, remove_self_loops
 
 
-def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropout, activation, residual, norm, nhead, nhead_out, attn_drop, num_edge_types=1, negative_slope=0.2, concat_out=True) -> nn.Module:
+def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropout, activation, residual, norm, nhead, nhead_out, attn_drop, weight_decomposition = None, vertical_stacking = True, num_edge_types=1, negative_slope=0.2, concat_out=True) -> nn.Module:
     if m_type == "gat":
         mod = GAT(
             in_dim=in_dim,
@@ -62,12 +62,14 @@ def setup_module(m_type, enc_dec, in_dim, num_hidden, out_dim, num_layers, dropo
             in_channels=int(in_dim),
             hidden_channels=int(num_hidden),
             out_channels=int(out_dim),
-            num_edge_types=int(num_edge_types),# TODO),
+            num_edge_types=int(num_edge_types),
             num_layers=num_layers,
             dropout=dropout,
             activation=activation,
             residual=residual,
             norm=create_norm(norm),
+            decomposition = weight_decomposition, #{'type': 'basis', 'num_bases': 2},
+            vertical_stacking = vertical_stacking,
             encoding=(enc_dec == "encoding"),
         )
     elif m_type == "mlp":
@@ -109,6 +111,8 @@ class PreModel(nn.Module):
             alpha_l: float = 2,
             concat_hidden: bool = False,
             num_edge_types: int = 1,
+            weight_decomposition = None,
+            vertical_stacking = True,
          ):
         super(PreModel, self).__init__()
         self._mask_rate = mask_rate
@@ -151,6 +155,8 @@ class PreModel(nn.Module):
             residual=residual,
             norm=norm,
             num_edge_types=num_edge_types,
+            weight_decomposition = weight_decomposition,
+            vertical_stacking = vertical_stacking,
         )
 
         # build decoder for attribute prediction
@@ -171,6 +177,8 @@ class PreModel(nn.Module):
             norm=norm,
             concat_out=True,
             num_edge_types=num_edge_types,
+            weight_decomposition = weight_decomposition,
+            vertical_stacking = vertical_stacking,
         )
 
         self.enc_mask_token = nn.Parameter(torch.zeros(1, in_dim))
@@ -228,7 +236,7 @@ class PreModel(nn.Module):
 
     def forward(self, graph, x, num_edge_types=None):
         # ---- attribute reconstruction ----
-        loss = self.mask_attr_prediction(graph,x, num_edge_types)
+        loss = self.mask_attr_prediction(graph, x, num_edge_types)
         loss_item = {"loss": loss.item()}
         return loss, loss_item
     
