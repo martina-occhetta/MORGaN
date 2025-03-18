@@ -24,6 +24,10 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
     graph = graph.to(device)
     x = feat.to(device)
 
+    # model_dtype = next(model.parameters()).dtype
+    # x = x.to(model_dtype)
+    # loss, loss_dict = model(x, graph.edge_index)
+
     epoch_iter = tqdm(range(max_epoch))
 
     for epoch in epoch_iter:
@@ -31,7 +35,7 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
         if num_edge_types != 1:
             loss, loss_dict = model(x, graph.edge_index, graph.edge_type)
         else:
-            loss, loss_dict = model(x, graph.edge_index)
+            loss, loss_dict = model(graph, x)
 
         optimizer.zero_grad()
         loss.backward()
@@ -78,6 +82,7 @@ def main(args):
     use_scheduler = args.scheduler
 
     graph, (num_features, num_classes) = load_dataset(dataset_name)
+    # print(graph)
     args.num_features = num_features
 
     acc_list = []
@@ -104,8 +109,11 @@ def main(args):
             scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=scheduler)
         else:
             scheduler = None
-            
+        
         x = graph.x
+        model_dtype = next(model.parameters()).dtype
+        x = x.to(model_dtype)
+
         if not load_model:
             model = pretrain(model, graph, x, optimizer, max_epoch, device, scheduler, num_classes, lr_f, weight_decay_f, max_epoch_f, linear_prob, num_edge_types, logger)
             model = model.cpu()
@@ -120,7 +128,7 @@ def main(args):
         model = model.to(device)
         model.eval()
 
-        final_acc, estp_acc = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob)
+        final_acc, estp_acc = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False)
         acc_list.append(final_acc)
         estp_acc_list.append(estp_acc)
 

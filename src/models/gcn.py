@@ -72,12 +72,13 @@ class GCN(nn.Module):
         self.norms = None  # Not used here since each GraphConv handles normalization.
         self.head = nn.Identity()
 
-    def forward(self, x, edge_index, return_hidden=False):
+    def forward(self, graph, x, return_hidden=False):
+        edge_index = graph.edge_index
         h = x
         hidden_list = []
         for l in range(self.num_layers):
             h = F.dropout(h, p=self.dropout, training=self.training)
-            h = self.gcn_layers[l](h, edge_index)
+            h = self.gcn_layers[l](graph, h, edge_index)
             hidden_list.append(h)
         if return_hidden:
             return self.head(h), hidden_list
@@ -121,34 +122,41 @@ class GraphConv(MessagePassing):
         self.fc = nn.Linear(in_channels, out_channels)
 
         # Residual connection: if in_channels != out_channels, use a linear mapping.
-        self.residual = residual
+        # self.residual = residual
         if residual:
             if in_channels != out_channels:
                 self.res_fc = nn.Linear(in_channels, out_channels, bias=False)
                 print("! Linear Residual !")
             else:
                 self.res_fc = nn.Identity()
+                print("! Identity Residual !")
         else:
-            self.res_fc = None
-
+            self.register_buffer('res_fc', None)
         # Optionally include a normalization layer (e.g. nn.BatchNorm1d or nn.LayerNorm)
         self.norm_layer = norm(out_channels) if norm is not None else None
 
-        self.activation = activation
+        self._activation = activation
         self.reset_parameters()
 
     def reset_parameters(self):
         self.fc.reset_parameters()
-        if self.res_fc is not None and not isinstance(self.res_fc, nn.Identity):
-            self.res_fc.reset_parameters()
-        if self.norm_layer is not None and hasattr(self.norm_layer, 'reset_parameters'):
-            self.norm_layer.reset_parameters()
+        # if self.res_fc is not None and not isinstance(self.res_fc, nn.Identity):
+        #     self.res_fc.reset_parameters()
+        # if self.norm_layer is not None and hasattr(self.norm_layer, 'reset_parameters'):
+        #     self.norm_layer.reset_parameters()
 
-    def forward(self, x, edge_index):
+    def forward(self, graph, x, edge_index):
         """
         x: Node feature tensor of shape [N, in_channels]
         edge_index: Graph connectivity in COO format with shape [2, E]
         """
+        
+        #x = graph.x
+
+        # Ensure the input features have the same dtype as the model parameters
+        x = x.to(next(self.parameters()).dtype)
+
+        #edge_index = graph.edge_index
         # Compute degrees for pre- and post-normalization.
         row, col = edge_index
         # Out-degree normalization for source nodes.
@@ -162,7 +170,7 @@ class GraphConv(MessagePassing):
         x_norm = x * norm_out.view(-1, 1)
 
         # Message passing: here our message() just passes the (pre-normalized) neighbor features.
-        out = self.propagate(edge_index, x=x_norm)
+        out = self.propagate(edge_index, x=x_norm, num_nodes=x.size(0))
 
         # After aggregation, apply the linear transformation.
         out = self.fc(out)
@@ -176,8 +184,8 @@ class GraphConv(MessagePassing):
         # Apply normalization layer (if any) and activation.
         if self.norm_layer is not None:
             out = self.norm_layer(out)
-        if self.activation is not None:
-            out = self.activation(out)
+        if self._activation is not None:
+            out = self._activation(out)
         return out
 
     def message(self, x_j):

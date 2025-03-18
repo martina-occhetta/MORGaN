@@ -1,10 +1,12 @@
 from collections import namedtuple, Counter
 import numpy as np
+import pandas as pd 
 
 import torch
 import torch.nn.functional as F
 
 import torch_geometric.transforms as T
+from torch_geometric.data import Data
 from torch_geometric.datasets import Planetoid, TUDataset
 from torch_geometric.utils import add_self_loops, remove_self_loops, to_undirected, degree
 from torch_geometric.data import Data, HeteroData
@@ -14,6 +16,7 @@ from ogb.nodeproppred import PygNodePropPredDataset
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
+import h5py
 
 def scale_feats(x):
     scaler = StandardScaler()
@@ -39,6 +42,77 @@ def load_processed_multidim_graph(filepath: str) -> Data:
     if not isinstance(data, HeteroData):
         raise ValueError("Loaded object is not a torch_geometric.data.HeteroDatas object.")
     return data
+
+def load_h5_graph(PATH, LABEL_PATH, ppi):
+    f = h5py.File(f'{PATH}/{ppi}_multiomics.h5', 'r')
+    # Build edge indices from the network matrix
+    network = f['network'][:]
+    src, dst = np.nonzero(network)
+    edge_index = torch.tensor(np.vstack((src, dst)), dtype=torch.long)
+
+    # Load node features and assign a node "name" attribute if desired
+    features = f['features'][:]
+    x = torch.from_numpy(features)
+    num_nodes = x.size(0)
+    node_name = f['gene_names'][...,-1].astype(str)
+
+    # Retrieve gene names and create a mapping: gene name -> node index
+    gene_name = f['gene_names'][...,-1].astype(str)
+    gene_map = {g: i for i, g in enumerate(gene_name)}  # gene name -> node index
+
+    # Originally, the code combined several label arrays but then reads a health.tsv.
+    # Here we read the health.tsv file and extract the symbols.
+    # Ensure that PATH is defined in your environment.
+    label_df = pd.read_csv(LABEL_PATH, sep='\t').astype(str) # TODO fix this for druggable gene prediction
+    label_symbols = label_df['symbol'].tolist()
+
+    # Determine positive nodes: indices that appear in both the health.tsv and gene_name list
+    mask = [gene_map[g] for g in sorted(list(set(label_symbols) & set(gene_name)))]
+
+    # Randomly select negative samples from those nodes not in the positive mask.
+    np.random.seed(42)
+    all_indices = set(range(len(gene_name)))
+    negative_candidates = sorted(list(all_indices - set(mask)))
+    neg_sample_size = min(len(mask), len(gene_name) - len(mask))
+    neg_mask = np.random.choice(negative_candidates, size=neg_sample_size, replace=False).tolist()
+
+    print("Negative mask indices:", neg_mask)
+
+    # Create a label vector (1 for positive, 0 for negative)
+    y = torch.zeros(len(gene_name), dtype=torch.float)
+    y[mask] = 1
+    y = y.unsqueeze(1)  # shape: [num_nodes, 1]
+
+    # Combine positive and negative indices for the split
+    final_mask = mask + neg_mask
+    final_labels = y[final_mask].squeeze(1).numpy()  # converting to numpy for stratification
+
+    # Split indices into train, test, and validation sets using stratification
+    train_idx, test_idx, _, _ = train_test_split(final_mask, final_labels, test_size=0.2,
+                                                    shuffle=True, stratify=final_labels, random_state=42)
+    train_idx, val_idx, _, _ = train_test_split(train_idx, y[train_idx].numpy().squeeze(1),
+                                                test_size=0.2, shuffle=True,
+                                                stratify=y[train_idx].numpy().squeeze(1), random_state=42)
+
+    # Create boolean masks for all nodes
+    train_mask = torch.zeros(len(gene_name), dtype=torch.bool)
+    test_mask = torch.zeros(len(gene_name), dtype=torch.bool)
+    val_mask = torch.zeros(len(gene_name), dtype=torch.bool)
+    train_mask[train_idx] = True
+    test_mask[test_idx] = True
+    val_mask[val_idx] = True
+
+    # Add self-loops to the edge_index
+    edge_index, _ = add_self_loops(edge_index, num_nodes=num_nodes)
+
+    # Build the PyTorch Geometric data object
+    data = Data(x=x, edge_index=edge_index, y=y)
+    data.train_mask = train_mask.unsqueeze(1)  # unsqueeze if you want to mimic the original shape
+    data.test_mask = test_mask.unsqueeze(1)
+    data.val_mask = val_mask.unsqueeze(1)
+    data.name = node_name  # optional: storing node names
+
+    return data#, gene_map
 
 def train_val_test_split(data, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
     """
@@ -134,6 +208,11 @@ def load_dataset(dataset_name):
 
         graph = train_val_test_split(graph, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15)
     
+    elif dataset_name in ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'PCNet', 'STRINGdb']:
+        graph = load_h5_graph(PATH='data/real/smg_data', LABEL_PATH='data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv', ppi=dataset_name)
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
     else:
         dataset = Planetoid("", dataset_name, transform=T.NormalizeFeatures())
         graph = dataset[0]
@@ -142,6 +221,10 @@ def load_dataset(dataset_name):
 
         num_features = dataset.num_features
         num_classes = dataset.num_classes
+
+    print('Loaded dataset: ', dataset_name)
+    print('Number of features: ', num_features)
+    print('Number of classes: ', num_classes)
     return graph, (num_features, num_classes)
 
 

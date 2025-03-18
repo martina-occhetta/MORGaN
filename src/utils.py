@@ -11,16 +11,16 @@ import torch.nn as nn
 from torch import optim as optim
 import wandb
 
-
+from torch_geometric.utils import add_self_loops
 
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 
 def accuracy(y_pred, y_true):
     y_true = y_true.squeeze().long()
-    preds = y_pred.max(1)[1].type_as(y_true)
-    correct = preds.eq(y_true).double()
-    correct = correct.sum().item()
+    # For binary classification, apply a sigmoid and threshold at 0.5
+    preds = (torch.sigmoid(y_pred) > 0.5).long()
+    correct = preds.eq(y_true).double().sum().item()
     return correct / len(y_true)
 
 
@@ -170,6 +170,47 @@ def load_best_configs(args, path):
     print("------ Use best configs ------")
     return args
 
+def drop_edge(data, drop_rate, return_edges = False):
+
+    """
+    Drops edges from the input graph with probability drop_rate and adds self-loops.
+
+    Parameters:
+      data (Data): PyG Data object containing the graph (must include 'edge_index').
+      drop_rate (float): The probability of dropping an edge.
+      return_edges (bool): If True, also return the dropped edges as a tensor.
+
+    Returns:
+      Data: A new Data object with updated edge_index including self-loops.
+      (optional) torch.Tensor: The edge_index tensor of dropped edges.
+    """
+    if drop_rate <= 0:
+        return data
+
+    # Number of nodes in the graph
+    num_nodes = data.num_nodes
+    edge_index = data.edge_index
+
+    # Create a random mask to decide which edges to keep.
+    # True means keep the edge; False means drop.
+    mask = torch.rand(edge_index.size(1), device=edge_index.device) > drop_rate
+
+    # Keep only edges that are not dropped.
+    kept_edge_index = edge_index[:, mask]
+
+    # Add self-loops to the kept edge_index.
+    new_edge_index, _ = add_self_loops(kept_edge_index, num_nodes=num_nodes)
+
+    # Obtain the dropped edges (if needed)
+    dropped_edge_index = edge_index[:, ~mask]
+
+    # Clone the original data and update the edge_index.
+    new_data = data.clone()
+    new_data.edge_index = new_edge_index
+
+    if return_edges:
+        return new_data, dropped_edge_index
+    return new_data
 
 # ------ logging ------
 
