@@ -121,6 +121,9 @@ class RGCN(nn.Module):
                 h = self.activation(h)
             hidden_list.append(h)
         out = self.head(h)
+        # Squeeze the output if out_channels == 1.
+        #if self.out_channels == 1:
+        out = out.squeeze(1)
         if return_hidden:
             return out, hidden_list
         else:

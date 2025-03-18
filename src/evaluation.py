@@ -69,7 +69,7 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
         model.train().to(device)
         if graph.num_edge_types != 1:
             out = model(graph, x, graph.num_edge_types)
-            out = out.squeeze(1) # TODO fix inside model
+            #out = out.squeeze(1) # TODO fix inside model
             labels = labels.float()
         else:
             #     out = model(graph, x)
@@ -84,7 +84,7 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
             model.eval()
             if graph.num_edge_types != 1:
                 pred = model(graph, x, graph.num_edge_types)
-                pred = pred.squeeze(1) # TODO fix inside model
+                #pred = pred.squeeze(1) # TODO fix inside model
             else:
                 pred = model(graph, x)
             val_acc = accuracy(pred[val_mask], labels[val_mask])
@@ -112,7 +112,7 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
     with torch.no_grad():
         if graph.num_edge_types != 1:
             pred = best_model(graph, x, graph.num_edge_types)
-            pred = pred.squeeze(1) # TODO fix inside model
+            #pred = pred.squeeze(1) # TODO fix inside model
         else:
             pred = best_model(graph, x)
         estp_test_acc = accuracy(pred[test_mask], labels[test_mask])
