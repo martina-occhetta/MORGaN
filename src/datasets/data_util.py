@@ -213,6 +213,11 @@ def load_dataset(dataset_name):
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
+    elif dataset_name in ['CPDB_cdgps', 'IRefIndex_2015_cdgps', 'IRefIndex_cdgps', 'PCNet_cdgps', 'STRINGdb_cdgps']:
+        graph = load_processed_graph(f'data/real/multidim_graph/6d/{dataset_name}_multiomics.pt')
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
     else:
         dataset = Planetoid("", dataset_name, transform=T.NormalizeFeatures())
         graph = dataset[0]
