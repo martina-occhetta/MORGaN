@@ -8,16 +8,21 @@ import torch.nn.functional as F
 import torch.optim as optim
 # from torch.utils.tensorboard.writer import SummaryWriter
 
-from src.models.modig import MODIG
-from utils_modig import *
+from src.modig.modig import MODIG
+from src.modig.utils_modig import *
+from src.datasets.data_util import load_processed_graph
 
 cuda = torch.cuda.is_available()
 
 def main(args):
+    graph = load_processed_graph(PATH='data/real/smg_data', LABEL_PATH='data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv', ppi='CPDB')
+    num_features = graph.x.shape[1]
+    num_classes = graph.y.max().item() + 1
+    
     def train(mask, label):
         model.train()
         optimizer.zero_grad()
-        output = model(graphlist_adj)
+        output = model(graph)
         loss = F.binary_cross_entropy_with_logits(
             output[mask], label, pos_weight=torch.Tensor([2.7]).cuda())
 
@@ -32,7 +37,7 @@ def main(args):
     @torch.no_grad()
     def test(mask, label):
         model.eval()
-        output = model(graphlist_adj)
+        output = model(graph)
         loss = F.binary_cross_entropy_with_logits(
             output[mask], label, pos_weight=torch.Tensor([2.7]).cuda())
 
