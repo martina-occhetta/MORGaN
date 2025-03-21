@@ -181,3 +181,5 @@ wandb/
 
 # model checkpoints
 checkpoints/
+
+.DS_Store

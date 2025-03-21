@@ -205,8 +205,8 @@ class PreModel(nn.Module):
         return criterion
     
     def encoding_mask_noise(self, graph, x, mask_rate=0.3):
-        num_nodes = graph.num_nodes
-        #num_nodes = x.shape[0]
+        #num_nodes = graph.num_nodes
+        num_nodes = x.shape[0]
         perm = torch.randperm(num_nodes, device=x.device)
         num_mask_nodes = int(mask_rate * num_nodes)
 
