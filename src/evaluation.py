@@ -3,13 +3,7 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 from sklearn import metrics
-from src.utils import create_optimizer, accuracy
-
-def result(pred, true):
-    aa = torch.sigmoid(pred)
-    precision, recall, _thresholds = metrics.precision_recall_curve(true, aa)
-    area = metrics.auc(recall, precision)
-    return metrics.roc_auc_score(true, aa), area, precision, recall
+from src.utils import create_optimizer, accuracy, result
 
 def node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=True, mute=False):
     model.eval()
@@ -32,8 +26,8 @@ def node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_de
     
     encoder.to(device)
     optimizer_f = create_optimizer("adam", encoder, lr_f, weight_decay_f)
-    final_acc, estp_acc = linear_probing_for_transductive_node_classifcation(encoder, graph, x, optimizer_f, max_epoch_f, device, mute)
-    return final_acc, estp_acc
+    (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_precision_f), (test_recall, estp_recall_f), (test_f1, estp_f1) = linear_probing_for_transductive_node_classifcation(encoder, graph, x, optimizer_f, max_epoch_f, device, mute)
+    return (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_precision_f), (test_recall, estp_recall_f), (test_f1, estp_f1)
 
 
 def linear_probing_for_transductive_node_classifcation(model, graph, feat, optimizer, max_epoch, device, mute=False):
@@ -89,9 +83,9 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
                 pred = model(graph, x)
             val_acc = accuracy(pred[val_mask], labels[val_mask])
             val_loss = criterion(pred[val_mask], labels[val_mask])
-            val_auc, val_aupr, precision, recall = result(pred[val_mask].cpu(), labels[val_mask].cpu())
+            val_auc, val_aupr, precision, recall, f1 = result(pred[val_mask].cpu(), labels[val_mask].cpu())
             test_acc = accuracy(pred[test_mask], labels[test_mask])
-            test_auc, test_aupr, precision, recall = result(pred[test_mask].cpu(), labels[test_mask].cpu())
+            test_auc, test_aupr, test_precision, test_recall, test_f1 = result(pred[test_mask].cpu(), labels[test_mask].cpu())
             test_loss = criterion(pred[test_mask], labels[test_mask])
         
         if val_aupr >= best_val_aupr:
@@ -116,7 +110,7 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
         else:
             pred = best_model(graph, x)
         estp_test_acc = accuracy(pred[test_mask], labels[test_mask])
-        estp_test_auc, estp_test_aupr, precision_f, recall_f = result(pred[test_mask].cpu(), labels[test_mask].cpu())
+        estp_test_auc, estp_test_aupr, estp_precision_f, estp_recall_f, estp_f1 = result(pred[test_mask].cpu(), labels[test_mask].cpu())
     if mute:
         print(f"# IGNORE: --- TestAcc: {test_acc:.4f}, early-stopping-TestAcc: {estp_test_acc:.4f}, Best ValAcc: {best_val_acc:.4f} in epoch {best_val_epoch} --- ")
     else:
@@ -124,7 +118,7 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
         print(f"--- TestAUPR: {test_aupr:.4f}, early-stopping-TestAUPR: {estp_test_aupr:.4f}, Best ValAUPR: {best_val_aupr:.4f} in epoch {best_val_epoch_aupr} --- ")
 
     # (final_acc, es_acc, best_acc)
-    return test_acc, estp_test_acc
+    return (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_precision_f), (test_recall, estp_recall_f), (test_f1, estp_f1)
 
 
 class LogisticRegression(nn.Module):

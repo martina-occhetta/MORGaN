@@ -178,3 +178,6 @@ data/
 
 # logs
 wandb/
+
+# model checkpoints
+checkpoints/

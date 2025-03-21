@@ -12,6 +12,7 @@ from torch import optim as optim
 import wandb
 
 from torch_geometric.utils import add_self_loops
+from sklearn import metrics
 
 from math import floor, sqrt
 import random
@@ -27,6 +28,21 @@ def accuracy(y_pred, y_true):
     correct = preds.eq(y_true).double().sum().item()
     return correct / len(y_true)
 
+def result(pred, true):
+    aa = torch.sigmoid(pred)
+    # precision, recall, _thresholds = metrics.precision_recall_curve(true, aa)
+    # area = metrics.auc(recall, precision)
+    # return metrics.roc_auc_score(true, aa), area, precision, recall
+    precision, recall, _thresholds = metrics.precision_recall_curve(true, aa)
+    aupr = metrics.auc(recall, precision)
+    
+    # Compute binary predictions using a threshold of 0.5
+    pred_labels = (aa >= 0.5)
+    f1 = metrics.f1_score(true, pred_labels)
+    
+    roc_auc = metrics.roc_auc_score(true, aa)
+    
+    return roc_auc, aupr, precision, recall, f1
 
 def set_random_seed(seed):
     random.seed(seed)
@@ -221,7 +237,7 @@ def drop_edge(data, drop_rate, return_edges = False):
 # ------ logging ------
 
 class WBLogger(object):
-    def __init__(self, log_path="./wandb", name="run", project='graphMAE'):
+    def __init__(self, log_path="./wandb", name="run", project='graphMAE-DG'):
         """
         Initializes a Weights & Biases run. The log_path is ignored in wandb,
         but kept for compatibility.
@@ -229,7 +245,7 @@ class WBLogger(object):
         wandb.init(project=project, name=name)
         self.last_step = 0
 
-    def note(self, metrics, step=None, accuracy=None, estp_accuracy= None, precision=None, recall=None, f1=None):
+    def note(self, metrics, step=None, accuracy=None, estp_accuracy= None, auc=None, estp_auc = None, aupr = None, estp_aupr = None, precision=None, estp_precision = None, recall=None, estp_recall = None, f1=None):
         if step is None:
             step = self.last_step
         metrics["step"] = step
@@ -237,10 +253,22 @@ class WBLogger(object):
             metrics["accuracy"] = accuracy
         if estp_accuracy is not None:
             metrics["estp_accuracy"] = estp_accuracy
+        if auc is not None:
+            metrics["auc"] = auc
+        if estp_auc is not None:
+            metrics["estp_auc"] = estp_auc
+        if aupr is not None:
+            metrics["aupr"] = aupr
+        if estp_aupr is not None:
+            metrics["estp_aupr"] = estp_aupr
         if precision is not None:
             metrics["precision"] = precision
+        if estp_precision is not None:
+            metrics["estp_precision"] = estp_precision
         if recall is not None:
             metrics["recall"] = recall
+        if estp_recall is not None:
+            metrics["estp_recall"] = estp_recall
         if f1 is not None:
             metrics["f1"] = f1
         wandb.log(metrics)

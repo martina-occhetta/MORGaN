@@ -157,6 +157,7 @@ class PreModel(nn.Module):
             num_edge_types=num_edge_types,
             weight_decomposition = weight_decomposition,
             vertical_stacking = vertical_stacking,
+            #return_hidden=False,
         )
 
         # build decoder for attribute prediction
@@ -278,10 +279,11 @@ class PreModel(nn.Module):
 
     def embed(self, graph, x, num_edge_types=None):
         if self._encoder_type == "rgcn":
-            rep = self.encoder(graph, x, num_edge_types)
+            rep, hidden_list = self.encoder(graph, x, num_edge_types, return_hidden=True)
+            return rep, hidden_list
         else:
             rep = self.encoder(graph, x)
-        return rep
+            return rep, None
 
     @property
     def enc_params(self):

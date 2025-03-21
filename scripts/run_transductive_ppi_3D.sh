@@ -6,8 +6,8 @@ device=$2
 [ -z "${device}" ] && device=-1
 
 # List of available datasets
-#datasets=("CPDB_cdgps" "IRefIndex_2015_cdgps" "IRefIndex_cdgps" "PCNet_cdgps" "STRINGdb_cdgps")
-datasets=("CPDB_cdgps_shuffled")
+#datasets=('CPDB_cd' 'CPDB_cg' 'CPDB_cp' 'CPDB_cs' 'CPDB_dg' 'CPDB_dp' 'CPDB_ds' 'CPDB_gp' 'CPDB_gs' 'CPDB_ps')
+datasets=('CPDB_ps')
 
 if [ -z "${dataset_input}" ]; then
     # No dataset provided; run for all options
@@ -40,7 +40,7 @@ if [ -z "${dataset_input}" ]; then
             --linear_prob \
             --scheduler \
             --use_cfg \
-            --num_edge_types 6 \
+            --num_edge_types 4 \
             --weight_decomposition "{'type': 'basis', 'num_bases': 2}" \
             --vertical_stacking "True"
     done
@@ -74,7 +74,7 @@ else
         --linear_prob \
         --scheduler \
         --use_cfg \
-        --num_edge_types 6 \
+        --num_edge_types 4 \
         --weight_decomposition "{'type': 'basis', 'num_bases': 2}" \
         --vertical_stacking "True"
 fi

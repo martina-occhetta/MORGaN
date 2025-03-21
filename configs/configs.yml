@@ -152,306 +152,19 @@ STRINGdb:
   scheduler: True
   logging: True
 
-# cora:
-#   lr: 0.001
-#   lr_f: 0.01
-#   num_hidden: 512
-#   num_heads: 4
-#   num_layers: 2
-#   weight_decay: 2e-4
-#   weight_decay_f: 1e-4
-#   max_epoch: 1500
-#   max_epoch_f: 300
-#   mask_rate: 0.5
-#   num_layers: 2
-#   encoder: gat
-#   decoder: gat 
-#   activation: prelu
-#   in_drop: 0.2
-#   attn_drop: 0.1
-#   linear_prob: True
-#   loss_fn: sce 
-#   drop_edge_rate: 0.0
-#   optimizer: adam
-#   replace_rate: 0.05 
-#   alpha_l: 3
-#   scheduler: True
-# citeseer:
-#   lr: 0.001
-#   lr_f: 0.01
-#   num_hidden: 512
-#   num_heads: 2
-#   num_layers: 2
-#   weight_decay: 2e-5
-#   weight_decay_f: 0.01
-#   max_epoch: 300
-#   max_epoch_f: 300
-#   mask_rate: 0.5
-#   num_layers: 2
-#   encoder: gat
-#   decoder: gat
-#   activation: prelu
-#   in_drop: 0.2  
-#   attn_drop: 0.1
-#   linear_prob: True
-#   loss_fn: sce
-#   drop_edge_rate: 0.0
-#   optimizer: adam
-#   replace_rate: 0.1
-#   alpha_l: 1 # or 3 
-#   scheduler: True
-# pubmed:
-#   lr: 0.001
-#   lr_f: 0.01
-#   num_hidden: 1024
-#   num_heads: 4
-#   num_layers: 2
-#   weight_decay: 1e-5
-#   weight_decay_f: 1e-4
-#   max_epoch: 1000
-#   max_epoch_f: 300
-#   mask_rate: 0.75
-#   num_layers: 2
-#   encoder: gat
-#   decoder: gat
-#   activation: prelu
-#   in_drop: 0.2
-#   attn_drop: 0.1
-#   linear_prob: True
-#   loss_fn: sce
-#   drop_edge_rate: 0.0
-#   optimizer: adam
-#   replace_rate: 0.0
-#   alpha_l: 3
-#   scheduler: True
-# ogbn-arxiv:
-#   lr: 0.001
-#   lr_f: 0.01
-#   num_hidden: 1024
-#   num_heads: 4
-#   weight_decay: 0
-#   weight_decay_f: 5e-4
-#   max_epoch: 1000
-#   max_epoch_f: 600
-#   mask_rate: 0.5
-#   drop_edge_rate: 0.5
-#   num_layers: 3
-#   encoder: gat
-#   decoder: gat 
-#   activation: prelu
-#   in_drop: 0.2
-#   attn_drop: 0.1
-#   linear_prob: True
-#   loss_fn: sce
-#   replace_rate: 0.0
-#   alpha_l: 3 # 2
-#   scheduler: True
-#   norm: layernorm
-# ppi:
-#   lr: 0.0001 # 1e-4 for hidden=1024/2048, 2e-5 for hidden=8192, 5e-6 for hidden=16384
-#   lr_f: 0.005
-#   num_hidden: 1024
-#   num_heads: 4
-#   weight_decay: 0
-#   weight_decay_f: 0
-#   max_epoch: 1000
-#   max_epoch_f: 2000
-#   mask_rate: 0.5
-#   num_layers: 3
-#   encoder: gat
-#   decoder: gat
-#   activation: prelu
-#   in_drop: 0.2
-#   loss_fn: sce
-#   optimizer: adam
-#   replace_rate: 0.1 # 0.1 for 256*4, else 0. 
-#   drop_edge_rate: 0.0
-#   alpha_l: 3
-#   norm: layernorm
-#   residual: True
-#   scheduler: True
-#   linear_prob: True
-# reddit:
-#   lr: 0.001
-#   lr_f: 0.005
-#   num_hidden: 512
-#   num_heads: 2
-#   weight_decay: 2e-4
-#   weight_decay_f: 0
-#   max_epoch: 500
-#   max_epoch_f: 500
-#   mask_rate: 0.75
-#   num_layers: 4
-#   encoder: gat
-#   decoder: gat
-#   activation: prelu
-#   in_drop: 0.2
-#   loss_fn: sce
-#   optimizer: adam
-#   replace_rate: 0.15
-#   drop_edge_rate: 0.5
-#   alpha_l: 3
-#   norm: layernorm
-#   residual: True
-#   scheduler: True
-#   linear_prob: True
-# IMDB-BINARY:
-#   lr: 0.00015
-#   lr_f: 0.005
-#   num_hidden: 512
-#   num_heads: 2
-#   weight_decay: 0
-#   weight_decay_f: 0
-#   max_epoch: 60
-#   max_epoch_f: 500
-#   mask_rate: 0.5
-#   num_layers: 2
-#   encoder: gin
-#   decoder: gin
-#   activation: prelu
-#   in_drop: 0.2
-#   loss_fn: sce
-#   optimizer: adam
-#   replace_rate: 0.0
-#   drop_edge_rate: 0.0
-#   alpha_l: 1
-#   norm: batchnorm
-#   residual: False
-#   scheduler: False
-#   linear_prob: True
-#   pooling: mean
-#   batch_size: 32
-#   alpha_l: 1
-# IMDB-MULTI:
-#   lr: 0.00015
-#   num_hidden: 512
-#   num_heads: 2
-#   weight_decay: 0
-#   max_epoch: 50
-#   mask_rate: 0.5
-#   num_layers: 3
-#   encoder: gin
-#   decoder: gin
-#   activation: prelu
-#   in_drop: 0.2
-#   loss_fn: sce
-#   optimizer: adam
-#   replace_rate: 0.0
-#   drop_edge_rate: 0.0
-#   alpha_l: 1
-#   norm: batchnorm
-#   scheduler: False
-#   linear_prob: True
-#   pooling: mean
-#   batch_size: 32
-#   alpha_l: 1
-# PROTEINS:
-#   lr: 0.00015
-#   num_hidden: 512
-#   weight_decay: 0
-#   max_epoch: 100
-#   mask_rate: 0.5
-#   num_layers: 3
-#   encoder: gin
-#   decoder: gin
-#   activation: prelu
-#   in_drop: 0.2
-#   loss_fn: sce
-#   optimizer: adam
-#   drop_edge_rate: 0.0
-#   alpha_l: 1
-#   norm: batchnorm
-#   scheduler: False
-#   linear_prob: True
-#   pooling: max
-#   batch_size: 32
-#   norm: batchnorm
-#   alpha_l: 1
-# MUTAG:
-#   num_hidden: 32
-#   num_layers: 5
-#   lr: 0.0005
-#   weight_decay: 0.00
-#   mask_rate: 0.75
-#   drop_edge_rate: 0.0
-#   max_epoch: 20
-#   encoder: gin
-#   decoder: gin
-#   activation: prelu
-#   loss_fn: sce
-#   scheduler: False  
-#   pooling: sum
-#   batch_size: 64
-#   alpha_l: 2
-#   replace_rate: 0.1
-#   norm: batchnorm
-#   in_drop: 0.2
-#   attn_drop: 0.1
-#   alpha_l: 2
-# REDDIT-BINARY:
-#   lr: 0.00015
-#   weight_decay: 0.0
-#   max_epoch: 100
-#   mask_rate: 0.75
-#   drop_edge_rate: 0.0
-#   num_hidden: 512
-#   num_layers: 2
-#   encoder: gin
-#   decoder: gin
-#   activation: prelu
-#   pooling: sum
-#   scheduler: True
-#   batch_size: 8
-#   replace_rate: 0.1
-#   norm: layernorm
-#   loss_fn: sce
-#   alpha_l: 2
-# COLLAB:
-#   lr: 0.00015
-#   weight_decay: 0.0
-#   max_epoch: 20
-#   num_layers: 2
-#   num_hidden: 256
-#   mask_rate: 0.75
-#   drop_edge_rate: 0.0
-#   activation: relu
-#   encoder: gin
-#   decoder: gin
-#   scheduler: True
-#   pooling: max
-#   batch_size: 32
-#   loss_fn: sce
-#   norm: batchnorm
-#   alpha_l: 1
-# NCI1:
-#   lr: 0.001
-#   max_epoch: 300
-#   num_layers: 2
-#   num_hidden: 512
-#   mask_rate: 0.25 # not 0.75
-#   drop_edge_rate: 0.0
-#   activation: prelu
-#   encoder: gin
-#   decoder: gin
-#   scheduler: True
-#   pool: sum
-#   batch_size: 16
-#   alpha_l: 2
-#   replace_rate: 0.1
-#   norm: batchnorm
-#   loss_fn: sce
-#   alpha_l: 2
-
-CPDB_cdgps:
-  lr: 0.001
-  lr_f: 0.01
-  num_hidden: 32
+##################################################################
+######################## 6 RELATION TYPES ########################
+##################################################################
+CPDB_cdgps_shuffled: # for ablation studies
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
   num_heads: 4
-  num_layers: 2
-  weight_decay: 2e-4
+  num_layers: 3
+  weight_decay: 1e-3
   weight_decay_f: 1e-4
   max_epoch: 100
-  max_epoch_f: 50
+  max_epoch_f: 200
   mask_rate: 0.5
   num_layers: 2
   encoder: rgcn
@@ -471,16 +184,44 @@ CPDB_cdgps:
   weight_decomposition: {'type': 'basis', 'num_bases': 2}
   vertical_stacking: True
 
-IRefIndex_2015_cdgps:
-  lr: 0.001
-  lr_f: 0.01
-  num_hidden: 32
+CPDB_cdgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
   num_heads: 4
-  num_layers: 2
-  weight_decay: 2e-4
+  num_layers: 3
+  weight_decay: 1e-3
   weight_decay_f: 1e-4
   max_epoch: 100
-  max_epoch_f: 50
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 6
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+IRefIndex_2015_cdgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
   mask_rate: 0.5
   num_layers: 2
   encoder: rgcn
@@ -501,15 +242,15 @@ IRefIndex_2015_cdgps:
   vertical_stacking: True
 
 IRefIndex_cdgps:
-  lr: 0.001
-  lr_f: 0.01
-  num_hidden: 32
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
   num_heads: 4
-  num_layers: 2
-  weight_decay: 2e-4
+  num_layers: 3
+  weight_decay: 1e-3
   weight_decay_f: 1e-4
   max_epoch: 100
-  max_epoch_f: 50
+  max_epoch_f: 200
   mask_rate: 0.5
   num_layers: 2
   encoder: rgcn
@@ -530,15 +271,15 @@ IRefIndex_cdgps:
   vertical_stacking: True
 
 PCNet_cdgps:
-  lr: 0.001
-  lr_f: 0.01
-  num_hidden: 32
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
   num_heads: 4
-  num_layers: 2
-  weight_decay: 2e-4
+  num_layers: 3
+  weight_decay: 1e-3
   weight_decay_f: 1e-4
   max_epoch: 100
-  max_epoch_f: 50
+  max_epoch_f: 200
   mask_rate: 0.5
   num_layers: 2
   encoder: rgcn
@@ -559,15 +300,15 @@ PCNet_cdgps:
   vertical_stacking: True
 
 STRINGdb_cdgps:
-  lr: 0.001
-  lr_f: 0.01
-  num_hidden: 32
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
   num_heads: 4
-  num_layers: 2
-  weight_decay: 2e-4
+  num_layers: 3
+  weight_decay: 1e-3
   weight_decay_f: 1e-4
   max_epoch: 100
-  max_epoch_f: 50
+  max_epoch_f: 200
   mask_rate: 0.5
   num_layers: 2
   encoder: rgcn
@@ -584,5 +325,1434 @@ STRINGdb_cdgps:
   scheduler: True
   logging: True
   num_edge_types: 6
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+##################################################################
+######################## 5 RELATION TYPES ########################
+##################################################################
+
+CPDB_cdgp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+IRefIndex_2015_cdgp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+IRefIndex_cdgp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+PCNet_cdgp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+STRINGdb_cdgp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+CPDB_cdgs:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True   
+
+IRefIndex_2015_cdgs: 
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+
+IRefIndex_cdgs:        
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+
+PCNet_cdgs:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True       
+STRINGdb_cdgs:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cdps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True     
+IRefIndex_2015_cdps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+IRefIndex_cdps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+PCNet_cdps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+STRINGdb_cdps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True       
+CPDB_cgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True       
+IRefIndex_2015_cgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+IRefIndex_cgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+PCNet_cgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+STRINGdb_cgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True     
+CPDB_dgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+IRefIndex_2015_dgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+IRefIndex_dgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+PCNet_dgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True      
+STRINGdb_dgps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 5
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+
+##################################################################
+######################## 4 RELATION TYPES ########################
+##################################################################
+
+CPDB_cdg:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cdp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cds:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cgp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cgs:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_dgp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_dgs:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_dps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_gps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 4
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+##################################################################
+######################## 3 RELATION TYPES ########################
+##################################################################
+
+CPDB_cd:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cg:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_cs:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_dg:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_dp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_ds:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_gp:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_gs:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_ps:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 3
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+
+##################################################################
+######################## 2 RELATION TYPES ########################
+##################################################################
+
+CPDB_c:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 2
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_d:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 2
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_g:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 2
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_p:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 2
+  weight_decomposition: {'type': 'basis', 'num_bases': 2}
+  vertical_stacking: True
+CPDB_s:
+  lr: 0.01
+  lr_f: 0.005
+  num_hidden: 64
+  num_heads: 4
+  num_layers: 3
+  weight_decay: 1e-3
+  weight_decay_f: 1e-4
+  max_epoch: 100
+  max_epoch_f: 200
+  mask_rate: 0.5
+  num_layers: 2
+  encoder: rgcn
+  decoder: rgcn 
+  activation: prelu
+  in_drop: 0.2
+  attn_drop: 0.1
+  linear_prob: True
+  loss_fn: sce 
+  drop_edge_rate: 0.0
+  optimizer: adam
+  replace_rate: 0.05 
+  alpha_l: 3
+  scheduler: True
+  logging: True
+  num_edge_types: 2
   weight_decomposition: {'type': 'basis', 'num_bases': 2}
   vertical_stacking: True

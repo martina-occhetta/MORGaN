@@ -49,8 +49,21 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
             logger.note(loss_dict, step=epoch)
 
         if (epoch + 1) % 200 == 0:
-            acc, estp_acc = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob, mute=True)
-            logger.note(loss_dict, step=epoch, accuracy=acc, estp_accuracy=estp_acc)
+            (acc, estp_acc), (auc, estp_auc), (aupr, estp_aupr), (precision, estp_precision), (recall, estp_recall), (f1, estp_f1) = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False) 
+            logger.note({
+                **loss_dict,
+                "accuracy": acc,
+                "estp_accuracy": estp_acc,
+                "auc": auc,
+                "estp_auc": estp_auc,
+                "aupr": aupr,
+                "estp_aupr": estp_aupr,
+                "precision": precision,
+                "estp_precision": estp_precision,
+                "recall": recall,
+                "estp_recall": estp_recall
+                },
+            step=epoch)
     # return best_model
     return model
 
@@ -87,6 +100,15 @@ def main(args):
 
     acc_list = []
     estp_acc_list = []
+    test_auc_list = []
+    estp_test_auc_list = []
+    test_aupr_list = []
+    estp_test_aupr_list = []
+    test_precision_list = []
+    estp_precision_f_list = []
+    test_recall_list = []
+    estp_recall_f_list = []
+    
     for i, seed in enumerate(seeds):
         print(f"####### Run {i} for seed {seed}")
         set_random_seed(seed)
@@ -128,18 +150,64 @@ def main(args):
         model = model.to(device)
         model.eval()
 
-        final_acc, estp_acc = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False)
-        acc_list.append(final_acc)
-        estp_acc_list.append(estp_acc)
+        (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_test_precision), (test_recall, estp_test_recall), (test_f1, estp_f1) = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False)
+        
+        logger.note({
+            "test_accuracy": test_acc,
+            "test_estp_accuracy": estp_test_acc,
+            "test_auc": test_auc,
+            "test_estp_auc": estp_test_auc,
+            "test_aupr": test_aupr,
+            "test_estp_aupr": estp_test_aupr,
+            "test_precision": test_precision,
+            "test_estp_precision": estp_test_precision,
+            "test_recall": test_recall,
+            "test_estp_recall": estp_test_recall,
+            "test_f1": test_f1,
+            "test_estp_f1": estp_f1
+            },
+            step=max_epoch)
+        
+        acc_list.append(test_acc)
+        estp_acc_list.append(estp_test_acc)
+        test_auc_list.append(test_auc)
+        estp_test_auc_list.append(estp_test_auc)
+        test_aupr_list.append(test_aupr)
+        estp_test_aupr_list.append(estp_test_aupr)
+        test_precision_list.append(test_precision)
+        estp_precision_f_list.append(estp_test_precision)
+        test_recall_list.append(test_recall)
+        estp_recall_f_list.append(estp_test_recall)
 
         if logger is not None:
             logger.finish()
 
     final_acc, final_acc_std = np.mean(acc_list), np.std(acc_list)
     estp_acc, estp_acc_std = np.mean(estp_acc_list), np.std(estp_acc_list)
-    print(f"# final_acc: {final_acc:.4f}±{final_acc_std:.4f}")
-    print(f"# early-stopping_acc: {estp_acc:.4f}±{estp_acc_std:.4f}")
+    final_auc, final_auc_std = np.mean(test_auc_list), np.std(test_auc_list)
+    estp_auc, estp_auc_std = np.mean(estp_test_auc_list), np.std(estp_test_auc_list)
+    final_aupr, final_aupr_std = np.mean(test_aupr_list), np.std(test_aupr_list)
+    estp_aupr, estp_aupr_std = np.mean(estp_test_aupr_list), np.std(estp_test_aupr_list)
+    print(f"# Final Accuracy: {final_acc:.4f}±{final_acc_std:.4f}")
+    print(f"# Early Stopping Accuracy: {estp_acc:.4f}±{estp_acc_std:.4f}")
+    print(f"# Final AUC: {final_auc:.4f}±{final_auc_std:.4f}")
+    print(f"# Early Stopping AUC: {estp_auc:.4f}±{estp_auc_std:.4f}")
+    print(f"# Final AUPR: {final_aupr:.4f}±{final_aupr_std:.4f}")
+    print(f"# Early Stopping AUPR: {estp_aupr:.4f}±{estp_aupr_std:.4f}")
 
+    # final_metrics = {
+    #     "final_accuracy": final_acc,
+    #     "final_accuracy_std": final_acc_std,
+    #     "early_stopping_accuracy": estp_acc,
+    #     "early_stopping_accuracy_std": estp_acc_std,
+    #     "final_auc": final_auc,
+    #     "final_auc_std": final_auc_std,
+    #     "final_aupr": final_aupr,
+    #     "final_aupr_std": final_aupr_std,
+    #     }
+        
+    # if logger is not None:
+    #     logger.note(final_metrics, step=max_epoch)   
 
 if __name__ == "__main__":
     args = build_args()

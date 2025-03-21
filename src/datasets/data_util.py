@@ -213,8 +213,32 @@ def load_dataset(dataset_name):
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
-    elif dataset_name in ['CPDB_cdgps', 'IRefIndex_2015_cdgps', 'IRefIndex_cdgps', 'PCNet_cdgps', 'STRINGdb_cdgps']:
+    elif dataset_name in ['CPDB_cdgps', 'IRefIndex_2015_cdgps', 'IRefIndex_cdgps', 'PCNet_cdgps', 'STRINGdb_cdgps', 'CPDB_cdgps_shuffled']:
         graph = load_processed_graph(f'data/real/multidim_graph/6d/{dataset_name}_multiomics.pt')
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
+    elif dataset_name in ["CPDB_cdgp", "IRefIndex_2015_cdgp", "IRefIndex_cdgp", "PCNet_cdgp", "STRINGdb_cdgp",
+        "CPDB_cdgs", "IRefIndex_2015_cdgs", "IRefIndex_cdgs", "PCNet_cdgs", "STRINGdb_cdgs",
+        "CPDB_cdps", "IRefIndex_2015_cdps", "IRefIndex_cdps", "PCNet_cdps", "STRINGdb_cdps",
+        "CPDB_cgps", "IRefIndex_2015_cgps", "IRefIndex_cgps", "PCNet_cgps", "STRINGdb_cgps",
+        "CPDB_dgps", "IRefIndex_2015_dgps", "IRefIndex_dgps", "PCNet_dgps", "STRINGdb_dgps"]:
+        graph = load_processed_graph(f'data/real/multidim_graph/5d/{dataset_name}_multiomics.pt')
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
+    elif dataset_name in ['CPDB_cdg', 'CPDB_cdp', 'CPDB_cds', 'CPDB_cgp', 'CPDB_cgs', 'CPDB_cps', 'CPDB_dgp', 'CPDB_dgs', 'CPDB_dps', 'CPDB_gps']:
+        graph = load_processed_graph(f'data/real/multidim_graph/4d/{dataset_name}_multiomics.pt')
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
+    elif dataset_name in ['CPDB_cd','CPDB_cg','CPDB_cp','CPDB_cs','CPDB_dg','CPDB_dp','CPDB_ds','CPDB_gp','CPDB_gs','CPDB_ps']:
+        graph = load_processed_graph(f'data/real/multidim_graph/3d/{dataset_name}_multiomics.pt')
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
+    elif dataset_name in ['CPDB_c', 'CPDB_d', 'CPDB_g', 'CPDB_p', 'CPDB_s']:
+        graph = load_processed_graph(f'data/real/multidim_graph/2d/{dataset_name}_multiomics.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 

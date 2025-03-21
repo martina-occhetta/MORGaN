@@ -6,8 +6,7 @@ device=$2
 [ -z "${device}" ] && device=-1
 
 # List of available datasets
-#datasets=("CPDB_cdgps" "IRefIndex_2015_cdgps" "IRefIndex_cdgps" "PCNet_cdgps" "STRINGdb_cdgps")
-datasets=("CPDB_cdgps_shuffled")
+datasets=('CPDB_cdg' 'CPDB_cdp' 'CPDB_cds' 'CPDB_cgp' 'CPDB_cgs' 'CPDB_cps' 'CPDB_dgp' 'CPDB_dgs' 'CPDB_dps' 'CPDB_gps')
 
 if [ -z "${dataset_input}" ]; then
     # No dataset provided; run for all options
@@ -34,13 +33,13 @@ if [ -z "${dataset_input}" ]; then
             --optimizer adam \
             --drop_edge_rate 0.0 \
             --loss_fn "sce" \
-            --seeds 2 \
+            --seeds 0 1 2 \
             --replace_rate 0.05 \
             --alpha_l 3 \
             --linear_prob \
             --scheduler \
             --use_cfg \
-            --num_edge_types 6 \
+            --num_edge_types 4 \
             --weight_decomposition "{'type': 'basis', 'num_bases': 2}" \
             --vertical_stacking "True"
     done
@@ -74,7 +73,7 @@ else
         --linear_prob \
         --scheduler \
         --use_cfg \
-        --num_edge_types 6 \
+        --num_edge_types 4 \
         --weight_decomposition "{'type': 'basis', 'num_bases': 2}" \
         --vertical_stacking "True"
 fi

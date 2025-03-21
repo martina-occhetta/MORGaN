@@ -1,0 +1,867 @@
+(.dg_env) (base) bty416@CLN-JFC-TFVH4594LN SMG-DG % sh scripts/run_transductive_ppi_6D.sh 
+Running dataset: CPDB_cdgps
+2025-03-18 21:40:47,239 - INFO - Using best configs
+------ Use best configs ------
+Namespace(seeds=[0, 1, 2, 3, 4], dataset='CPDB_cdgps', device=-1, max_epoch=100, warmup_steps=-1, num_heads=4, num_out_heads=1, num_layers=2, num_hidden=32, residual=False, in_drop=0.2, attn_drop=0.1, norm=None, lr=0.001, weight_decay=0.0002, negative_slope=0.2, activation='prelu', mask_rate=0.5, drop_edge_rate=0.0, replace_rate=0.05, num_edge_types=6, weight_decomposition={'type': 'basis', 'num_bases': 2}, vertical_stacking=True, encoder='rgcn', decoder='rgcn', loss_fn='sce', alpha_l=3, optimizer='adam', max_epoch_f=50, lr_f=0.01, weight_decay_f=0.0001, linear_prob=True, load_model=False, save_model=False, use_cfg=True, logging=True, scheduler=True, concat_hidden=False, pooling='mean', deg4feat=False, batch_size=32)
+Loaded dataset:  CPDB_cdgps
+Number of features:  64
+Number of classes:  2.0
+####### Run 0 for seed 0
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: martinaina (aidd_m) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214047-zjozgna1
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/zjozgna1
+2025-03-18 21:40:48,719 - INFO - Use schedular
+2025-03-18 21:40:48,719 - INFO - start training..
+  0%|                                                                                                                                                                                   | 0/100 [00:00<?, ?it/s]/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/utils.py:378: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:646.)
+  values = torch.sparse.FloatTensor(indices.t(), values, torch.Size(size))
+# Epoch 99: train_loss: 0.1477: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:14<00:00,  7.09it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1401, val_loss: 0.3650, val_acc:0.8877551020408163, val_aupr: 0.9502, test_loss: 0.5201, test_acc: 0.8780,test_auc: 0.9291, test_aupr: 0.9116: 100%|█| 50/50 [00:08<00:00,  5.95it/s]
+--- TestAcc: 0.8780, early-stopping-TestAcc: 0.9024, Best ValAcc: 0.9082 in epoch 37 --- 
+--- TestAUPR: 0.9116, early-stopping-TestAUPR: 0.9108, Best ValAUPR: 0.9519 in epoch 46 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▅▅▄▄▄▄▄▃▃▃▃▃▃▃▃▃▂▂▂▂▂▂▂▁▁▁▁▂▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr █████▇▇▇▇▇▇▇▆▆▆▆▅▅▅▅▅▄▄▄▄▃▃▃▃▃▂▂▂▂▁▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▃▃▃▄▄▄▅▅▅▅▅▅▆▆▆▆▆▆▆▆▇▇▇▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.14772
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/zjozgna1
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214047-zjozgna1/logs
+####### Run 1 for seed 1
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214113-5yvfapcs
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/5yvfapcs
+2025-03-18 21:41:13,435 - INFO - Use schedular
+2025-03-18 21:41:13,438 - INFO - start training..
+# Epoch 99: train_loss: 0.1420: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:14<00:00,  6.86it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1693, val_loss: 0.4487, val_acc:0.8571428571428571, val_aupr: 0.9400, test_loss: 0.4467, test_acc: 0.9024,test_auc: 0.9228, test_aupr: 0.9064: 100%|█| 50/50 [00:08<00:00,  6.23it/s]
+--- TestAcc: 0.9024, early-stopping-TestAcc: 0.8943, Best ValAcc: 0.8980 in epoch 44 --- 
+--- TestAUPR: 0.9064, early-stopping-TestAUPR: 0.8936, Best ValAUPR: 0.9521 in epoch 42 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr █████▇▇▇▇▇▆▆▆▅▅▅▅▅▅▅▄▄▄▃▃▃▃▃▃▂▂▂▂▂▁▁▁▁▁▁
+wandb: step ▁▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.14198
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/5yvfapcs
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214113-5yvfapcs/logs
+####### Run 2 for seed 2
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214137-qvlsyors
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/qvlsyors
+2025-03-18 21:41:38,327 - INFO - Use schedular
+2025-03-18 21:41:38,337 - INFO - start training..
+# Epoch 99: train_loss: 0.1464: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:15<00:00,  6.33it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1876, val_loss: 0.5471, val_acc:0.8775510204081632, val_aupr: 0.9288, test_loss: 0.5246, test_acc: 0.9024,test_auc: 0.9188, test_aupr: 0.8963: 100%|█| 50/50 [00:08<00:00,  6.03it/s]
+--- TestAcc: 0.9024, early-stopping-TestAcc: 0.9187, Best ValAcc: 0.8980 in epoch 44 --- 
+--- TestAUPR: 0.8963, early-stopping-TestAUPR: 0.9029, Best ValAUPR: 0.9474 in epoch 30 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▆▅▅▅▄▄▄▄▃▃▃▂▃▂▂▂▁▂▂▂▁▁▁▁▁▁▁▁▁▁▂▁▁▁▁▁▁▁▁
+wandb:   lr ███████▇▇▇▆▆▆▆▅▅▅▅▅▄▄▄▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁
+wandb: step ▁▁▁▂▂▂▂▃▃▃▃▃▃▃▃▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇▇███
+wandb: 
+wandb: Run summary:
+wandb: loss 0.14638
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/qvlsyors
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214137-qvlsyors/logs
+####### Run 3 for seed 3
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214204-ag4waru5
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/ag4waru5
+2025-03-18 21:42:04,674 - INFO - Use schedular
+2025-03-18 21:42:04,675 - INFO - start training..
+# Epoch 99: train_loss: 0.1424: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:14<00:00,  6.69it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1425, val_loss: 0.4379, val_acc:0.8775510204081632, val_aupr: 0.9287, test_loss: 0.4648, test_acc: 0.8780,test_auc: 0.9323, test_aupr: 0.9171: 100%|█| 50/50 [00:08<00:00,  6.25it/s]
+--- TestAcc: 0.8780, early-stopping-TestAcc: 0.9024, Best ValAcc: 0.9082 in epoch 36 --- 
+--- TestAUPR: 0.9171, early-stopping-TestAUPR: 0.9122, Best ValAUPR: 0.9415 in epoch 40 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▇▆▆▆▆▅▅▅▄▄▄▄▃▃▂▂▂▂▂▂▂▁▂▂▂▂▁▁▁▂▂▁▁▁▁▁▁▁▁
+wandb:   lr ███████▇▇▇▇▇▇▇▆▆▆▅▅▅▄▄▄▄▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▆▆▆▆▆▆▆▇▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.1424
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/ag4waru5
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214204-ag4waru5/logs
+####### Run 4 for seed 4
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214229-rzpbg1qy
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/rzpbg1qy
+2025-03-18 21:42:29,936 - INFO - Use schedular
+2025-03-18 21:42:29,937 - INFO - start training..
+# Epoch 99: train_loss: 0.1471: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:14<00:00,  6.90it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1174, val_loss: 0.5802, val_acc:0.8979591836734694, val_aupr: 0.9370, test_loss: 0.6891, test_acc: 0.9024,test_auc: 0.9190, test_aupr: 0.9069: 100%|█| 50/50 [00:08<00:00,  5.97it/s]
+--- TestAcc: 0.9024, early-stopping-TestAcc: 0.9106, Best ValAcc: 0.9082 in epoch 19 --- 
+--- TestAUPR: 0.9069, early-stopping-TestAUPR: 0.8979, Best ValAUPR: 0.9512 in epoch 4 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ███████▇▇▇▇▇▆▆▆▆▆▅▅▅▄▄▄▄▄▃▃▃▃▃▂▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▄▄▄▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.1471
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run CPDB_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/rzpbg1qy
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214229-rzpbg1qy/logs
+# final_acc: 0.8927±0.0119
+# early-stopping_acc: 0.9057±0.0083
+Running dataset: IRefIndex_2015_cdgps
+2025-03-18 21:42:58,834 - INFO - Using best configs
+------ Use best configs ------
+Namespace(seeds=[0, 1, 2, 3, 4], dataset='IRefIndex_2015_cdgps', device=-1, max_epoch=100, warmup_steps=-1, num_heads=4, num_out_heads=1, num_layers=2, num_hidden=32, residual=False, in_drop=0.2, attn_drop=0.1, norm=None, lr=0.001, weight_decay=0.0002, negative_slope=0.2, activation='prelu', mask_rate=0.5, drop_edge_rate=0.0, replace_rate=0.05, num_edge_types=6, weight_decomposition={'type': 'basis', 'num_bases': 2}, vertical_stacking=True, encoder='rgcn', decoder='rgcn', loss_fn='sce', alpha_l=3, optimizer='adam', max_epoch_f=50, lr_f=0.01, weight_decay_f=0.0001, linear_prob=True, load_model=False, save_model=False, use_cfg=True, logging=True, scheduler=True, concat_hidden=False, pooling='mean', deg4feat=False, batch_size=32)
+Loaded dataset:  IRefIndex_2015_cdgps
+Number of features:  64
+Number of classes:  2.0
+####### Run 0 for seed 0
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: martinaina (aidd_m) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214259-k5so10et
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/k5so10et
+2025-03-18 21:42:59,801 - INFO - Use schedular
+2025-03-18 21:42:59,801 - INFO - start training..
+  0%|                                                                                                                                                                                   | 0/100 [00:00<?, ?it/s]/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/utils.py:378: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:646.)
+  values = torch.sparse.FloatTensor(indices.t(), values, torch.Size(size))
+# Epoch 99: train_loss: 0.1597: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:07<00:00, 12.87it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(191.)
+Number of negative labels: tensor(191.)
+# Epoch: 49, train_loss: 0.2055, val_loss: 0.1975, val_acc:0.9166666666666666, val_aupr: 0.9823, test_loss: 0.4982, test_acc: 0.8083,test_auc: 0.8950, test_aupr: 0.9106: 100%|█| 50/50 [00:05<00:00,  9.84it/s]
+--- TestAcc: 0.8083, early-stopping-TestAcc: 0.8750, Best ValAcc: 0.9479 in epoch 25 --- 
+--- TestAUPR: 0.9106, early-stopping-TestAUPR: 0.9300, Best ValAUPR: 0.9846 in epoch 31 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▇▆▅▅▄▅▄▄▄▃▃▃▄▃▂▃▂▂▂▂▂▂▂▁▁▂▁▂▂▂▁▂▁▂▂▂▁▁▂
+wandb:   lr ███████▇▇▇▇▇▆▆▆▆▅▅▄▄▄▄▄▄▄▃▃▃▂▂▂▁▁▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▂▃▃▃▄▄▄▄▄▅▅▅▅▅▆▆▆▆▆▆▇▇▇▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.15973
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/k5so10et
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214259-k5so10et/logs
+####### Run 1 for seed 1
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214314-dkviu7ib
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/dkviu7ib
+2025-03-18 21:43:14,875 - INFO - Use schedular
+2025-03-18 21:43:14,876 - INFO - start training..
+# Epoch 99: train_loss: 0.1609: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:08<00:00, 11.76it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(191.)
+Number of negative labels: tensor(191.)
+# Epoch: 49, train_loss: 0.1373, val_loss: 0.2471, val_acc:0.9166666666666666, val_aupr: 0.9754, test_loss: 0.5221, test_acc: 0.8417,test_auc: 0.9158, test_aupr: 0.9220: 100%|█| 50/50 [00:04<00:00, 10.44it/s]
+--- TestAcc: 0.8417, early-stopping-TestAcc: 0.8583, Best ValAcc: 0.9375 in epoch 32 --- 
+--- TestAUPR: 0.9220, early-stopping-TestAUPR: 0.9293, Best ValAUPR: 0.9812 in epoch 31 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▅▅▅▄▄▄▄▃▄▃▃▃▃▃▂▂▂▂▂▂▂▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ████████▇▇▇▆▆▆▅▅▄▄▄▄▄▄▃▃▃▃▃▃▃▃▂▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▅▅▅▅▅▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇█
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16091
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/dkviu7ib
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214314-dkviu7ib/logs
+####### Run 2 for seed 2
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214329-703oe4s6
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/703oe4s6
+2025-03-18 21:43:30,359 - INFO - Use schedular
+2025-03-18 21:43:30,360 - INFO - start training..
+# Epoch 99: train_loss: 0.1580: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:07<00:00, 12.57it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(191.)
+Number of negative labels: tensor(191.)
+# Epoch: 49, train_loss: 0.2443, val_loss: 0.3954, val_acc:0.875, val_aupr: 0.9617, test_loss: 0.4252, test_acc: 0.8500,test_auc: 0.9164, test_aupr: 0.9290: 100%|██████████████| 50/50 [00:04<00:00, 10.24it/s]
+--- TestAcc: 0.8500, early-stopping-TestAcc: 0.8750, Best ValAcc: 0.9062 in epoch 36 --- 
+--- TestAUPR: 0.9290, early-stopping-TestAUPR: 0.9323, Best ValAUPR: 0.9737 in epoch 28 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr █████████▇▇▇▇▇▇▆▆▆▆▆▅▅▄▄▄▃▃▃▃▃▂▂▂▂▁▁▁▁▁▁
+wandb: step ▁▁▁▁▂▂▂▂▂▂▃▄▄▄▄▄▄▄▅▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.15798
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/703oe4s6
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214329-703oe4s6/logs
+####### Run 3 for seed 3
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214345-9n6ijtl0
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/9n6ijtl0
+2025-03-18 21:43:45,523 - INFO - Use schedular
+2025-03-18 21:43:45,524 - INFO - start training..
+# Epoch 99: train_loss: 0.1611: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:08<00:00, 11.67it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(191.)
+Number of negative labels: tensor(191.)
+# Epoch: 49, train_loss: 0.1609, val_loss: 0.2198, val_acc:0.9166666666666666, val_aupr: 0.9779, test_loss: 0.4413, test_acc: 0.8417,test_auc: 0.9144, test_aupr: 0.9214: 100%|█| 50/50 [00:04<00:00, 10.11it/s]
+--- TestAcc: 0.8417, early-stopping-TestAcc: 0.8583, Best ValAcc: 0.9583 in epoch 29 --- 
+--- TestAUPR: 0.9214, early-stopping-TestAUPR: 0.9307, Best ValAUPR: 0.9888 in epoch 31 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▇▆▆▆▆▅▄▅▅▃▃▃▃▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▁▁▂▁▂▁▂▁
+wandb:   lr █████████▇▇▆▆▆▆▅▅▅▅▅▄▄▄▄▄▄▃▃▃▃▃▃▂▂▂▂▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▃▄▄▄▅▅▅▅▅▅▅▆▆▆▆▇▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16113
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/9n6ijtl0
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214345-9n6ijtl0/logs
+####### Run 4 for seed 4
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214400-s57ccknm
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/s57ccknm
+2025-03-18 21:44:01,295 - INFO - Use schedular
+2025-03-18 21:44:01,296 - INFO - start training..
+# Epoch 99: train_loss: 0.1625: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:08<00:00, 12.40it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(191.)
+Number of negative labels: tensor(191.)
+# Epoch: 49, train_loss: 0.1878, val_loss: 0.1881, val_acc:0.9375, val_aupr: 0.9813, test_loss: 0.4231, test_acc: 0.8500,test_auc: 0.9297, test_aupr: 0.9457: 100%|█████████████| 50/50 [00:04<00:00, 10.31it/s]
+--- TestAcc: 0.8500, early-stopping-TestAcc: 0.8500, Best ValAcc: 0.9375 in epoch 49 --- 
+--- TestAUPR: 0.9457, early-stopping-TestAUPR: 0.9457, Best ValAUPR: 0.9860 in epoch 38 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▇▅▅▄▅▄▄▄▄▄▃▃▃▃▂▂▂▂▂▁▂▂▁▁▁▂▂▂▂▁▁▁▁▂▂▁▁▁▁
+wandb:   lr ███████▇▇▇▇▇▆▆▆▆▅▅▅▅▄▄▄▄▄▃▃▃▂▂▂▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▃▃▃▃▃▄▄▄▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16252
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_2015_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/s57ccknm
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214400-s57ccknm/logs
+# final_acc: 0.8383±0.0155
+# early-stopping_acc: 0.8633±0.0100
+Running dataset: IRefIndex_cdgps
+2025-03-18 21:44:37,381 - INFO - Using best configs
+------ Use best configs ------
+Namespace(seeds=[0, 1, 2, 3, 4], dataset='IRefIndex_cdgps', device=-1, max_epoch=100, warmup_steps=-1, num_heads=4, num_out_heads=1, num_layers=2, num_hidden=32, residual=False, in_drop=0.2, attn_drop=0.1, norm=None, lr=0.001, weight_decay=0.0002, negative_slope=0.2, activation='prelu', mask_rate=0.5, drop_edge_rate=0.0, replace_rate=0.05, num_edge_types=6, weight_decomposition={'type': 'basis', 'num_bases': 2}, vertical_stacking=True, encoder='rgcn', decoder='rgcn', loss_fn='sce', alpha_l=3, optimizer='adam', max_epoch_f=50, lr_f=0.01, weight_decay_f=0.0001, linear_prob=True, load_model=False, save_model=False, use_cfg=True, logging=True, scheduler=True, concat_hidden=False, pooling='mean', deg4feat=False, batch_size=32)
+Loaded dataset:  IRefIndex_cdgps
+Number of features:  64
+Number of classes:  2.0
+####### Run 0 for seed 0
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: martinaina (aidd_m) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214438-46salq17
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/46salq17
+2025-03-18 21:44:39,118 - INFO - Use schedular
+2025-03-18 21:44:39,119 - INFO - start training..
+  0%|                                                                                                                                                                                   | 0/100 [00:00<?, ?it/s]/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/utils.py:378: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:646.)
+  values = torch.sparse.FloatTensor(indices.t(), values, torch.Size(size))
+# Epoch 99: train_loss: 0.1760: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:20<00:00,  4.81it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(202.)
+Number of negative labels: tensor(202.)
+# Epoch: 49, train_loss: 0.1727, val_loss: 0.3080, val_acc:0.9108910891089109, val_aupr: 0.9293, test_loss: 0.2754, test_acc: 0.9134,test_auc: 0.9497, test_aupr: 0.9572: 100%|█| 50/50 [00:11<00:00,  4.42it/s]
+--- TestAcc: 0.9134, early-stopping-TestAcc: 0.9055, Best ValAcc: 0.9208 in epoch 40 --- 
+--- TestAUPR: 0.9572, early-stopping-TestAUPR: 0.9792, Best ValAUPR: 0.9293 in epoch 49 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ██████▇▇▇▇▇▇▇▇▇▆▆▆▅▅▅▅▄▄▄▄▃▃▃▃▃▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▁▂▂▂▂▂▂▂▂▂▃▃▃▃▄▄▄▄▄▄▅▅▅▅▆▆▆▆▆▆▆▇▇▇▇▇█
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17602
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/46salq17
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214438-46salq17/logs
+####### Run 1 for seed 1
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214513-a7zf53pb
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/a7zf53pb
+2025-03-18 21:45:13,670 - INFO - Use schedular
+2025-03-18 21:45:13,671 - INFO - start training..
+# Epoch 99: train_loss: 0.1725: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:19<00:00,  5.12it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(202.)
+Number of negative labels: tensor(202.)
+# Epoch: 49, train_loss: 0.1675, val_loss: 0.2834, val_acc:0.900990099009901, val_aupr: 0.9492, test_loss: 0.2774, test_acc: 0.9055,test_auc: 0.9549, test_aupr: 0.9568: 100%|██| 50/50 [00:11<00:00,  4.48it/s]
+--- TestAcc: 0.9055, early-stopping-TestAcc: 0.8898, Best ValAcc: 0.9208 in epoch 45 --- 
+--- TestAUPR: 0.9568, early-stopping-TestAUPR: 0.9527, Best ValAUPR: 0.9492 in epoch 49 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss ███▇▇▆▅▅▅▄▄▃▃▂▃▃▃▂▂▂▂▂▁▂▂▃▂▂▂▁▂▃▂▂▂▂▁▂▂▂
+wandb:   lr ██████████▇▇▇▇▇▅▅▅▅▅▄▄▄▃▃▃▃▃▃▂▂▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17249
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/a7zf53pb
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214513-a7zf53pb/logs
+####### Run 2 for seed 2
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214546-3nz1cr3v
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/3nz1cr3v
+2025-03-18 21:45:46,878 - INFO - Use schedular
+2025-03-18 21:45:46,880 - INFO - start training..
+# Epoch 99: train_loss: 0.1739: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:20<00:00,  4.97it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(202.)
+Number of negative labels: tensor(202.)
+# Epoch: 49, train_loss: 0.2284, val_loss: 0.2702, val_acc:0.9108910891089109, val_aupr: 0.8950, test_loss: 0.2349, test_acc: 0.9134,test_auc: 0.9683, test_aupr: 0.9726: 100%|█| 50/50 [00:10<00:00,  4.56it/s]
+--- TestAcc: 0.9134, early-stopping-TestAcc: 0.8976, Best ValAcc: 0.9208 in epoch 46 --- 
+--- TestAUPR: 0.9726, early-stopping-TestAUPR: 0.9744, Best ValAUPR: 0.9060 in epoch 12 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ██████▇▇▇▇▇▇▆▆▆▆▅▅▅▅▄▄▄▄▃▃▃▂▂▂▂▂▁▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▅▅▆▆▆▆▆▆▇▇▇▇▇█
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17388
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/3nz1cr3v
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214546-3nz1cr3v/logs
+####### Run 3 for seed 3
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214619-4r66wr3m
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/4r66wr3m
+2025-03-18 21:46:20,366 - INFO - Use schedular
+2025-03-18 21:46:20,367 - INFO - start training..
+# Epoch 99: train_loss: 0.1692: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:20<00:00,  5.00it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(202.)
+Number of negative labels: tensor(202.)
+# Epoch: 49, train_loss: 0.2005, val_loss: 0.2459, val_acc:0.9306930693069307, val_aupr: 0.9336, test_loss: 0.2671, test_acc: 0.8976,test_auc: 0.9561, test_aupr: 0.9665: 100%|█| 50/50 [00:10<00:00,  4.65it/s]
+--- TestAcc: 0.8976, early-stopping-TestAcc: 0.9055, Best ValAcc: 0.9406 in epoch 44 --- 
+--- TestAUPR: 0.9665, early-stopping-TestAUPR: 0.9664, Best ValAUPR: 0.9336 in epoch 49 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ██████▇▇▇▇▇▇▆▆▆▆▆▅▅▅▅▄▄▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▄▄▄▅▅▅▅▅▆▆▆▆▆▆▇▇▇▇▇█
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16916
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/4r66wr3m
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214619-4r66wr3m/logs
+####### Run 4 for seed 4
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214653-hoc08b7p
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/hoc08b7p
+2025-03-18 21:46:53,518 - INFO - Use schedular
+2025-03-18 21:46:53,526 - INFO - start training..
+# Epoch 99: train_loss: 0.1740: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:21<00:00,  4.76it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(202.)
+Number of negative labels: tensor(202.)
+# Epoch: 49, train_loss: 0.1760, val_loss: 0.3205, val_acc:0.8910891089108911, val_aupr: 0.8876, test_loss: 0.2141, test_acc: 0.9291,test_auc: 0.9707, test_aupr: 0.9746: 100%|█| 50/50 [00:11<00:00,  4.36it/s]
+--- TestAcc: 0.9291, early-stopping-TestAcc: 0.9291, Best ValAcc: 0.9208 in epoch 44 --- 
+--- TestAUPR: 0.9746, early-stopping-TestAUPR: 0.9772, Best ValAUPR: 0.9086 in epoch 46 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ███████▇▇▇▆▆▆▆▅▅▅▅▅▄▄▄▃▃▃▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▆▆▆▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17399
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run IRefIndex_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/hoc08b7p
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214653-hoc08b7p/logs
+# final_acc: 0.9118±0.0104
+# early-stopping_acc: 0.9055±0.0132
+Running dataset: PCNet_cdgps
+2025-03-18 21:47:31,981 - INFO - Using best configs
+------ Use best configs ------
+Namespace(seeds=[0, 1, 2, 3, 4], dataset='PCNet_cdgps', device=-1, max_epoch=100, warmup_steps=-1, num_heads=4, num_out_heads=1, num_layers=2, num_hidden=32, residual=False, in_drop=0.2, attn_drop=0.1, norm=None, lr=0.001, weight_decay=0.0002, negative_slope=0.2, activation='prelu', mask_rate=0.5, drop_edge_rate=0.0, replace_rate=0.05, num_edge_types=6, weight_decomposition={'type': 'basis', 'num_bases': 2}, vertical_stacking=True, encoder='rgcn', decoder='rgcn', loss_fn='sce', alpha_l=3, optimizer='adam', max_epoch_f=50, lr_f=0.01, weight_decay_f=0.0001, linear_prob=True, load_model=False, save_model=False, use_cfg=True, logging=True, scheduler=True, concat_hidden=False, pooling='mean', deg4feat=False, batch_size=32)
+Loaded dataset:  PCNet_cdgps
+Number of features:  64
+Number of classes:  2.0
+####### Run 0 for seed 0
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: martinaina (aidd_m) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_214732-3ivpnk42
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/3ivpnk42
+2025-03-18 21:47:33,115 - INFO - Use schedular
+2025-03-18 21:47:33,116 - INFO - start training..
+  0%|                                                                                                                                                                                   | 0/100 [00:00<?, ?it/s]/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/utils.py:378: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:646.)
+  values = torch.sparse.FloatTensor(indices.t(), values, torch.Size(size))
+# Epoch 99: train_loss: 0.1705: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [01:48<00:00,  1.09s/it]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(206.)
+Number of negative labels: tensor(206.)
+# Epoch: 49, train_loss: 0.1537, val_loss: 0.1933, val_acc:0.9223300970873787, val_aupr: 0.9819, test_loss: 0.3790, test_acc: 0.8915,test_auc: 0.9481, test_aupr: 0.9125: 100%|█| 50/50 [00:50<00:00,  1.02s/it]
+--- TestAcc: 0.8915, early-stopping-TestAcc: 0.9147, Best ValAcc: 0.9612 in epoch 15 --- 
+--- TestAUPR: 0.9125, early-stopping-TestAUPR: 0.9079, Best ValAUPR: 0.9931 in epoch 22 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▆▆▅▅▅▄▄▄▃▃▃▂▃▂▂▂▂▂▂▂▂▂▁▂▂▁▁▂▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ███████▇▇▇▇▇▆▆▆▆▅▅▅▅▄▄▄▄▃▃▃▃▃▃▂▂▂▁▁▁▁▁▁▁
+wandb: step ▁▁▁▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17053
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/3ivpnk42
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_214732-3ivpnk42/logs
+####### Run 1 for seed 1
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_215015-pf56gfma
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/pf56gfma
+2025-03-18 21:50:15,742 - INFO - Use schedular
+2025-03-18 21:50:15,743 - INFO - start training..
+# Epoch 99: train_loss: 0.1710: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [01:46<00:00,  1.07s/it]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(206.)
+Number of negative labels: tensor(206.)
+# Epoch: 49, train_loss: 0.1467, val_loss: 0.2664, val_acc:0.9320388349514563, val_aupr: 0.9566, test_loss: 0.3156, test_acc: 0.9070,test_auc: 0.9502, test_aupr: 0.9573: 100%|█| 50/50 [00:51<00:00,  1.03s/it]
+--- TestAcc: 0.9070, early-stopping-TestAcc: 0.9147, Best ValAcc: 0.9417 in epoch 31 --- 
+--- TestAUPR: 0.9573, early-stopping-TestAUPR: 0.9507, Best ValAUPR: 0.9742 in epoch 46 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ██████▇▇▇▇▇▆▆▆▆▅▅▅▅▅▄▄▃▃▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17097
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/pf56gfma
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_215015-pf56gfma/logs
+####### Run 2 for seed 2
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_215256-rc8i7wmb
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/rc8i7wmb
+2025-03-18 21:52:56,947 - INFO - Use schedular
+2025-03-18 21:52:56,949 - INFO - start training..
+# Epoch 99: train_loss: 0.1728: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [01:47<00:00,  1.07s/it]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(206.)
+Number of negative labels: tensor(206.)
+# Epoch: 49, train_loss: 0.1937, val_loss: 0.1860, val_acc:0.9320388349514563, val_aupr: 0.9845, test_loss: 0.2849, test_acc: 0.9225,test_auc: 0.9575, test_aupr: 0.9097: 100%|█| 50/50 [00:51<00:00,  1.03s/it]
+--- TestAcc: 0.9225, early-stopping-TestAcc: 0.9225, Best ValAcc: 0.9515 in epoch 47 --- 
+--- TestAUPR: 0.9097, early-stopping-TestAUPR: 0.9103, Best ValAUPR: 0.9853 in epoch 46 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▇▇▆▆▆▆▄▄▄▃▃▄▃▂▂▂▂▂▂▂▂▁▁▁▁▂▁▁▂▂▁▁▂▂▁▂▁▁▂
+wandb:   lr ███████▇▇▇▇▇▇▇▆▆▆▆▅▅▄▄▄▄▄▃▃▃▃▃▂▂▂▂▁▁▁▁▁▁
+wandb: step ▁▁▁▂▂▂▂▂▂▃▃▃▄▄▄▄▄▄▅▅▅▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇███
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17277
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/rc8i7wmb
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_215256-rc8i7wmb/logs
+####### Run 3 for seed 3
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_215537-dhgmdzsf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/dhgmdzsf
+2025-03-18 21:55:38,519 - INFO - Use schedular
+2025-03-18 21:55:38,523 - INFO - start training..
+# Epoch 99: train_loss: 0.1676: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [01:46<00:00,  1.07s/it]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(206.)
+Number of negative labels: tensor(206.)
+# Epoch: 49, train_loss: 0.1279, val_loss: 0.1524, val_acc:0.9611650485436893, val_aupr: 0.9878, test_loss: 0.3426, test_acc: 0.9147,test_auc: 0.9353, test_aupr: 0.9240: 100%|█| 50/50 [00:51<00:00,  1.02s/it]
+--- TestAcc: 0.9147, early-stopping-TestAcc: 0.8992, Best ValAcc: 0.9709 in epoch 26 --- 
+--- TestAUPR: 0.9240, early-stopping-TestAUPR: 0.9311, Best ValAUPR: 0.9884 in epoch 47 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ████▇▇▇▇▇▇▆▆▆▅▅▅▅▄▄▄▄▃▃▃▃▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁
+wandb: step ▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16759
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/dhgmdzsf
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_215537-dhgmdzsf/logs
+####### Run 4 for seed 4
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_215818-ye1club3
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/ye1club3
+2025-03-18 21:58:19,034 - INFO - Use schedular
+2025-03-18 21:58:19,036 - INFO - start training..
+# Epoch 99: train_loss: 0.1712: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [01:46<00:00,  1.07s/it]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(206.)
+Number of negative labels: tensor(206.)
+# Epoch: 49, train_loss: 0.1496, val_loss: 0.1539, val_acc:0.9514563106796117, val_aupr: 0.9669, test_loss: 0.3243, test_acc: 0.9070,test_auc: 0.9526, test_aupr: 0.9442: 100%|█| 50/50 [00:51<00:00,  1.02s/it]
+--- TestAcc: 0.9070, early-stopping-TestAcc: 0.8992, Best ValAcc: 0.9612 in epoch 7 --- 
+--- TestAUPR: 0.9442, early-stopping-TestAUPR: 0.9322, Best ValAUPR: 0.9943 in epoch 27 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ████████▇▇▇▇▇▇▇▇▆▆▆▆▆▅▅▅▅▄▄▃▃▃▃▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▂▂▂▂▂▃▃▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▆▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17115
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run PCNet_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/ye1club3
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_215818-ye1club3/logs
+# final_acc: 0.9085±0.0103
+# early-stopping_acc: 0.9101±0.0093
+Running dataset: STRINGdb_cdgps
+2025-03-18 22:01:03,382 - INFO - Using best configs
+------ Use best configs ------
+Namespace(seeds=[0, 1, 2, 3, 4], dataset='STRINGdb_cdgps', device=-1, max_epoch=100, warmup_steps=-1, num_heads=4, num_out_heads=1, num_layers=2, num_hidden=32, residual=False, in_drop=0.2, attn_drop=0.1, norm=None, lr=0.001, weight_decay=0.0002, negative_slope=0.2, activation='prelu', mask_rate=0.5, drop_edge_rate=0.0, replace_rate=0.05, num_edge_types=6, weight_decomposition={'type': 'basis', 'num_bases': 2}, vertical_stacking=True, encoder='rgcn', decoder='rgcn', loss_fn='sce', alpha_l=3, optimizer='adam', max_epoch_f=50, lr_f=0.01, weight_decay_f=0.0001, linear_prob=True, load_model=False, save_model=False, use_cfg=True, logging=True, scheduler=True, concat_hidden=False, pooling='mean', deg4feat=False, batch_size=32)
+Loaded dataset:  STRINGdb_cdgps
+Number of features:  64
+Number of classes:  2.0
+####### Run 0 for seed 0
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: martinaina (aidd_m) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_220103-nc49tss0
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/nc49tss0
+2025-03-18 22:01:04,429 - INFO - Use schedular
+2025-03-18 22:01:04,429 - INFO - start training..
+  0%|                                                                                                                                                                                   | 0/100 [00:00<?, ?it/s]/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/utils.py:378: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:646.)
+  values = torch.sparse.FloatTensor(indices.t(), values, torch.Size(size))
+# Epoch 99: train_loss: 0.1699: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:16<00:00,  6.12it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1519, val_loss: 0.3531, val_acc:0.8877551020408163, val_aupr: 0.9416, test_loss: 0.1949, test_acc: 0.9268,test_auc: 0.9794, test_aupr: 0.9823: 100%|█| 50/50 [00:09<00:00,  5.48it/s]
+--- TestAcc: 0.9268, early-stopping-TestAcc: 0.9024, Best ValAcc: 0.9184 in epoch 19 --- 
+--- TestAUPR: 0.9823, early-stopping-TestAUPR: 0.9729, Best ValAUPR: 0.9777 in epoch 10 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss ██▇▆▆▄▄▄▄▃▃▃▃▃▃▂▂▂▂▂▃▂▂▂▂▂▁▁▂▁▂▁▁▂▁▂▂▂▂▂
+wandb:   lr ████████▇▇▇▇▇▇▇▆▆▅▅▅▄▄▄▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▃▄▄▄▄▄▄▅▅▆▆▆▆▇▇▇▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16993
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/nc49tss0
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_220103-nc49tss0/logs
+####### Run 1 for seed 1
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_220131-jl75mfyq
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/jl75mfyq
+2025-03-18 22:01:32,362 - INFO - Use schedular
+2025-03-18 22:01:32,363 - INFO - start training..
+# Epoch 99: train_loss: 0.1692: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:17<00:00,  5.65it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1199, val_loss: 0.3527, val_acc:0.9081632653061225, val_aupr: 0.9632, test_loss: 0.3604, test_acc: 0.9187,test_auc: 0.9490, test_aupr: 0.9178: 100%|█| 50/50 [00:08<00:00,  5.59it/s]
+--- TestAcc: 0.9187, early-stopping-TestAcc: 0.9187, Best ValAcc: 0.9184 in epoch 35 --- 
+--- TestAUPR: 0.9178, early-stopping-TestAUPR: 0.9271, Best ValAUPR: 0.9751 in epoch 20 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▇▇▆▆▅▆▅▄▄▄▄▄▃▄▃▃▃▃▃▂▃▂▂▂▂▂▂▁▁▂▂▁▁▁▂▂▂▂▁
+wandb:   lr ██████████▇▇▆▆▆▆▅▅▄▄▄▄▃▃▃▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁
+wandb: step ▁▁▁▁▂▂▂▂▃▃▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▆▆▇▇▇▇▇█
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16922
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/jl75mfyq
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_220131-jl75mfyq/logs
+####### Run 2 for seed 2
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_220200-55wq9pxd
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/55wq9pxd
+2025-03-18 22:02:01,320 - INFO - Use schedular
+2025-03-18 22:02:01,320 - INFO - start training..
+# Epoch 99: train_loss: 0.1696: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:16<00:00,  6.05it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1745, val_loss: 0.2461, val_acc:0.9387755102040817, val_aupr: 0.9651, test_loss: 0.2325, test_acc: 0.9268,test_auc: 0.9733, test_aupr: 0.9763: 100%|█| 50/50 [00:09<00:00,  5.45it/s]
+--- TestAcc: 0.9268, early-stopping-TestAcc: 0.9268, Best ValAcc: 0.9388 in epoch 49 --- 
+--- TestAUPR: 0.9763, early-stopping-TestAUPR: 0.9763, Best ValAUPR: 0.9789 in epoch 19 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ████████▇▇▇▇▇▆▆▆▆▅▅▅▄▄▄▄▃▃▂▂▂▂▂▁▁▁▁▁▁▁▁▁
+wandb: step ▁▁▂▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▆▆▆▆▆▆▇▇▇▇▇▇████
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16959
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/55wq9pxd
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_220200-55wq9pxd/logs
+####### Run 3 for seed 3
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_220228-7xxw1g4n
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/7xxw1g4n
+2025-03-18 22:02:29,285 - INFO - Use schedular
+2025-03-18 22:02:29,286 - INFO - start training..
+# Epoch 99: train_loss: 0.1678: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:17<00:00,  5.86it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1842, val_loss: 0.2491, val_acc:0.9285714285714286, val_aupr: 0.9612, test_loss: 0.2262, test_acc: 0.9106,test_auc: 0.9741, test_aupr: 0.9771: 100%|█| 50/50 [00:09<00:00,  5.49it/s]
+--- TestAcc: 0.9106, early-stopping-TestAcc: 0.9106, Best ValAcc: 0.9286 in epoch 49 --- 
+--- TestAUPR: 0.9771, early-stopping-TestAUPR: 0.9771, Best ValAUPR: 0.9612 in epoch 49 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   lr ██████▇▇▇▇▇▇▆▆▆▆▆▅▅▅▄▄▄▄▄▃▃▃▂▂▂▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▂▂▃▃▃▃▃▃▄▄▅▅▅▅▅▅▆▆▆▆▆▆▆▆▇▇▇▇▇█
+wandb: 
+wandb: Run summary:
+wandb: loss 0.16784
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/7xxw1g4n
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_220228-7xxw1g4n/logs
+####### Run 4 for seed 4
+wandb: Tracking run with wandb version 0.19.7
+wandb: Run data is saved locally in /Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/wandb/run-20250318_220257-kojbxjxz
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn
+wandb: ⭐️ View project at https://wandb.ai/aidd_m/graphMAE
+wandb: 🚀 View run at https://wandb.ai/aidd_m/graphMAE/runs/kojbxjxz
+2025-03-18 22:02:57,713 - INFO - Use schedular
+2025-03-18 22:02:57,714 - INFO - start training..
+# Epoch 99: train_loss: 0.1755: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:17<00:00,  5.78it/s]
+num parameters for finetuning: 35420
+Number of positive labels: tensor(196.)
+Number of negative labels: tensor(195.)
+# Epoch: 49, train_loss: 0.1699, val_loss: 0.2783, val_acc:0.9183673469387755, val_aupr: 0.9690, test_loss: 0.2725, test_acc: 0.9187,test_auc: 0.9685, test_aupr: 0.9715: 100%|█| 50/50 [00:09<00:00,  5.31it/s]
+--- TestAcc: 0.9187, early-stopping-TestAcc: 0.9268, Best ValAcc: 0.9286 in epoch 29 --- 
+--- TestAUPR: 0.9715, early-stopping-TestAUPR: 0.9702, Best ValAUPR: 0.9776 in epoch 11 --- 
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: loss █▇▇▆▆▆▆▆▆▅▆▅▅▄▄▅▄▄▃▃▂▃▂▂▂▂▂▂▂▂▂▁▁▁▂▂▁▂▂▂
+wandb:   lr █████▇▇▇▇▇▇▇▆▆▆▆▅▅▅▅▅▄▄▄▄▃▃▃▃▂▂▂▂▂▂▁▁▁▁▁
+wandb: step ▁▁▁▁▁▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb: loss 0.17549
+wandb:   lr 0
+wandb: step 99
+wandb: 
+wandb: 🚀 View run STRINGdb_cdgps_loss_sce_rpr_0.05_nh_32_nl_2_lr_0.001_mp_100_mpf_50_wd_0.0002_wdf_0.0001_rgcn_rgcn at: https://wandb.ai/aidd_m/graphMAE/runs/kojbxjxz
+wandb: ⭐️ View project at: https://wandb.ai/aidd_m/graphMAE
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20250318_220257-kojbxjxz/logs
+# final_acc: 0.9203±0.0061
+# early-stopping_acc: 0.9171±0.0095
+(.dg_env) (base) bty416@CLN-JFC-TFVH4594LN SMG-DG % 

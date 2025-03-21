@@ -18,6 +18,7 @@ def build_model(args):
     replace_rate = args.replace_rate
     weight_decomposition = args.weight_decomposition
     vertical_stacking = args.vertical_stacking
+    #return_hidden = args.return_hidden
     if args.num_edge_types is not None:
        num_edge_types = args.num_edge_types
     else:
@@ -53,5 +54,6 @@ def build_model(args):
         num_edge_types=num_edge_types,
         weight_decomposition=weight_decomposition,
         vertical_stacking=vertical_stacking,
+        #return_hidden=return_hidden
     )
     return model
