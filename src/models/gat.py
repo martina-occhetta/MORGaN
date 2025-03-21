@@ -69,7 +69,8 @@ class GAT(nn.Module):
     
         self.head = nn.Identity()
 
-    def forward(self, x, edge_index, return_hidden=False):
+    def forward(self, graph, x, return_hidden=False):
+        edge_index = graph.edge_index
         h = x
         hidden_list = []
         for l in range(self.num_layers):
@@ -83,8 +84,29 @@ class GAT(nn.Module):
         else:
             return self.head(h)
 
-    def reset_classifier(self, num_classes):
-        self.head = nn.Linear(self.num_heads * self.out_dim, num_classes)
+    def reset_classifier(self, num_classes, concat=False, datas_dim=0):
+        #self.head = nn.Linear(self.num_heads * self.out_dim, num_classes)
+        dtype = next(self.parameters()).dtype  # Get the current dtype.
+        # print("num_heads:", self.num_heads)
+        # print("out_dim:", self.out_dim)
+        # print("Computed input features:", self.num_heads * self.out_dim)
+        if concat:
+            self.head = nn.Sequential(
+                nn.Linear(self.out_dim * self.num_heads, 256),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(256, 64),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(64, 1)
+            ).to(dtype)
+        else:
+            self.head = nn.Sequential(
+                nn.Linear(self.num_heads*self.out_dim, 1)
+            ).to(dtype)
+        self.link_head = nn.Sequential(
+            nn.Linear(self.out_dim, 128)
+        ).to(dtype)
 
 
 class GATConv(MessagePassing):

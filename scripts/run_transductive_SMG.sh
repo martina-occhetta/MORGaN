@@ -32,5 +32,5 @@ python main_transductive.py \
 	--alpha_l 3 \
 	--linear_prob \
 	--scheduler \
-	#--use_cfg \
+	--use_cfg \
 	#--num_edge_types 5 \
