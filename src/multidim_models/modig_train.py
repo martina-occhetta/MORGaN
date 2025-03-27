@@ -8,8 +8,9 @@ import torch.nn.functional as F
 import torch.optim as optim
 # from torch.utils.tensorboard.writer import SummaryWriter
 
-from src.modig.modig import MODIG
-from src.modig.utils_modig import *
+from src.multidim_models.modig import MODIG
+from src.multidim_models.modig_utils import *
+from src.multidim_models.mdmni import MDMNI_DGD
 from src.datasets.data_util import load_processed_graph
 
 cuda = torch.cuda.is_available()

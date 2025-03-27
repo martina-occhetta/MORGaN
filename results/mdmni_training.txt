@@ -1,0 +1,707 @@
+(.dg_env) (base) bty416@CLN-JFC-TFVH4594LN SMG-DG % python src/multidim_models/mdmni_train.py
+CPU
+
+* args_dict：
+ {'networks': [1, 2, 3, 4, 5, 6], 'thr_go': 0.8, 'thr_seq': 0.8, 'thr_exp': 0.8, 'thr_path': 0.6, 'thr_cpdb': 0.8, 'thr_string': 0.8, 'thr_domain': 0.3, 'epochs': 1000, 'patience': 120, 'hidden_dim': 256, 'output_dim': 32, 'dropout': 0.2, 'lr': 0.001, 'wd': 0.0005, 'seed': 42, 'k': 10, 'train_name': 'Feature_data'}
+
+The dim of feature: 55
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+Loading train network datasets……
+The train profiles already exist!
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+Selected Network INFO：
+    The STRING network.
+    The DOMAIN network.
+    The EXP network.
+    The GO network.
+    The PATH network.
+    The SEQ network.
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+The number of all gene index: 2812
+
+Cross validation ……
+=====================================================
+Fold 1：
+Traceback (most recent call last):
+  File "/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/multidim_models/mdmni_train.py", line 224, in <module>
+    main(args_dic)
+  File "/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/multidim_models/mdmni_train.py", line 165, in main
+    early_stopping = EarlyStopping(patience=args['patience'], verbose=True)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/src/multidim_models/mdmni_utils.py", line 67, in __init__
+    self.val_loss_min = np.Inf
+                        ^^^^^^
+  File "/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/.dg_env/lib/python3.12/site-packages/numpy/__init__.py", line 400, in __getattr__
+    raise AttributeError(
+AttributeError: `np.Inf` was removed in the NumPy 2.0 release. Use `np.inf` instead.
+(.dg_env) (base) bty416@CLN-JFC-TFVH4594LN SMG-DG % python src/multidim_models/mdmni_train.py
+CPU
+
+* args_dict：
+ {'networks': [1, 2, 3, 4, 5, 6], 'thr_go': 0.8, 'thr_seq': 0.8, 'thr_exp': 0.8, 'thr_path': 0.6, 'thr_cpdb': 0.8, 'thr_string': 0.8, 'thr_domain': 0.3, 'epochs': 1000, 'patience': 120, 'hidden_dim': 256, 'output_dim': 32, 'dropout': 0.2, 'lr': 0.001, 'wd': 0.0005, 'seed': 42, 'k': 10, 'train_name': 'Feature_data'}
+
+The dim of feature: 55
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+Loading train network datasets……
+The train profiles already exist!
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+Selected Network INFO：
+    The STRING network.
+    The DOMAIN network.
+    The EXP network.
+    The GO network.
+    The PATH network.
+    The SEQ network.
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+The number of all gene index: 2812
+
+Cross validation ……
+=====================================================
+Fold 1：
+Epoch 20：
+Train Loss: 0.4221, Train Accuracy: 0.8113, Train AUC: 0.9036, Train AUPR: 0.8967
+Val Loss: 0.4289, Val Accuracy: 0.8178, Val AUC: 0.8993, Val AUPR: 0.8976
+
+Epoch 40：
+Train Loss: 0.3786, Train Accuracy: 0.8231, Train AUC: 0.9328, Train AUPR: 0.9344
+Val Loss: 0.4054, Val Accuracy: 0.8400, Val AUC: 0.9162, Val AUPR: 0.9027
+
+Epoch 60：
+Train Loss: 0.4964, Train Accuracy: 0.7708, Train AUC: 0.9361, Train AUPR: 0.9377
+Val Loss: 0.5248, Val Accuracy: 0.7511, Val AUC: 0.9196, Val AUPR: 0.9100
+
+Epoch 80：
+Train Loss: 0.4360, Train Accuracy: 0.8019, Train AUC: 0.9417, Train AUPR: 0.9429
+Val Loss: 0.4665, Val Accuracy: 0.7911, Val AUC: 0.9232, Val AUPR: 0.9154
+
+Epoch 100：
+Train Loss: 0.3771, Train Accuracy: 0.8320, Train AUC: 0.9466, Train AUPR: 0.9475
+Val Loss: 0.4263, Val Accuracy: 0.8533, Val AUC: 0.9252, Val AUPR: 0.9182
+
+Epoch 120：
+Train Loss: 0.3141, Train Accuracy: 0.8557, Train AUC: 0.9504, Train AUPR: 0.9508
+Val Loss: 0.3737, Val Accuracy: 0.8444, Val AUC: 0.9262, Val AUPR: 0.9180
+
+Epoch 140：
+Train Loss: 0.3388, Train Accuracy: 0.8478, Train AUC: 0.9553, Train AUPR: 0.9566
+Val Loss: 0.4116, Val Accuracy: 0.8578, Val AUC: 0.9265, Val AUPR: 0.9194
+
+Epoch 160：
+Train Loss: 0.3249, Train Accuracy: 0.8562, Train AUC: 0.9583, Train AUPR: 0.9597
+Val Loss: 0.4215, Val Accuracy: 0.8400, Val AUC: 0.9240, Val AUPR: 0.9183
+
+Epoch 180：
+Train Loss: 0.3588, Train Accuracy: 0.8458, Train AUC: 0.9595, Train AUPR: 0.9603
+Val Loss: 0.4498, Val Accuracy: 0.8400, Val AUC: 0.9260, Val AUPR: 0.9204
+
+Epoch 200：
+Train Loss: 0.2638, Train Accuracy: 0.8849, Train AUC: 0.9576, Train AUPR: 0.9595
+Val Loss: 0.4106, Val Accuracy: 0.8578, Val AUC: 0.9103, Val AUPR: 0.9008
+
+Early stopping at epoch 207
+=====================================================
+Fold 2：
+Epoch 20：
+Train Loss: 0.4272, Train Accuracy: 0.8152, Train AUC: 0.9021, Train AUPR: 0.8960
+Val Loss: 0.4224, Val Accuracy: 0.8133, Val AUC: 0.9058, Val AUPR: 0.8796
+
+Epoch 40：
+Train Loss: 0.4045, Train Accuracy: 0.8063, Train AUC: 0.9230, Train AUPR: 0.9240
+Val Loss: 0.3978, Val Accuracy: 0.8222, Val AUC: 0.9298, Val AUPR: 0.9270
+
+Epoch 60：
+Train Loss: 0.3497, Train Accuracy: 0.8508, Train AUC: 0.9333, Train AUPR: 0.9346
+Val Loss: 0.3326, Val Accuracy: 0.8444, Val AUC: 0.9406, Val AUPR: 0.9418
+
+Epoch 80：
+Train Loss: 0.4078, Train Accuracy: 0.8113, Train AUC: 0.9393, Train AUPR: 0.9398
+Val Loss: 0.3905, Val Accuracy: 0.8133, Val AUC: 0.9506, Val AUPR: 0.9537
+
+Epoch 100：
+Train Loss: 0.3789, Train Accuracy: 0.8320, Train AUC: 0.9405, Train AUPR: 0.9412
+Val Loss: 0.3660, Val Accuracy: 0.8178, Val AUC: 0.9493, Val AUPR: 0.9513
+
+Epoch 120：
+Train Loss: 0.3696, Train Accuracy: 0.8379, Train AUC: 0.9477, Train AUPR: 0.9480
+Val Loss: 0.3498, Val Accuracy: 0.8444, Val AUC: 0.9538, Val AUPR: 0.9572
+
+Epoch 140：
+Train Loss: 0.3437, Train Accuracy: 0.8473, Train AUC: 0.9515, Train AUPR: 0.9524
+Val Loss: 0.3263, Val Accuracy: 0.8533, Val AUC: 0.9563, Val AUPR: 0.9603
+
+Epoch 160：
+Train Loss: 0.4630, Train Accuracy: 0.7984, Train AUC: 0.9524, Train AUPR: 0.9535
+Val Loss: 0.4539, Val Accuracy: 0.7867, Val AUC: 0.9565, Val AUPR: 0.9603
+
+Epoch 180：
+Train Loss: 0.3535, Train Accuracy: 0.8449, Train AUC: 0.9576, Train AUPR: 0.9589
+Val Loss: 0.3465, Val Accuracy: 0.8400, Val AUC: 0.9559, Val AUPR: 0.9597
+
+Epoch 200：
+Train Loss: 0.2887, Train Accuracy: 0.8760, Train AUC: 0.9596, Train AUPR: 0.9616
+Val Loss: 0.2944, Val Accuracy: 0.8578, Val AUC: 0.9558, Val AUPR: 0.9591
+
+Epoch 220：
+Train Loss: 0.3517, Train Accuracy: 0.8493, Train AUC: 0.9601, Train AUPR: 0.9617
+Val Loss: 0.3546, Val Accuracy: 0.8533, Val AUC: 0.9540, Val AUPR: 0.9574
+
+Epoch 240：
+Train Loss: 0.5105, Train Accuracy: 0.7994, Train AUC: 0.9550, Train AUPR: 0.9575
+Val Loss: 0.5215, Val Accuracy: 0.8133, Val AUC: 0.9446, Val AUPR: 0.9477
+
+Epoch 260：
+Train Loss: 0.2748, Train Accuracy: 0.8819, Train AUC: 0.9664, Train AUPR: 0.9687
+Val Loss: 0.2965, Val Accuracy: 0.8622, Val AUC: 0.9579, Val AUPR: 0.9611
+
+Epoch 280：
+Train Loss: 0.2334, Train Accuracy: 0.9086, Train AUC: 0.9665, Train AUPR: 0.9687
+Val Loss: 0.2612, Val Accuracy: 0.8800, Val AUC: 0.9592, Val AUPR: 0.9621
+
+Epoch 300：
+Train Loss: 0.3565, Train Accuracy: 0.8473, Train AUC: 0.9700, Train AUPR: 0.9722
+Val Loss: 0.3837, Val Accuracy: 0.8533, Val AUC: 0.9576, Val AUPR: 0.9605
+
+Epoch 320：
+Train Loss: 0.2528, Train Accuracy: 0.8967, Train AUC: 0.9677, Train AUPR: 0.9699
+Val Loss: 0.3087, Val Accuracy: 0.8622, Val AUC: 0.9497, Val AUPR: 0.9516
+
+Epoch 340：
+Train Loss: 0.2372, Train Accuracy: 0.8982, Train AUC: 0.9741, Train AUPR: 0.9762
+Val Loss: 0.2900, Val Accuracy: 0.8711, Val AUC: 0.9572, Val AUPR: 0.9604
+
+Epoch 360：
+Train Loss: 0.3100, Train Accuracy: 0.8691, Train AUC: 0.9716, Train AUPR: 0.9733
+Val Loss: 0.3716, Val Accuracy: 0.8667, Val AUC: 0.9550, Val AUPR: 0.9570
+
+Epoch 380：
+Train Loss: 0.2055, Train Accuracy: 0.9200, Train AUC: 0.9757, Train AUPR: 0.9782
+Val Loss: 0.2646, Val Accuracy: 0.8978, Val AUC: 0.9623, Val AUPR: 0.9664
+
+Epoch 400：
+Train Loss: 0.2322, Train Accuracy: 0.9032, Train AUC: 0.9690, Train AUPR: 0.9704
+Val Loss: 0.3487, Val Accuracy: 0.8356, Val AUC: 0.9403, Val AUPR: 0.9426
+
+Epoch 420：
+Train Loss: 0.2169, Train Accuracy: 0.9125, Train AUC: 0.9777, Train AUPR: 0.9801
+Val Loss: 0.3220, Val Accuracy: 0.8622, Val AUC: 0.9557, Val AUPR: 0.9579
+
+Epoch 440：
+Train Loss: 0.2089, Train Accuracy: 0.9130, Train AUC: 0.9785, Train AUPR: 0.9808
+Val Loss: 0.3117, Val Accuracy: 0.8667, Val AUC: 0.9557, Val AUPR: 0.9574
+
+Early stopping at epoch 451
+=====================================================
+Fold 3：
+Epoch 20：
+Train Loss: 0.4243, Train Accuracy: 0.8127, Train AUC: 0.9013, Train AUPR: 0.8947
+Val Loss: 0.4288, Val Accuracy: 0.7911, Val AUC: 0.9023, Val AUPR: 0.9009
+
+Epoch 40：
+Train Loss: 0.3577, Train Accuracy: 0.8389, Train AUC: 0.9314, Train AUPR: 0.9323
+Val Loss: 0.3347, Val Accuracy: 0.8533, Val AUC: 0.9434, Val AUPR: 0.9489
+
+Epoch 60：
+Train Loss: 0.3645, Train Accuracy: 0.8404, Train AUC: 0.9396, Train AUPR: 0.9401
+Val Loss: 0.3532, Val Accuracy: 0.8356, Val AUC: 0.9422, Val AUPR: 0.9473
+
+Epoch 80：
+Train Loss: 0.3879, Train Accuracy: 0.8310, Train AUC: 0.9427, Train AUPR: 0.9438
+Val Loss: 0.3778, Val Accuracy: 0.8267, Val AUC: 0.9420, Val AUPR: 0.9471
+
+Epoch 100：
+Train Loss: 0.2923, Train Accuracy: 0.8691, Train AUC: 0.9489, Train AUPR: 0.9502
+Val Loss: 0.2992, Val Accuracy: 0.8578, Val AUC: 0.9448, Val AUPR: 0.9474
+
+Epoch 120：
+Train Loss: 0.3207, Train Accuracy: 0.8617, Train AUC: 0.9516, Train AUPR: 0.9535
+Val Loss: 0.3298, Val Accuracy: 0.8489, Val AUC: 0.9439, Val AUPR: 0.9492
+
+Epoch 140：
+Train Loss: 0.3558, Train Accuracy: 0.8533, Train AUC: 0.9540, Train AUPR: 0.9557
+Val Loss: 0.3703, Val Accuracy: 0.8356, Val AUC: 0.9449, Val AUPR: 0.9481
+
+Epoch 160：
+Train Loss: 0.4209, Train Accuracy: 0.8216, Train AUC: 0.9536, Train AUPR: 0.9551
+Val Loss: 0.4130, Val Accuracy: 0.8133, Val AUC: 0.9493, Val AUPR: 0.9548
+
+Epoch 180：
+Train Loss: 0.3323, Train Accuracy: 0.8567, Train AUC: 0.9587, Train AUPR: 0.9600
+Val Loss: 0.3458, Val Accuracy: 0.8400, Val AUC: 0.9502, Val AUPR: 0.9547
+
+Epoch 200：
+Train Loss: 0.2728, Train Accuracy: 0.8888, Train AUC: 0.9570, Train AUPR: 0.9591
+Val Loss: 0.3022, Val Accuracy: 0.8622, Val AUC: 0.9448, Val AUPR: 0.9486
+
+Epoch 220：
+Train Loss: 0.3289, Train Accuracy: 0.8552, Train AUC: 0.9619, Train AUPR: 0.9637
+Val Loss: 0.3458, Val Accuracy: 0.8444, Val AUC: 0.9541, Val AUPR: 0.9582
+
+Epoch 240：
+Train Loss: 0.2737, Train Accuracy: 0.8913, Train AUC: 0.9613, Train AUPR: 0.9641
+Val Loss: 0.3244, Val Accuracy: 0.8667, Val AUC: 0.9440, Val AUPR: 0.9479
+
+Epoch 260：
+Train Loss: 0.2840, Train Accuracy: 0.8918, Train AUC: 0.9586, Train AUPR: 0.9609
+Val Loss: 0.3283, Val Accuracy: 0.8444, Val AUC: 0.9448, Val AUPR: 0.9468
+
+Epoch 280：
+Train Loss: 0.3187, Train Accuracy: 0.8656, Train AUC: 0.9664, Train AUPR: 0.9688
+Val Loss: 0.3694, Val Accuracy: 0.8578, Val AUC: 0.9534, Val AUPR: 0.9567
+
+Epoch 300：
+Train Loss: 0.2794, Train Accuracy: 0.8913, Train AUC: 0.9673, Train AUPR: 0.9700
+Val Loss: 0.3275, Val Accuracy: 0.8711, Val AUC: 0.9525, Val AUPR: 0.9561
+
+Epoch 320：
+Train Loss: 0.2504, Train Accuracy: 0.8972, Train AUC: 0.9683, Train AUPR: 0.9710
+Val Loss: 0.3427, Val Accuracy: 0.8400, Val AUC: 0.9413, Val AUPR: 0.9421
+
+Epoch 340：
+Train Loss: 0.2668, Train Accuracy: 0.8987, Train AUC: 0.9620, Train AUPR: 0.9644
+Val Loss: 0.3230, Val Accuracy: 0.8667, Val AUC: 0.9447, Val AUPR: 0.9461
+
+Epoch 360：
+Train Loss: 0.2237, Train Accuracy: 0.9086, Train AUC: 0.9721, Train AUPR: 0.9750
+Val Loss: 0.2915, Val Accuracy: 0.8711, Val AUC: 0.9549, Val AUPR: 0.9546
+
+Epoch 380：
+Train Loss: 0.3064, Train Accuracy: 0.8874, Train AUC: 0.9687, Train AUPR: 0.9710
+Val Loss: 0.3601, Val Accuracy: 0.8578, Val AUC: 0.9583, Val AUPR: 0.9608
+
+Epoch 400：
+Train Loss: 0.2441, Train Accuracy: 0.8992, Train AUC: 0.9667, Train AUPR: 0.9683
+Val Loss: 0.2792, Val Accuracy: 0.8800, Val AUC: 0.9549, Val AUPR: 0.9537
+
+Epoch 420：
+Train Loss: 0.2249, Train Accuracy: 0.9111, Train AUC: 0.9749, Train AUPR: 0.9772
+Val Loss: 0.2958, Val Accuracy: 0.8622, Val AUC: 0.9573, Val AUPR: 0.9594
+
+Epoch 440：
+Train Loss: 0.2352, Train Accuracy: 0.9032, Train AUC: 0.9733, Train AUPR: 0.9755
+Val Loss: 0.2903, Val Accuracy: 0.8756, Val AUC: 0.9590, Val AUPR: 0.9568
+
+Epoch 460：
+Train Loss: 0.2165, Train Accuracy: 0.9096, Train AUC: 0.9752, Train AUPR: 0.9773
+Val Loss: 0.2923, Val Accuracy: 0.8667, Val AUC: 0.9558, Val AUPR: 0.9576
+
+Epoch 480：
+Train Loss: 0.2178, Train Accuracy: 0.9130, Train AUC: 0.9729, Train AUPR: 0.9747
+Val Loss: 0.2547, Val Accuracy: 0.8756, Val AUC: 0.9616, Val AUPR: 0.9613
+
+Epoch 500：
+Train Loss: 0.2045, Train Accuracy: 0.9185, Train AUC: 0.9756, Train AUPR: 0.9772
+Val Loss: 0.2620, Val Accuracy: 0.8711, Val AUC: 0.9607, Val AUPR: 0.9605
+
+Epoch 520：
+Train Loss: 0.2393, Train Accuracy: 0.9027, Train AUC: 0.9784, Train AUPR: 0.9806
+Val Loss: 0.3339, Val Accuracy: 0.8622, Val AUC: 0.9628, Val AUPR: 0.9633
+
+Epoch 540：
+Train Loss: 0.2207, Train Accuracy: 0.9042, Train AUC: 0.9815, Train AUPR: 0.9836
+Val Loss: 0.3059, Val Accuracy: 0.8622, Val AUC: 0.9678, Val AUPR: 0.9705
+
+Epoch 560：
+Train Loss: 0.2143, Train Accuracy: 0.9116, Train AUC: 0.9748, Train AUPR: 0.9763
+Val Loss: 0.2968, Val Accuracy: 0.8756, Val AUC: 0.9566, Val AUPR: 0.9545
+
+Epoch 580：
+Train Loss: 0.1709, Train Accuracy: 0.9338, Train AUC: 0.9820, Train AUPR: 0.9837
+Val Loss: 0.2453, Val Accuracy: 0.8844, Val AUC: 0.9655, Val AUPR: 0.9663
+
+Epoch 600：
+Train Loss: 0.1849, Train Accuracy: 0.9289, Train AUC: 0.9792, Train AUPR: 0.9809
+Val Loss: 0.2796, Val Accuracy: 0.8933, Val AUC: 0.9550, Val AUPR: 0.9534
+
+Early stopping at epoch 613
+=====================================================
+Fold 4：
+Epoch 20：
+Train Loss: 0.4017, Train Accuracy: 0.8246, Train AUC: 0.9035, Train AUPR: 0.8986
+Val Loss: 0.4027, Val Accuracy: 0.8133, Val AUC: 0.9003, Val AUPR: 0.8947
+
+Epoch 40：
+Train Loss: 0.3446, Train Accuracy: 0.8449, Train AUC: 0.9355, Train AUPR: 0.9368
+Val Loss: 0.4039, Val Accuracy: 0.8133, Val AUC: 0.9073, Val AUPR: 0.9065
+
+Epoch 60：
+Train Loss: 0.3085, Train Accuracy: 0.8671, Train AUC: 0.9428, Train AUPR: 0.9450
+Val Loss: 0.3783, Val Accuracy: 0.8533, Val AUC: 0.9123, Val AUPR: 0.9142
+
+Epoch 80：
+Train Loss: 0.3029, Train Accuracy: 0.8656, Train AUC: 0.9464, Train AUPR: 0.9485
+Val Loss: 0.3735, Val Accuracy: 0.8311, Val AUC: 0.9197, Val AUPR: 0.9215
+
+Epoch 100：
+Train Loss: 0.4304, Train Accuracy: 0.8142, Train AUC: 0.9438, Train AUPR: 0.9456
+Val Loss: 0.4987, Val Accuracy: 0.7644, Val AUC: 0.9247, Val AUPR: 0.9266
+
+Epoch 120：
+Train Loss: 0.2781, Train Accuracy: 0.8809, Train AUC: 0.9544, Train AUPR: 0.9563
+Val Loss: 0.3730, Val Accuracy: 0.8267, Val AUC: 0.9219, Val AUPR: 0.9231
+
+Epoch 140：
+Train Loss: 0.3372, Train Accuracy: 0.8429, Train AUC: 0.9585, Train AUPR: 0.9599
+Val Loss: 0.4521, Val Accuracy: 0.7733, Val AUC: 0.9201, Val AUPR: 0.9234
+
+Epoch 160：
+Train Loss: 0.2698, Train Accuracy: 0.8824, Train AUC: 0.9598, Train AUPR: 0.9622
+Val Loss: 0.4139, Val Accuracy: 0.8311, Val AUC: 0.9173, Val AUPR: 0.9153
+
+Epoch 180：
+Train Loss: 0.2985, Train Accuracy: 0.8671, Train AUC: 0.9617, Train AUPR: 0.9643
+Val Loss: 0.4618, Val Accuracy: 0.7956, Val AUC: 0.9142, Val AUPR: 0.9158
+
+Epoch 200：
+Train Loss: 0.2523, Train Accuracy: 0.8962, Train AUC: 0.9625, Train AUPR: 0.9655
+Val Loss: 0.4431, Val Accuracy: 0.8222, Val AUC: 0.9083, Val AUPR: 0.9096
+
+Epoch 220：
+Train Loss: 0.3092, Train Accuracy: 0.8641, Train AUC: 0.9658, Train AUPR: 0.9686
+Val Loss: 0.4815, Val Accuracy: 0.8044, Val AUC: 0.9193, Val AUPR: 0.9200
+
+Early stopping at epoch 227
+=====================================================
+Fold 5：
+Epoch 20：
+Train Loss: 0.4194, Train Accuracy: 0.8137, Train AUC: 0.9024, Train AUPR: 0.8949
+Val Loss: 0.4391, Val Accuracy: 0.8089, Val AUC: 0.8870, Val AUPR: 0.8868
+
+Epoch 40：
+Train Loss: 0.3669, Train Accuracy: 0.8286, Train AUC: 0.9341, Train AUPR: 0.9340
+Val Loss: 0.3971, Val Accuracy: 0.8133, Val AUC: 0.9163, Val AUPR: 0.9309
+
+Epoch 60：
+Train Loss: 0.4016, Train Accuracy: 0.8226, Train AUC: 0.9372, Train AUPR: 0.9377
+Val Loss: 0.4484, Val Accuracy: 0.8089, Val AUC: 0.9189, Val AUPR: 0.9335
+
+Epoch 80：
+Train Loss: 0.4306, Train Accuracy: 0.8137, Train AUC: 0.9424, Train AUPR: 0.9421
+Val Loss: 0.4927, Val Accuracy: 0.7867, Val AUC: 0.9186, Val AUPR: 0.9327
+
+Epoch 100：
+Train Loss: 0.3492, Train Accuracy: 0.8404, Train AUC: 0.9470, Train AUPR: 0.9465
+Val Loss: 0.4291, Val Accuracy: 0.7956, Val AUC: 0.9182, Val AUPR: 0.9322
+
+Epoch 120：
+Train Loss: 0.3459, Train Accuracy: 0.8429, Train AUC: 0.9522, Train AUPR: 0.9522
+Val Loss: 0.4445, Val Accuracy: 0.8000, Val AUC: 0.9184, Val AUPR: 0.9331
+
+Epoch 140：
+Train Loss: 0.3884, Train Accuracy: 0.8379, Train AUC: 0.9532, Train AUPR: 0.9532
+Val Loss: 0.5098, Val Accuracy: 0.8000, Val AUC: 0.9194, Val AUPR: 0.9307
+
+Epoch 160：
+Train Loss: 0.2557, Train Accuracy: 0.8893, Train AUC: 0.9609, Train AUPR: 0.9620
+Val Loss: 0.3754, Val Accuracy: 0.8356, Val AUC: 0.9191, Val AUPR: 0.9325
+
+Epoch 180：
+Train Loss: 0.2680, Train Accuracy: 0.8794, Train AUC: 0.9616, Train AUPR: 0.9629
+Val Loss: 0.3921, Val Accuracy: 0.8222, Val AUC: 0.9194, Val AUPR: 0.9322
+
+Early stopping at epoch 181
+=====================================================
+Fold 6：
+Epoch 20：
+Train Loss: 0.4058, Train Accuracy: 0.8241, Train AUC: 0.9031, Train AUPR: 0.8982
+Val Loss: 0.4191, Val Accuracy: 0.8356, Val AUC: 0.8907, Val AUPR: 0.8828
+
+Epoch 40：
+Train Loss: 0.3409, Train Accuracy: 0.8409, Train AUC: 0.9294, Train AUPR: 0.9306
+Val Loss: 0.3564, Val Accuracy: 0.8489, Val AUC: 0.9228, Val AUPR: 0.9192
+
+Epoch 60：
+Train Loss: 0.4051, Train Accuracy: 0.8261, Train AUC: 0.9316, Train AUPR: 0.9338
+Val Loss: 0.4255, Val Accuracy: 0.8311, Val AUC: 0.9177, Val AUPR: 0.9168
+
+Epoch 80：
+Train Loss: 0.3058, Train Accuracy: 0.8661, Train AUC: 0.9456, Train AUPR: 0.9471
+Val Loss: 0.3394, Val Accuracy: 0.8711, Val AUC: 0.9305, Val AUPR: 0.9270
+
+Epoch 100：
+Train Loss: 0.2977, Train Accuracy: 0.8686, Train AUC: 0.9484, Train AUPR: 0.9491
+Val Loss: 0.3464, Val Accuracy: 0.8667, Val AUC: 0.9302, Val AUPR: 0.9267
+
+Epoch 120：
+Train Loss: 0.5703, Train Accuracy: 0.7841, Train AUC: 0.9212, Train AUPR: 0.9200
+Val Loss: 0.5791, Val Accuracy: 0.7733, Val AUC: 0.9110, Val AUPR: 0.9062
+
+Epoch 140：
+Train Loss: 0.3653, Train Accuracy: 0.8330, Train AUC: 0.9464, Train AUPR: 0.9490
+Val Loss: 0.3999, Val Accuracy: 0.8400, Val AUC: 0.9302, Val AUPR: 0.9262
+
+Epoch 160：
+Train Loss: 0.2770, Train Accuracy: 0.8720, Train AUC: 0.9539, Train AUPR: 0.9553
+Val Loss: 0.3243, Val Accuracy: 0.8667, Val AUC: 0.9382, Val AUPR: 0.9324
+
+Epoch 180：
+Train Loss: 0.3184, Train Accuracy: 0.8622, Train AUC: 0.9580, Train AUPR: 0.9592
+Val Loss: 0.3696, Val Accuracy: 0.8800, Val AUC: 0.9398, Val AUPR: 0.9331
+
+Epoch 200：
+Train Loss: 0.3602, Train Accuracy: 0.8419, Train AUC: 0.9589, Train AUPR: 0.9604
+Val Loss: 0.4120, Val Accuracy: 0.8533, Val AUC: 0.9396, Val AUPR: 0.9345
+
+Epoch 220：
+Train Loss: 0.2646, Train Accuracy: 0.8908, Train AUC: 0.9618, Train AUPR: 0.9641
+Val Loss: 0.3249, Val Accuracy: 0.8356, Val AUC: 0.9445, Val AUPR: 0.9431
+
+Epoch 240：
+Train Loss: 0.2714, Train Accuracy: 0.8814, Train AUC: 0.9591, Train AUPR: 0.9618
+Val Loss: 0.3228, Val Accuracy: 0.8267, Val AUC: 0.9384, Val AUPR: 0.9375
+
+Epoch 260：
+Train Loss: 0.2866, Train Accuracy: 0.8676, Train AUC: 0.9649, Train AUPR: 0.9667
+Val Loss: 0.3476, Val Accuracy: 0.8889, Val AUC: 0.9452, Val AUPR: 0.9425
+
+Epoch 280：
+Train Loss: 0.2366, Train Accuracy: 0.9002, Train AUC: 0.9665, Train AUPR: 0.9690
+Val Loss: 0.3181, Val Accuracy: 0.8711, Val AUC: 0.9433, Val AUPR: 0.9394
+
+Epoch 300：
+Train Loss: 0.2491, Train Accuracy: 0.8943, Train AUC: 0.9659, Train AUPR: 0.9687
+Val Loss: 0.3392, Val Accuracy: 0.8489, Val AUC: 0.9360, Val AUPR: 0.9325
+
+Epoch 320：
+Train Loss: 0.2517, Train Accuracy: 0.8977, Train AUC: 0.9656, Train AUPR: 0.9682
+Val Loss: 0.3390, Val Accuracy: 0.8711, Val AUC: 0.9409, Val AUPR: 0.9363
+
+Epoch 340：
+Train Loss: 0.3060, Train Accuracy: 0.8636, Train AUC: 0.9715, Train AUPR: 0.9745
+Val Loss: 0.4005, Val Accuracy: 0.8444, Val AUC: 0.9473, Val AUPR: 0.9441
+
+Epoch 360：
+Train Loss: 0.2762, Train Accuracy: 0.8824, Train AUC: 0.9721, Train AUPR: 0.9741
+Val Loss: 0.3751, Val Accuracy: 0.8800, Val AUC: 0.9452, Val AUPR: 0.9429
+
+Early stopping at epoch 366
+=====================================================
+Fold 7：
+Epoch 20：
+Train Loss: 0.4585, Train Accuracy: 0.8058, Train AUC: 0.9079, Train AUPR: 0.8996
+Val Loss: 0.5046, Val Accuracy: 0.7378, Val AUC: 0.8746, Val AUPR: 0.8884
+
+Epoch 40：
+Train Loss: 0.3347, Train Accuracy: 0.8562, Train AUC: 0.9352, Train AUPR: 0.9343
+Val Loss: 0.3762, Val Accuracy: 0.8133, Val AUC: 0.9137, Val AUPR: 0.9247
+
+Epoch 60：
+Train Loss: 0.4105, Train Accuracy: 0.8167, Train AUC: 0.9270, Train AUPR: 0.9267
+Val Loss: 0.4613, Val Accuracy: 0.7644, Val AUC: 0.9046, Val AUPR: 0.9184
+
+Epoch 80：
+Train Loss: 0.3212, Train Accuracy: 0.8567, Train AUC: 0.9434, Train AUPR: 0.9435
+Val Loss: 0.3754, Val Accuracy: 0.8133, Val AUC: 0.9251, Val AUPR: 0.9357
+
+Epoch 100：
+Train Loss: 0.3116, Train Accuracy: 0.8631, Train AUC: 0.9446, Train AUPR: 0.9458
+Val Loss: 0.3351, Val Accuracy: 0.8489, Val AUC: 0.9325, Val AUPR: 0.9363
+
+Epoch 120：
+Train Loss: 0.2932, Train Accuracy: 0.8701, Train AUC: 0.9499, Train AUPR: 0.9512
+Val Loss: 0.3321, Val Accuracy: 0.8533, Val AUC: 0.9362, Val AUPR: 0.9425
+
+Epoch 140：
+Train Loss: 0.3392, Train Accuracy: 0.8572, Train AUC: 0.9495, Train AUPR: 0.9497
+Val Loss: 0.4101, Val Accuracy: 0.8133, Val AUC: 0.9302, Val AUPR: 0.9413
+
+Epoch 160：
+Train Loss: 0.3490, Train Accuracy: 0.8424, Train AUC: 0.9549, Train AUPR: 0.9567
+Val Loss: 0.4164, Val Accuracy: 0.8267, Val AUC: 0.9365, Val AUPR: 0.9391
+
+Epoch 180：
+Train Loss: 0.3684, Train Accuracy: 0.8340, Train AUC: 0.9558, Train AUPR: 0.9580
+Val Loss: 0.4205, Val Accuracy: 0.8222, Val AUC: 0.9407, Val AUPR: 0.9440
+
+Epoch 200：
+Train Loss: 0.3390, Train Accuracy: 0.8567, Train AUC: 0.9549, Train AUPR: 0.9576
+Val Loss: 0.4211, Val Accuracy: 0.8356, Val AUC: 0.9351, Val AUPR: 0.9375
+
+Epoch 220：
+Train Loss: 0.2967, Train Accuracy: 0.8770, Train AUC: 0.9581, Train AUPR: 0.9611
+Val Loss: 0.3927, Val Accuracy: 0.8444, Val AUC: 0.9290, Val AUPR: 0.9231
+
+Epoch 240：
+Train Loss: 0.3456, Train Accuracy: 0.8552, Train AUC: 0.9582, Train AUPR: 0.9605
+Val Loss: 0.4200, Val Accuracy: 0.8533, Val AUC: 0.9342, Val AUPR: 0.9328
+
+Epoch 260：
+Train Loss: 0.2866, Train Accuracy: 0.8765, Train AUC: 0.9547, Train AUPR: 0.9578
+Val Loss: 0.3719, Val Accuracy: 0.8533, Val AUC: 0.9284, Val AUPR: 0.9205
+
+Epoch 280：
+Train Loss: 0.2914, Train Accuracy: 0.8750, Train AUC: 0.9578, Train AUPR: 0.9602
+Val Loss: 0.3597, Val Accuracy: 0.8444, Val AUC: 0.9341, Val AUPR: 0.9263
+
+Epoch 300：
+Train Loss: 0.2781, Train Accuracy: 0.8844, Train AUC: 0.9536, Train AUPR: 0.9550
+Val Loss: 0.3842, Val Accuracy: 0.8533, Val AUC: 0.9222, Val AUPR: 0.9072
+
+Early stopping at epoch 315
+=====================================================
+Fold 8：
+Epoch 20：
+Train Loss: 0.4296, Train Accuracy: 0.8078, Train AUC: 0.9003, Train AUPR: 0.8948
+Val Loss: 0.3844, Val Accuracy: 0.8311, Val AUC: 0.9332, Val AUPR: 0.9277
+
+Epoch 40：
+Train Loss: 0.3510, Train Accuracy: 0.8414, Train AUC: 0.9278, Train AUPR: 0.9291
+Val Loss: 0.3114, Val Accuracy: 0.8489, Val AUC: 0.9476, Val AUPR: 0.9483
+
+Epoch 60：
+Train Loss: 0.3348, Train Accuracy: 0.8552, Train AUC: 0.9398, Train AUPR: 0.9403
+Val Loss: 0.3237, Val Accuracy: 0.8400, Val AUC: 0.9498, Val AUPR: 0.9503
+
+Epoch 80：
+Train Loss: 0.3062, Train Accuracy: 0.8661, Train AUC: 0.9437, Train AUPR: 0.9449
+Val Loss: 0.2962, Val Accuracy: 0.8667, Val AUC: 0.9482, Val AUPR: 0.9489
+
+Epoch 100：
+Train Loss: 0.2925, Train Accuracy: 0.8790, Train AUC: 0.9476, Train AUPR: 0.9487
+Val Loss: 0.2945, Val Accuracy: 0.8667, Val AUC: 0.9501, Val AUPR: 0.9489
+
+Epoch 120：
+Train Loss: 0.3317, Train Accuracy: 0.8538, Train AUC: 0.9503, Train AUPR: 0.9514
+Val Loss: 0.3670, Val Accuracy: 0.8356, Val AUC: 0.9486, Val AUPR: 0.9441
+
+Epoch 140：
+Train Loss: 0.2951, Train Accuracy: 0.8765, Train AUC: 0.9538, Train AUPR: 0.9550
+Val Loss: 0.3351, Val Accuracy: 0.8489, Val AUC: 0.9501, Val AUPR: 0.9385
+
+Epoch 160：
+Train Loss: 0.3083, Train Accuracy: 0.8626, Train AUC: 0.9557, Train AUPR: 0.9570
+Val Loss: 0.3618, Val Accuracy: 0.8400, Val AUC: 0.9515, Val AUPR: 0.9334
+
+Epoch 180：
+Train Loss: 0.3395, Train Accuracy: 0.8582, Train AUC: 0.9565, Train AUPR: 0.9581
+Val Loss: 0.3913, Val Accuracy: 0.8444, Val AUC: 0.9531, Val AUPR: 0.9401
+
+Epoch 200：
+Train Loss: 0.3037, Train Accuracy: 0.8750, Train AUC: 0.9574, Train AUPR: 0.9595
+Val Loss: 0.3598, Val Accuracy: 0.8622, Val AUC: 0.9527, Val AUPR: 0.9301
+
+Epoch 220：
+Train Loss: 0.3660, Train Accuracy: 0.8513, Train AUC: 0.9575, Train AUPR: 0.9584
+Val Loss: 0.4452, Val Accuracy: 0.8400, Val AUC: 0.9463, Val AUPR: 0.9318
+
+Epoch 240：
+Train Loss: 0.2462, Train Accuracy: 0.9012, Train AUC: 0.9650, Train AUPR: 0.9678
+Val Loss: 0.3352, Val Accuracy: 0.8578, Val AUC: 0.9498, Val AUPR: 0.9203
+
+Epoch 260：
+Train Loss: 0.3186, Train Accuracy: 0.8750, Train AUC: 0.9654, Train AUPR: 0.9672
+Val Loss: 0.4223, Val Accuracy: 0.8356, Val AUC: 0.9538, Val AUPR: 0.9402
+
+Epoch 280：
+Train Loss: 0.2337, Train Accuracy: 0.9086, Train AUC: 0.9674, Train AUPR: 0.9698
+Val Loss: 0.2925, Val Accuracy: 0.8933, Val AUC: 0.9569, Val AUPR: 0.9340
+
+Epoch 300：
+Train Loss: 0.4084, Train Accuracy: 0.8666, Train AUC: 0.9646, Train AUPR: 0.9667
+Val Loss: 0.5217, Val Accuracy: 0.8444, Val AUC: 0.9564, Val AUPR: 0.9249
+
+Early stopping at epoch 303
+=====================================================
+Fold 9：
+Epoch 20：
+Train Loss: 0.4390, Train Accuracy: 0.8039, Train AUC: 0.9046, Train AUPR: 0.8988
+Val Loss: 0.4390, Val Accuracy: 0.8044, Val AUC: 0.9142, Val AUPR: 0.9013
+
+Epoch 40：
+Train Loss: 0.4082, Train Accuracy: 0.8083, Train AUC: 0.9277, Train AUPR: 0.9292
+Val Loss: 0.4170, Val Accuracy: 0.8089, Val AUC: 0.9322, Val AUPR: 0.9268
+
+Epoch 60：
+Train Loss: 0.3208, Train Accuracy: 0.8607, Train AUC: 0.9396, Train AUPR: 0.9413
+Val Loss: 0.3142, Val Accuracy: 0.8800, Val AUC: 0.9427, Val AUPR: 0.9400
+
+Epoch 80：
+Train Loss: 0.3217, Train Accuracy: 0.8597, Train AUC: 0.9436, Train AUPR: 0.9452
+Val Loss: 0.3024, Val Accuracy: 0.8933, Val AUC: 0.9482, Val AUPR: 0.9477
+
+Epoch 100：
+Train Loss: 0.3368, Train Accuracy: 0.8458, Train AUC: 0.9477, Train AUPR: 0.9490
+Val Loss: 0.3660, Val Accuracy: 0.8356, Val AUC: 0.9423, Val AUPR: 0.9343
+
+Epoch 120：
+Train Loss: 0.3167, Train Accuracy: 0.8557, Train AUC: 0.9509, Train AUPR: 0.9523
+Val Loss: 0.3566, Val Accuracy: 0.8622, Val AUC: 0.9434, Val AUPR: 0.9388
+
+Epoch 140：
+Train Loss: 0.3235, Train Accuracy: 0.8518, Train AUC: 0.9538, Train AUPR: 0.9554
+Val Loss: 0.3807, Val Accuracy: 0.8444, Val AUC: 0.9407, Val AUPR: 0.9355
+
+Epoch 160：
+Train Loss: 0.3202, Train Accuracy: 0.8547, Train AUC: 0.9572, Train AUPR: 0.9595
+Val Loss: 0.3720, Val Accuracy: 0.8444, Val AUC: 0.9464, Val AUPR: 0.9443
+
+Epoch 180：
+Train Loss: 0.3669, Train Accuracy: 0.8409, Train AUC: 0.9565, Train AUPR: 0.9585
+Val Loss: 0.4625, Val Accuracy: 0.8133, Val AUC: 0.9398, Val AUPR: 0.9375
+
+Epoch 200：
+Train Loss: 0.2991, Train Accuracy: 0.8775, Train AUC: 0.9586, Train AUPR: 0.9609
+Val Loss: 0.4021, Val Accuracy: 0.8578, Val AUC: 0.9371, Val AUPR: 0.9353
+
+Early stopping at epoch 204
+=====================================================
+Fold 10：
+Epoch 20：
+Train Loss: 0.4210, Train Accuracy: 0.8123, Train AUC: 0.9049, Train AUPR: 0.8995
+Val Loss: 0.4148, Val Accuracy: 0.8438, Val AUC: 0.9058, Val AUPR: 0.8872
+
+Epoch 40：
+Train Loss: 0.4267, Train Accuracy: 0.7960, Train AUC: 0.9295, Train AUPR: 0.9309
+Val Loss: 0.4124, Val Accuracy: 0.8214, Val AUC: 0.9322, Val AUPR: 0.9273
+
+Epoch 60：
+Train Loss: 0.3924, Train Accuracy: 0.8281, Train AUC: 0.9354, Train AUPR: 0.9372
+Val Loss: 0.3736, Val Accuracy: 0.8438, Val AUC: 0.9412, Val AUPR: 0.9335
+
+Epoch 80：
+Train Loss: 0.3525, Train Accuracy: 0.8370, Train AUC: 0.9394, Train AUPR: 0.9413
+Val Loss: 0.3407, Val Accuracy: 0.8482, Val AUC: 0.9451, Val AUPR: 0.9389
+
+Epoch 100：
+Train Loss: 0.3011, Train Accuracy: 0.8672, Train AUC: 0.9471, Train AUPR: 0.9491
+Val Loss: 0.3075, Val Accuracy: 0.8705, Val AUC: 0.9463, Val AUPR: 0.9405
+
+Epoch 120：
+Train Loss: 0.3735, Train Accuracy: 0.8247, Train AUC: 0.9486, Train AUPR: 0.9504
+Val Loss: 0.3757, Val Accuracy: 0.8304, Val AUC: 0.9508, Val AUPR: 0.9491
+
+Epoch 140：
+Train Loss: 0.3107, Train Accuracy: 0.8617, Train AUC: 0.9512, Train AUPR: 0.9538
+Val Loss: 0.3530, Val Accuracy: 0.8661, Val AUC: 0.9428, Val AUPR: 0.9379
+
+Epoch 160：
+Train Loss: 0.3944, Train Accuracy: 0.8301, Train AUC: 0.9556, Train AUPR: 0.9575
+Val Loss: 0.4515, Val Accuracy: 0.8304, Val AUC: 0.9454, Val AUPR: 0.9410
+
+Epoch 180：
+Train Loss: 0.4402, Train Accuracy: 0.8247, Train AUC: 0.9533, Train AUPR: 0.9557
+Val Loss: 0.5167, Val Accuracy: 0.8080, Val AUC: 0.9408, Val AUPR: 0.9369
+
+Epoch 200：
+Train Loss: 0.3016, Train Accuracy: 0.8681, Train AUC: 0.9605, Train AUPR: 0.9628
+Val Loss: 0.3786, Val Accuracy: 0.8571, Val AUC: 0.9450, Val AUPR: 0.9427
+
+Epoch 220：
+Train Loss: 0.2882, Train Accuracy: 0.8711, Train AUC: 0.9604, Train AUPR: 0.9628
+Val Loss: 0.3732, Val Accuracy: 0.8527, Val AUC: 0.9439, Val AUPR: 0.9445
+
+Early stopping at epoch 231
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+Testing……
+
+Test results:
+Acc: 0.8845, AUC: 0.9432, AUPR: 0.9420
+Recall：0.8968, Pre：0.8362, F1：0.8858
+
+The Training and Testing are finished!
