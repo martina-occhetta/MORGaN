@@ -194,7 +194,7 @@ def main(args):
         val_label   = multidim_graph.y[val_mask].to(device)
         test_label  = multidim_graph.y[test_mask].to(device)
 
-        print("\nTraining using predefined splits …")
+        print("\nTraining using predefined splits ...")
         model = MDMNI_DGD(input_dim, hidden_dim=args['hidden_dim'],
                         output_dim=args['output_dim'], dropout=args['dropout'])
         

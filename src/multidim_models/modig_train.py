@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# @FileName  : main.py
+# @Time      : 2022/01/01 22:20:17
+# @Author    : Zhao-Wenny
+
 import argparse
 import os
 
@@ -8,22 +14,161 @@ import torch.nn.functional as F
 import torch.optim as optim
 # from torch.utils.tensorboard.writer import SummaryWriter
 
-from src.multidim_models.modig import MODIG
-from src.multidim_models.modig_utils import *
-from src.multidim_models.mdmni import MDMNI_DGD
-from src.datasets.data_util import load_processed_graph
+from modig import MODIG
+from modig_graph import ModigGraph
+from utils import *
 
 cuda = torch.cuda.is_available()
 
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Train MODIG with cross-validation and save model to file')
+    parser.add_argument('-t', '--title', help='the name of running experiment',
+                        dest='title',
+                        default=None,
+                        type=str
+                        )
+    parser.add_argument('-ppi', '--ppi', help='the chosen type of PPI',
+                        dest='ppi',
+                        default='CPDB',
+                        type=str
+                        )
+    parser.add_argument('-omic', '--omic', help='the chosen node attribute [multiomic, snv, cnv, mrna, dm]',
+                        dest='omic',
+                        default='multiomic',
+                        type=str
+                        )
+    parser.add_argument('-cancer', '--cancer', help='the model on pancan or specific cancer type',
+                        dest='cancer',
+                        default='pancan',
+                        type=str
+                        )
+    parser.add_argument('-e', '--epochs', help='maximum number of epochs (default: 1000)',
+                        dest='epochs',
+                        default=1000,
+                        type=int
+                        )
+    parser.add_argument('-p', '--patience', help='patience (default: 20)',
+                        dest='patience',
+                        default=20,
+                        type=int
+                        )
+    parser.add_argument('-dp', '--dropout', help='the dropout rate (default: 0.25)',
+                        dest='dp',
+                        default=0.25,
+                        type=float
+                        )
+    parser.add_argument('-lr', '--learningrate', help='the learning rate (default: 0.001)',
+                        dest='lr',
+                        default=0.001,
+                        type=float
+                        )
+    parser.add_argument('-wd', '--weightdecay', help='the weight decay (default: 0.0005)',
+                        dest='wd',
+                        default=0.0005,
+                        type=float
+                        )
+    parser.add_argument('-hs1', '--hiddensize1', help='the hidden size of first convolution layer (default: 300)',
+                        dest='hs1',
+                        default=300,
+                        type=int
+                        )
+    parser.add_argument('-hs2', '--hiddensize2', help='the hidden size of second convolution layer (default: 100)',
+                        dest='hs2',
+                        default=100,
+                        type=int
+                        )
+    parser.add_argument('-thr_go', '--thr_go', help='the threshold for GO semantic similarity (default: 0.8)',
+                        dest='thr_go',
+                        default=0.8,
+                        type=float
+                        )
+    parser.add_argument('-thr_seq', '--thr_seq', help='the threshold for gene sequence similarity (default: 0.5)',
+                        dest='thr_seq',
+                        default=0.5,
+                        type=float
+                        )
+    parser.add_argument('-thr_exp', '--thr_exp', help='the threshold for tissue co-expression pattern (default: 0.8)',
+                        dest='thr_exp',
+                        default=0.8,
+                        type=float
+                        )
+    parser.add_argument('-thr_path', '--thr_path', help='the threshold of gene pathway co-occurrence (default: 0.5)',
+                        dest='thr_path',
+                        default=0.5,
+                        type=float
+                        )
+    parser.add_argument('-seed', '--seed', help='the random seed (default: 42)',
+                        dest='seed',
+                        default=42,
+                        type=int
+                        )
+    args = parser.parse_args()
+    return args
+
+
 def main(args):
-    graph = load_processed_graph(PATH='data/real/smg_data', LABEL_PATH='data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv', ppi='CPDB')
-    num_features = graph.x.shape[1]
-    num_classes = graph.y.max().item() + 1
-    
+
+    seed_torch(args['seed'])
+    file_save_path = os.path.join('./Output', args['ppi'], args['title'])
+    make_dir(file_save_path)
+
+    # load data
+    graph_path = os.path.join('./Data/graph', args['ppi'])
+    if not os.path.exists(graph_path):
+        os.makedirs(graph_path)
+
+    modig_input = ModigGraph(graph_path, args['ppi'], args['cancer'])
+
+    print('Network INFO')
+
+    ppi_path = os.path.join(graph_path, args['ppi'] + '_ppi.tsv')
+    go_path = os.path.join(
+        graph_path, args['ppi'] + '_' + str(args['thr_go']) + '_go.tsv')
+    exp_path = os.path.join(
+        graph_path, args['ppi'] + '_' + str(args['thr_exp']) + '_exp.tsv')
+    seq_path = os.path.join(
+        graph_path, args['ppi'] + '_' + str(args['thr_seq']) + '_seq.tsv')
+    path_path = os.path.join(
+        graph_path, args['ppi'] + '_' + str(args['thr_path']) + '_path.tsv')
+
+    omic_path = os.path.join(graph_path, args['ppi'] + '_omics.tsv')
+
+    if os.path.exists(ppi_path) & os.path.exists(go_path) & os.path.exists(exp_path) & os.path.exists(seq_path) & os.path.exists(path_path) & os.path.exists(omic_path):
+        print('The five gene similarity profiles and omic feature already exist!')
+        ppi_network = pd.read_csv(ppi_path, sep='\t', index_col=0)
+        go_network = pd.read_csv(go_path, sep='\t', index_col=0)
+        exp_network = pd.read_csv(exp_path, sep='\t', index_col=0)
+        seq_network = pd.read_csv(seq_path, sep='\t', index_col=0)
+        path_network = pd.read_csv(path_path, sep='\t', index_col=0)
+        omicsfeature = pd.read_csv(omic_path, sep='\t', index_col=0)
+        final_gene_node = list(omicsfeature.index)
+
+    else:
+        omicsfeature, final_gene_node = modig_input.get_node_omicfeature()
+        ppi_network, go_network, exp_network, seq_network, path_network = modig_input.generate_graph(
+            args['thr_go'], args['thr_exp'], args['thr_seq'], args['thr_path'])
+
+    print("==========================================================")
+    print('Network INFO')
+    name_of_network = ['PPI', 'GO', 'EXP', 'SEQ', 'PATH']
+    graphlist = []
+    for i, network in enumerate([ppi_network, go_network, exp_network, seq_network, path_network]):
+        featured_graph = modig_input.load_featured_graph(network, omicsfeature)
+        print(f'The {name_of_network[i]} graph: {featured_graph}')
+        graphlist.append(featured_graph)
+
+    n_fdim = graphlist[0].x.shape[1]  # n_gene = featured_gsn.x.shape[0]
+    graphlist_adj = [graph.cuda() for graph in graphlist]
+    k_sets, idx_list, label_list = modig_input.ten_fold_five_crs_validation(
+        file_save_path)
+    print("==========================================================")
+
     def train(mask, label):
         model.train()
         optimizer.zero_grad()
-        output = model(graph)
+        output = model(graphlist_adj)
         loss = F.binary_cross_entropy_with_logits(
             output[mask], label, pos_weight=torch.Tensor([2.7]).cuda())
 
@@ -38,7 +183,7 @@ def main(args):
     @torch.no_grad()
     def test(mask, label):
         model.eval()
-        output = model(graph)
+        output = model(graphlist_adj)
         loss = F.binary_cross_entropy_with_logits(
             output[mask], label, pos_weight=torch.Tensor([2.7]).cuda())
 
@@ -130,3 +275,13 @@ def main(args):
 
     plot_average_PR_curve(pred_all, label_all, file_save_path)
     plot_average_ROC_curve(pred_all, label_all, file_save_path)
+
+
+if __name__ == '__main__':
+
+    args = parse_args()
+    args_dic = vars(args)
+    print('args_dict', args_dic)
+
+    main(args_dic)
+    print('The Training is finished!')
