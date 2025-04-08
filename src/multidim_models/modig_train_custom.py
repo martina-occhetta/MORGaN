@@ -85,7 +85,7 @@ def parse_args():
                         )
     parser.add_argument('-e', '--epochs', help='maximum number of epochs (default: 1000)',
                         dest='epochs',
-                        default=1000,
+                        default=100,
                         type=int
                         )
     parser.add_argument('-p', '--patience', help='patience (default: 20)',
@@ -198,7 +198,7 @@ def main(args):
     relation_graphs = split_relations(multidim_graph)
     print(f"Split multi-relational graph into {len(relation_graphs)} relation-specific graphs.")
     
-    final_gene_node = multidim_graph.node_names
+    final_gene_node = multidim_graph.name
     input_dim = multidim_graph.x.shape[1]
     idx_list = np.arange(multidim_graph.num_nodes)
     label_list = multidim_graph.y.cpu().numpy()  # if you need it as a numpy array
@@ -236,7 +236,7 @@ def main(args):
 
         return pred, loss.item(), acc, auroc, aupr
 
-    file_save_path = os.path.join('modig_results/modig', args['dataset_name'])
+    file_save_path = os.path.join('modig_results/modig', args['dataset'])
     if not os.path.exists(file_save_path):
         os.makedirs(file_save_path)
 
@@ -275,6 +275,7 @@ def main(args):
         patience=args['patience'], verbose=True)
 
         for epoch in range(1, args['epochs']+1):
+            print(f"Epoch {epoch}")
             _, _ = train(train_mask, train_label)
             _, loss_val, _, _, _ = test(val_mask, val_label)
 
@@ -285,6 +286,7 @@ def main(args):
 
             #torch.cuda.empty_cache()
 
+        print("Testing ...")
         pred, _, ACC[i], AUC[i], AUPR[i] = test(
                 val_mask, val_label)
 
