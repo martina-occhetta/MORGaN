@@ -2,6 +2,7 @@ import logging
 import numpy as np
 from tqdm import tqdm
 import torch
+import time
 
 from src.utils import (
     build_args,
@@ -31,6 +32,7 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
     epoch_iter = tqdm(range(max_epoch))
 
     for epoch in epoch_iter:
+        epoch_start = time.time()
         model.train()
         if num_edge_types != 1:
             loss, loss_dict = model(graph, x, num_edge_types)
@@ -64,11 +66,16 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
                 "estp_recall": estp_recall
                 },
             step=epoch)
+
+        epoch_end = time.time()
+        print(f"Epoch {epoch} runtime: {epoch_end - epoch_start:.2f} seconds")
+            
     # return best_model
     return model
 
 
 def main(args):
+    start_time = time.time()  # Record the start time
     device = args.device if args.device >= 0 else "cpu"
     seeds = args.seeds
     dataset_name = args.dataset
@@ -110,9 +117,12 @@ def main(args):
     estp_recall_f_list = []
     
     for i, seed in enumerate(seeds):
+
         print(f"####### Run {i} for seed {seed}")
         set_random_seed(seed)
 
+        run_start = time.time()
+        
         if logs:
             logger = WBLogger(name=f"{dataset_name}_loss_{loss_fn}_rpr_{replace_rate}_nh_{num_hidden}_nl_{num_layers}_lr_{lr}_mp_{max_epoch}_mpf_{max_epoch_f}_wd_{weight_decay}_wdf_{weight_decay_f}_{encoder_type}_{decoder_type}")
         else:
@@ -179,8 +189,15 @@ def main(args):
         test_recall_list.append(test_recall)
         estp_recall_f_list.append(estp_test_recall)
 
+        run_end = time.time()
+        print(f"Run {i} total runtime: {run_end - run_start:.2f} seconds")
+        
         if logger is not None:
             logger.finish()
+
+    end_time = time.time()  # Record the end time after everything is done
+    total_runtime = end_time - start_time
+    print(f"Total runtime: {total_runtime:.2f} seconds")
 
     final_acc, final_acc_std = np.mean(acc_list), np.std(acc_list)
     estp_acc, estp_acc_std = np.mean(estp_acc_list), np.std(estp_acc_list)

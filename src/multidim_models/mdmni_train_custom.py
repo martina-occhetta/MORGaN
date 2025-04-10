@@ -18,6 +18,7 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score, average_precision_score, recall_score, f1_score
 import faulthandler  
 from datetime import datetime
+import time
 
 from mdmni import MDMNI_DGD
 from mdmni_network import generate_graph
@@ -87,7 +88,7 @@ def parse_args():
     parser.add_argument('--thr_cpdb', dest='thr_cpdb', default=0.8, type=float, help='the threshold of CPDB PPI')
     parser.add_argument('--thr_string', dest='thr_string', default=0.8, type=float, help='the threshold of STRING PPI')
     parser.add_argument('--thr_domain', dest='thr_domain', default=0.3, type=float, help='the threshold of Domain similarity')
-    parser.add_argument('--epochs', dest='epochs', default=1000, type=int, help='maximum number of epochs')
+    parser.add_argument('--epochs', dest='epochs', default=100, type=int, help='maximum number of epochs')
     parser.add_argument('--patience', dest='patience', default=120, type=int, help='waiting iterations when performance no longer improves')
     parser.add_argument('--hidden_dim', dest='hidden_dim', default=256, type=int, help='the dim of hidden layer')
     parser.add_argument('--output_dim', dest='output_dim', default=32, type=int, help='the dim of output')
@@ -103,6 +104,7 @@ def parse_args():
 
 
 def main(args):
+    start_time = time.time()  # Record the start time
     dataset_name = args['dataset_name']
 
     if dataset_name in ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'PCNet', 'STRINGdb']:
@@ -180,10 +182,12 @@ def main(args):
     if not os.path.exists(file_save_path):
         os.makedirs(file_save_path)
 
-    seeds = [0,1,2]
+    #seeds = [0,1,2]
+    seeds = [1]
     results =  []
 
     for i, seed in enumerate(seeds):
+        run_start = time.time()
         print(f"####### Run {i} for seed {seed}")
         set_random_seed(seed)
         # Extract predefined splits and move to the device
@@ -207,6 +211,7 @@ def main(args):
         best_model_state_dict = None
 
         for epoch in range(1, args['epochs'] + 1):
+            epoch_start = time.time()
             # Train on the training split
             train_loss, train_acc = train(train_mask, train_label)
             # Evaluate on the validation split
@@ -222,6 +227,9 @@ def main(args):
                     f"Val AUC: {val_auroc:.4f}, Val AUPR: {val_aupr:.4f}")
                 print("")
 
+            epoch_end = time.time()
+            print(f"Run {i} - Epoch {epoch} runtime: {epoch_end - epoch_start:.2f} seconds")
+            
             early_stopping(loss_val, model)
             # Save the best model based on validation accuracy
             if val_acc > best_val_acc:
@@ -231,6 +239,9 @@ def main(args):
                 print(f"Early stopping at epoch {epoch}")
                 break
 
+        run_end = time.time()
+        print(f"Run {i} total runtime: {run_end - run_start:.2f} seconds")
+    
         print("\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
         print("Testing …")
         # Reload the best model before testing
@@ -249,6 +260,10 @@ def main(args):
         print(f"Acc: {test_acc:.4f}, AUC: {test_auc:.4f}, AUPR: {test_aupr:.4f}")
         print(f"Recall: {test_recall:.4f}, Precision: {test_precision:.4f}, F1: {test_f1:.4f}\n")
         #     k_sets, test_mask, test_label, idx_list, label_list = cross_validation(train_path, file_save_path, args['k'])
+
+        end_time = time.time()  # Record the end time after everything is done
+        total_runtime = end_time - start_time
+        print(f"Total runtime: {total_runtime:.2f} seconds")
     
 
     # print("\nCross validation ……")

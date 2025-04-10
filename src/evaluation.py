@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from sklearn import metrics
 from src.utils import create_optimizer, accuracy, result
-
+import time
 def node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=True, mute=False):
     model.eval()
     if linear_prob:
@@ -60,6 +60,7 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
         epoch_iter = range(max_epoch)
 
     for epoch in epoch_iter:
+        #epoch_start = time.time()
         model.train().to(device)
         if graph.num_edge_types != 1:
             out = model(graph, x, graph.num_edge_types)
@@ -101,6 +102,9 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
 
         if not mute:
             epoch_iter.set_description(f"# Epoch: {epoch}, train_loss:{loss.item(): .4f}, val_loss:{val_loss.item(): .4f}, val_acc:{val_acc}, val_aupr:{val_aupr: .4f}, test_loss:{test_loss.item(): .4f}, test_acc:{test_acc: .4f},test_auc:{test_auc: .4f}, test_aupr:{test_aupr: .4f}")
+        
+        #epoch_end = time.time()
+        #print(f"Epoch {epoch} runtime: {epoch_end - epoch_start:.2f} seconds")
 
     best_model.eval()
     with torch.no_grad():
@@ -117,6 +121,7 @@ def linear_probing_for_transductive_node_classifcation(model, graph, feat, optim
         print(f"--- TestAcc: {test_acc:.4f}, early-stopping-TestAcc: {estp_test_acc:.4f}, Best ValAcc: {best_val_acc:.4f} in epoch {best_val_epoch} --- ")
         print(f"--- TestAUPR: {test_aupr:.4f}, early-stopping-TestAUPR: {estp_test_aupr:.4f}, Best ValAUPR: {best_val_aupr:.4f} in epoch {best_val_epoch_aupr} --- ")
 
+    
     # (final_acc, es_acc, best_acc)
     return (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_precision_f), (test_recall, estp_recall_f), (test_f1, estp_f1)
 

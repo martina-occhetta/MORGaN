@@ -7,7 +7,7 @@ device=$2
 
 # List of available datasets
 #datasets=("CPDB_cdgps" "IRefIndex_2015_cdgps" "IRefIndex_cdgps" "PCNet_cdgps" "STRINGdb_cdgps")
-datasets=("CPDB_cdgps_shuffled")
+datasets=("CPDB_cdgps")
 
 if [ -z "${dataset_input}" ]; then
     # No dataset provided; run for all options
@@ -34,7 +34,7 @@ if [ -z "${dataset_input}" ]; then
             --optimizer adam \
             --drop_edge_rate 0.0 \
             --loss_fn "sce" \
-            --seeds 2 \
+            --seeds  1 2 \
             --replace_rate 0.05 \
             --alpha_l 3 \
             --linear_prob \

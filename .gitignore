@@ -183,3 +183,5 @@ wandb/
 checkpoints/
 
 .DS_Store
+
+results/
