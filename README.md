@@ -1,1 +1,1 @@
-# SMG-DG
+# MORGaN
