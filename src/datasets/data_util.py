@@ -242,6 +242,11 @@ def load_dataset(dataset_name):
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
+    elif dataset_name in ['CPDB_cdgps_CNA_GE_METH', 'CPDB_cdgps_CNA_GE_MF', 'CPDB_cdgps_CNA_METH_MF', 'CPDB_cdgps_CNA', 'CPDB_cdgps_GE_METH_MF', 'CPDB_cdgps_GE', 'CPDB_cdgps_METH', 'CPDB_cdgps_MF', 'CPDB_cdgps_random_features']:
+        graph = load_processed_graph(f'data/real/multidim_graph/6d/feature_ablations/{dataset_name}.pt')
+        num_features = graph.x.shape[1]
+        num_classes = graph.y.max().item() + 1
+
     else:
         dataset = Planetoid("", dataset_name, transform=T.NormalizeFeatures())
         graph = dataset[0]

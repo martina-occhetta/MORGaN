@@ -32,7 +32,7 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
     epoch_iter = tqdm(range(max_epoch))
 
     for epoch in epoch_iter:
-        epoch_start = time.time()
+        #epoch_start = time.time()
         model.train()
         if num_edge_types != 1:
             loss, loss_dict = model(graph, x, num_edge_types)
@@ -67,8 +67,8 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
                 },
             step=epoch)
 
-        epoch_end = time.time()
-        print(f"Epoch {epoch} runtime: {epoch_end - epoch_start:.2f} seconds")
+        #epoch_end = time.time()
+        #print(f"Epoch {epoch} runtime: {epoch_end - epoch_start:.2f} seconds")
             
     # return best_model
     return model
@@ -191,7 +191,7 @@ def main(args):
 
         run_end = time.time()
         print(f"Run {i} total runtime: {run_end - run_start:.2f} seconds")
-        
+
         if logger is not None:
             logger.finish()
 
