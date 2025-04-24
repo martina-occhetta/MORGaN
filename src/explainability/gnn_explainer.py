@@ -1,6 +1,8 @@
 from copy import copy
 from math import sqrt
-from typing import Optional
+from typing import Optional, Tuple
+
+from torch import Tensor
 
 import numpy as np
 import torch
@@ -133,24 +135,53 @@ class GNNExplainer(torch.nn.Module):
 
         return x, edge_index, mapping, edge_mask, kwargs
 
+    # def __loss__(self, node_idx, log_logits, pred_label):
+    #     # node_idx is -1 for explaining graphs
+    #     loss = -log_logits[
+    #         node_idx, pred_label[node_idx]] if node_idx != -1 else -log_logits[
+    #             0, pred_label[0]]
+
+    #     m = self.edge_mask.sigmoid()
+    #     edge_reduce = getattr(torch, self.coeffs['edge_reduction'])
+    #     loss = loss + self.coeffs['edge_size'] * edge_reduce(m)
+    #     ent = -m * torch.log(m + EPS) - (1 - m) * torch.log(1 - m + EPS)
+    #     loss = loss + self.coeffs['edge_ent'] * ent.mean()
+
+    #     m = self.node_feat_mask.sigmoid()
+    #     node_feat_reduce = getattr(torch, self.coeffs['node_feat_reduction'])
+    #     loss = loss + self.coeffs['node_feat_size'] * node_feat_reduce(m)
+    #     ent = -m * torch.log(m + EPS) - (1 - m) * torch.log(1 - m + EPS)
+    #     loss = loss + self.coeffs['node_feat_ent'] * ent.mean()
+
+    #     return loss
+
     def __loss__(self, node_idx, log_logits, pred_label):
-        # node_idx is -1 for explaining graphs
-        loss = -log_logits[
-            node_idx, pred_label[node_idx]] if node_idx != -1 else -log_logits[
-                0, pred_label[0]]
+        # Ensure pred_label is 1-dimensional. If it is 0-dimensional, convert it to a Python int.
+        if pred_label.dim() == 0:
+            pred_label = pred_label.unsqueeze(0)  # now shape [1]
+        
+        # Now, if we are explaining a specific node:
+        if node_idx != -1:
+            # If the subgraph has only one node, node_idx should be 0.
+            index = node_idx if pred_label.numel() > 1 else 0
+            loss = -log_logits[index, pred_label[index].item()]
+        else:
+            loss = -log_logits[0, pred_label[0].item()]
 
         m = self.edge_mask.sigmoid()
         edge_reduce = getattr(torch, self.coeffs['edge_reduction'])
         loss = loss + self.coeffs['edge_size'] * edge_reduce(m)
+        
         ent = -m * torch.log(m + EPS) - (1 - m) * torch.log(1 - m + EPS)
         loss = loss + self.coeffs['edge_ent'] * ent.mean()
 
         m = self.node_feat_mask.sigmoid()
         node_feat_reduce = getattr(torch, self.coeffs['node_feat_reduction'])
         loss = loss + self.coeffs['node_feat_size'] * node_feat_reduce(m)
+        
         ent = -m * torch.log(m + EPS) - (1 - m) * torch.log(1 - m + EPS)
         loss = loss + self.coeffs['node_feat_ent'] * ent.mean()
-
+        
         return loss
 
     def __to_log_prob__(self, x: torch.Tensor) -> torch.Tensor:
@@ -159,7 +190,8 @@ class GNNExplainer(torch.nn.Module):
         return x
 
     def explain_graph(self, data, **kwargs):
-        r"""Learns and returns an edge mask that play a
+        """
+        Learns and returns an edge mask that play a
         crucial role to explain the prediction made by the GNN for a graph.
         Args:
             x (Tensor): The node feature matrix.
@@ -221,65 +253,172 @@ class GNNExplainer(torch.nn.Module):
         self.__clear_masks__()
         return node_feat_mask, edge_mask
 
-    def explain_node(self, node_idx, x, edge_index, **kwargs):
-        r"""Learns and returns a node feature mask and an edge mask that play a
-        crucial role to explain the prediction made by the GNN for node
-        :attr:`node_idx`.
-        Args:
-            node_idx (int): The node to explain.
-            x (Tensor): The node feature matrix.
-            edge_index (LongTensor): The edge indices.
-            **kwargs (optional): Additional arguments passed to the GNN module.
-        :rtype: (:class:`Tensor`, :class:`Tensor`)
-        """
+    # def explain_node(self, node_idx, x, edge_index, **kwargs):
+    #     r"""Learns and returns a node feature mask and an edge mask that play a
+    #     crucial role to explain the prediction made by the GNN for node
+    #     :attr:`node_idx`.
+    #     Args:
+    #         node_idx (int): The node to explain.
+    #         x (Tensor): The node feature matrix.
+    #         edge_index (LongTensor): The edge indices.
+    #         **kwargs (optional): Additional arguments passed to the GNN module.
+    #     :rtype: (:class:`Tensor`, :class:`Tensor`)
+    #     """
 
+    #     self.model.eval()
+    #     self.__clear_masks__()
+
+    #     num_edges = edge_index.size(1)
+
+    #     # Only operate on a k-hop subgraph around `node_idx`.
+    #     x, edge_index, mapping, hard_edge_mask, kwargs = self.__subgraph__(
+    #         node_idx, x, edge_index, **kwargs)
+
+    #     # Get the initial prediction.
+    #     with torch.no_grad():
+    #         out = self.model(x=x, edge_index=edge_index, **kwargs)
+    #         log_logits = self.__to_log_prob__(out)
+    #         pred_label = log_logits.argmax(dim=-1)
+
+    #     self.__set_masks__(x, edge_index)
+    #     self.to(x.device)
+
+    #     optimizer = torch.optim.Adam([self.node_feat_mask, self.edge_mask],
+    #                                  lr=self.lr)
+
+    #     if self.log:  # pragma: no cover
+    #         pbar = tqdm(total=self.epochs)
+    #         pbar.set_description(f'Explain node {node_idx}')
+
+    #     for epoch in range(1, self.epochs + 1):
+    #         optimizer.zero_grad()
+    #         h = x * self.node_feat_mask.view(1, -1).sigmoid()
+    #         out = self.model(x=h, edge_index=edge_index, **kwargs)
+    #         log_logits = self.__to_log_prob__(out)
+    #         loss = self.__loss__(mapping, log_logits, pred_label)
+    #         loss.backward()
+    #         optimizer.step()
+
+    #         if self.log:  # pragma: no cover
+    #             pbar.update(1)
+
+    #     if self.log:  # pragma: no cover
+    #         pbar.close()
+
+    #     node_feat_mask = self.node_feat_mask.detach().sigmoid()
+    #     edge_mask = self.edge_mask.new_zeros(num_edges)
+    #     edge_mask[hard_edge_mask] = self.edge_mask.detach().sigmoid()
+
+    #     self.__clear_masks__()
+
+    #     return node_feat_mask, edge_mask
+
+    def explain_node(self, node_idx: int, data: Data, **kwargs) -> Tuple[Tensor, Tensor]:
+        """
+        Learns and returns a node feature mask and an edge mask to explain the prediction
+        for the given node index from a PyG Data object.
+        
+        Args:
+            node_idx (int): The target node index to explain.
+            data (Data): A PyG Data object containing at least 'x', 'edge_index' and (optionally) 
+                        'edge_type' and 'num_nodes'.
+            **kwargs: Additional keyword arguments (if any) to pass to __subgraph__.
+        
+        Returns:
+            Tuple[Tensor, Tensor]: The node feature mask and the edge mask.
+        """
+        # Put the model in evaluation mode and clear any previous masks:
         self.model.eval()
         self.__clear_masks__()
+        
+        # Extract the node features and edge index from the Data object.
+        x, edge_index = data.x, data.edge_index
+        
+        # Extract a k-hop subgraph around the target node.
+        # (This returns a smaller subgraph restricted to the neighborhood of `node_idx`.)
+        # mapping will allow us to map subgraph nodes back to the original indices.
+        x_sub, edge_index_sub, mapping, hard_edge_mask, extra = self.__subgraph__(
+            node_idx, x, edge_index, **kwargs
+        )
 
-        num_edges = edge_index.size(1)
-
-        # Only operate on a k-hop subgraph around `node_idx`.
-        x, edge_index, mapping, hard_edge_mask, kwargs = self.__subgraph__(
-            node_idx, x, edge_index, **kwargs)
-
-        # Get the initial prediction.
+        print("x_sub shape:", x_sub.shape)
+        print("edge_index_sub shape:", edge_index_sub.shape)
+        print("mapping:", mapping)
+        
+        # Make a copy of the original data object and replace its x and edge_index
+        # with the subgraph versions. (Optionally, you could also adjust 'edge_type'
+        # if needed by extracting it from extra or using data.edge_type[hard_edge_mask].)
+        data_sub = copy(data)
+        data_sub.x = x_sub
+        data_sub.edge_index = edge_index_sub
+        data_sub.edge_type = data.edge_type[hard_edge_mask]  # Update edge types accordingly
+        # (If your model also uses edge_type, be sure to update that similarly.)
+        
+        # Get an initial prediction on the subgraph.
         with torch.no_grad():
-            out = self.model(x=x, edge_index=edge_index, **kwargs)
+            out = self.model(data_sub, data_sub.x, data.num_edge_types)
+            print(f'Out 1: {out}')
+            if isinstance(out, tuple):
+                out = out[0]
+            if out.dim() == 1:
+                out = out.unsqueeze(0)
+            print(f'Out after extraction: {out}')
             log_logits = self.__to_log_prob__(out)
             pred_label = log_logits.argmax(dim=-1)
+            print("log_logits shape:", log_logits.shape)
+            print("pred_label shape:", pred_label.shape)    
+        
+        # Initialize the learnable masks (both on nodes and edges).
+        self.__set_masks__(x_sub, edge_index_sub, type=1)
+        self.to(x_sub.device)
 
-        self.__set_masks__(x, edge_index)
-        self.to(x.device)
-
-        optimizer = torch.optim.Adam([self.node_feat_mask, self.edge_mask],
-                                     lr=self.lr)
-
-        if self.log:  # pragma: no cover
+        # Create an optimizer for the two masks.
+        optimizer = torch.optim.Adam([self.node_feat_mask, self.edge_mask], lr=self.lr)
+        
+        if self.log:
+            from tqdm import tqdm
             pbar = tqdm(total=self.epochs)
             pbar.set_description(f'Explain node {node_idx}')
 
+        # Run the optimization loop.
         for epoch in range(1, self.epochs + 1):
             optimizer.zero_grad()
-            h = x * self.node_feat_mask.view(1, -1).sigmoid()
-            out = self.model(x=h, edge_index=edge_index, **kwargs)
+            
+            # Apply the node feature mask: multiply the original (subgraph) features
+            # elementwise by the sigmoid of the learnable mask.
+            h = x_sub * self.node_feat_mask.view(1, -1).sigmoid()
+            
+            # Create a copy of the subgraph and replace its node features with the masked version.
+            data_copy = copy(data_sub)
+            data_copy.x = h
+            
+            # Run the model on the modified data object.
+            out = self.model(data_copy, h, data.num_edge_types)
             log_logits = self.__to_log_prob__(out)
-            loss = self.__loss__(mapping, log_logits, pred_label)
+            
+            # Compute the loss.
+            # (The __loss__ function combines a negative log-likelihood term with
+            # regularizers encouraging mask sparsity and high entropy.)
+            loss = self.__loss__(mapping.item() if torch.is_tensor(mapping) else mapping, log_logits, pred_label)
             loss.backward()
             optimizer.step()
 
-            if self.log:  # pragma: no cover
+            if self.log:
                 pbar.update(1)
-
-        if self.log:  # pragma: no cover
+        if self.log:
             pbar.close()
 
+        # Detach the final masks.
         node_feat_mask = self.node_feat_mask.detach().sigmoid()
-        edge_mask = self.edge_mask.new_zeros(num_edges)
-        edge_mask[hard_edge_mask] = self.edge_mask.detach().sigmoid()
+        
+        # For edge mask, place the masked scores back into an array the size of the original edge_index.
+        full_edge_mask = self.edge_mask.new_zeros(data.edge_index.size(1))
+        full_edge_mask[hard_edge_mask] = self.edge_mask.detach().sigmoid()
 
+        # Clear temporary masks from the model.
         self.__clear_masks__()
-
-        return node_feat_mask, edge_mask
+        
+        return node_feat_mask, full_edge_mask
 
     def visualize_subgraph(self, node_idx, edge_index, edge_mask, y=None,
                            threshold=None, **kwargs):
