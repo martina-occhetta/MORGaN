@@ -65,6 +65,8 @@ def build_args():
     parser.add_argument("--max_epoch", type=int, default=200,
                         help="number of training epochs")
     parser.add_argument("--warmup_steps", type=int, default=-1)
+    parser.add_argument("--experiment_type", type=str, default="predict_druggable_genes",
+                        help="Type of experiment to run: 'feature_ablations', 'edge_ablations', 'ppi_datasets', or 'predict_druggable_genes'")
 
     parser.add_argument("--num_heads", type=int, default=4,
                         help="number of hidden attention heads")
@@ -174,23 +176,95 @@ def create_optimizer(opt, model, lr, weight_decay, get_num_layer=None, get_layer
 
 # -------------------
 
-def load_best_configs(args, path):
-    with open(path, "r") as f:
-        configs = yaml.load(f, yaml.FullLoader)
-
-    if args.dataset not in configs:
-        logging.info("Best args not found")
-        return args
-
-    logging.info("Using best configs")
-    configs = configs[args.dataset]
-
-    for k, v in configs.items():
-        if "lr" in k or "weight_decay" in k:
-            v = float(v)
-        setattr(args, k, v)
-    print("------ Use best configs ------")
+def load_config(args, config_path):
+    """Load configuration from a YAML file and update args."""
+    with open(config_path, "r") as f:
+        config = yaml.load(f, yaml.FullLoader)
+    
+    logging.info(f"Loading configuration from {config_path}")
+    
+    # Update args with configuration values
+    for section, params in config.items():
+        if section == "experiment_type":
+            setattr(args, section, params)
+            continue
+            
+        # Handle both dictionary and non-dictionary cases
+        if isinstance(params, dict):
+            # Handle dictionary case
+            for param_name, value in params.items():
+                if isinstance(value, dict):
+                    # Handle nested parameters
+                    for nested_param, nested_value in value.items():
+                        full_param_name = f"{param_name}_{nested_param}"
+                        # Convert string values to appropriate types
+                        if isinstance(nested_value, str):
+                            try:
+                                if nested_value.lower() == 'true':
+                                    nested_value = True
+                                elif nested_value.lower() == 'false':
+                                    nested_value = False
+                                else:
+                                    # Try to convert to float first (handles scientific notation)
+                                    try:
+                                        nested_value = float(nested_value)
+                                        # If it's a whole number, convert to int
+                                        if nested_value.is_integer():
+                                            nested_value = int(nested_value)
+                                    except ValueError:
+                                        pass  # Keep as string if conversion fails
+                            except:
+                                pass  # Keep original value if any conversion fails
+                        setattr(args, full_param_name, nested_value)
+                else:
+                    # Handle direct parameters
+                    # Convert string values to appropriate types
+                    if isinstance(value, str):
+                        try:
+                            if value.lower() == 'true':
+                                value = True
+                            elif value.lower() == 'false':
+                                value = False
+                            else:
+                                # Try to convert to float first (handles scientific notation)
+                                try:
+                                    value = float(value)
+                                    # If it's a whole number, convert to int
+                                    if value.is_integer():
+                                        value = int(value)
+                                except ValueError:
+                                    pass  # Keep as string if conversion fails
+                        except:
+                            pass  # Keep original value if any conversion fails
+                    setattr(args, param_name, value)
+        else:
+            # Handle non-dictionary case
+            # Convert string values to appropriate types
+            if isinstance(params, str):
+                try:
+                    if params.lower() == 'true':
+                        params = True
+                    elif params.lower() == 'false':
+                        params = False
+                    else:
+                        # Try to convert to float first (handles scientific notation)
+                        try:
+                            params = float(params)
+                            # If it's a whole number, convert to int
+                            if params.is_integer():
+                                params = int(params)
+                        except ValueError:
+                            pass  # Keep as string if conversion fails
+                except:
+                    pass  # Keep original value if any conversion fails
+            setattr(args, section, params)
+    
     return args
+
+def load_best_configs(args, path):
+    """Legacy function for backward compatibility."""
+    logging.warning("load_best_configs is deprecated. Please use load_config instead.")
+    return load_config(args, path)
 
 def drop_edge(data, drop_rate, return_edges = False):
 
@@ -237,7 +311,7 @@ def drop_edge(data, drop_rate, return_edges = False):
 # ------ logging ------
 
 class WBLogger(object):
-    def __init__(self, log_path="./wandb", name="run", project='graphMAE-DG'):
+    def __init__(self, log_path="./wandb", name="run", project='MORGaN'):
         """
         Initializes a Weights & Biases run. The log_path is ignored in wandb,
         but kept for compatibility.

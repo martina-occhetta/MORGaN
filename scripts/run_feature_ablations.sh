@@ -1,81 +1,61 @@
 #!/bin/bash
 
-dataset_input=$1
-device=$2
+# Define all possible feature types
+FEATURE_TYPES=(
+    "CNA"
+    "GE"
+    "METH"
+    "MF"
+)
 
-[ -z "${device}" ] && device=-1
+# Define PPIs
+PPIS=("CPDB") #"IRefIndex_2015" "IRefIndex" "STRINGdb" "PCNet")
 
-# List of available datasets
-#datasets=("CPDB_cdgps" "IRefIndex_2015_cdgps" "IRefIndex_cdgps" "PCNet_cdgps" "STRINGdb_cdgps")
-# datasets=('CPDB_cdgps_CNA_GE_METH' 'CPDB_cdgps_CNA_GE_MF' 'CPDB_cdgps_CNA_METH_MF' 'CPDB_cdgps_CNA' 'CPDB_cdgps_GE_METH_MF' 'CPDB_cdgps_GE' 'CPDB_cdgps_METH' 'CPDB_cdgps_MF')
-datasets=("CPDB_cdgps_random_features")
-
-if [ -z "${dataset_input}" ]; then
-    # No dataset provided; run for all options
-    for dataset in "${datasets[@]}"; do
-        echo "Running dataset: $dataset"
-        python main_transductive.py \
-            --device $device \
-            --dataset $dataset \
-            --mask_rate 0.5 \
-            --encoder "rgcn" \
-            --decoder "rgcn" \
-            --in_drop 0.2 \
-            --attn_drop 0.1 \
-            --num_layers 2 \
-            --num_hidden 32 \
-            --num_heads 4 \
-            --max_epoch 100 \
-            --max_epoch_f 300 \
-            --lr 0.001 \
-            --weight_decay 0 \
-            --lr_f 0.01 \
-            --weight_decay_f 1e-4 \
-            --activation prelu \
-            --optimizer adam \
-            --drop_edge_rate 0.0 \
-            --loss_fn "sce" \
-            --seeds 0 1 2 \
-            --replace_rate 0.05 \
-            --alpha_l 3 \
-            --linear_prob \
-            --scheduler \
-            --use_cfg \
-            --num_edge_types 6 \
-            --weight_decomposition "{'type': 'basis', 'num_bases': 2}" \
-            --vertical_stacking "True"
-    done
-else
-    # A dataset was provided; run for the given dataset
-    dataset=$dataset_input
+# Function to run experiment for a single dataset
+run_experiment() {
+    local ppi=$1
+    local feature_types=$2
+    local dataset_name
+    
+    dataset_name="${ppi}_cdgps_${feature_types}"
+    
+    echo "Running experiment for dataset: $dataset_name"
     python main_transductive.py \
-        --device $device \
-        --dataset $dataset \
-        --mask_rate 0.5 \
-        --encoder "rgcn" \
-        --decoder "rgcn" \
-        --in_drop 0.2 \
-        --attn_drop 0.1 \
-        --num_layers 2 \
-        --num_hidden 32 \
-        --num_heads 4 \
-        --max_epoch 5 \
-        --max_epoch_f 300 \
-        --lr 0.001 \
-        --weight_decay 0 \
-        --lr_f 0.01 \
-        --weight_decay_f 1e-4 \
-        --activation prelu \
-        --optimizer adam \
-        --drop_edge_rate 0.0 \
-        --loss_fn "sce" \
-        --seeds 0 1 2 3 4 \
-        --replace_rate 0.05 \
-        --alpha_l 3 \
-        --linear_prob \
-        --scheduler \
+        --dataset "$dataset_name" \
+        --experiment_type "feature_ablations" \
         --use_cfg \
-        --num_edge_types 6 \
-        --weight_decomposition "{'type': 'basis', 'num_bases': 2}" \
-        --vertical_stacking "True"
-fi
+        --seeds 0 1 
+}
+
+# Run experiments for each PPI
+for ppi in "${PPIS[@]}"; do
+    # Single feature type experiments
+    for feature_type in "${FEATURE_TYPES[@]}"; do
+        run_experiment "$ppi" "$feature_type"
+    done
+    
+    # Two feature type combinations
+    for ((i=0; i<${#FEATURE_TYPES[@]}; i++)); do
+        for ((j=i+1; j<${#FEATURE_TYPES[@]}; j++)); do
+            feature_combo="${FEATURE_TYPES[i]}_${FEATURE_TYPES[j]}"
+            run_experiment "$ppi" "$feature_combo"
+        done
+    done
+    
+    # Three feature type combinations
+    for ((i=0; i<${#FEATURE_TYPES[@]}; i++)); do
+        for ((j=i+1; j<${#FEATURE_TYPES[@]}; j++)); do
+            for ((k=j+1; k<${#FEATURE_TYPES[@]}; k++)); do
+                feature_combo="${FEATURE_TYPES[i]}_${FEATURE_TYPES[j]}_${FEATURE_TYPES[k]}"
+                run_experiment "$ppi" "$feature_combo"
+            done
+        done
+    done
+    
+    # All feature types
+    all_features=$(IFS="_"; echo "${FEATURE_TYPES[*]}")
+    run_experiment "$ppi" "$all_features"
+    
+    # Random features version
+    run_experiment "$ppi" "random_features"
+done

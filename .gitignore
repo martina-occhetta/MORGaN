@@ -185,3 +185,6 @@ checkpoints/
 .DS_Store
 
 results/
+figures/
+random/
+paper/

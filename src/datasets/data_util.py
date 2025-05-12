@@ -170,30 +170,30 @@ def train_val_test_split(data, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15)
     return data
 
 def load_dataset(dataset_name):
-    if dataset_name == "ogbn-arxiv":
-        dataset = PygNodePropPredDataset(name='ogbn-arxiv', root="./data")
-        graph = dataset[0]
-        num_nodes = graph.x.shape[0]
-        graph.edge_index = to_undirected(graph.edge_index)
-        graph.edge_index = remove_self_loops(graph.edge_index)[0]
-        graph.edge_index = add_self_loops(graph.edge_index)[0]
-        split_idx = dataset.get_idx_split()
-        train_idx, val_idx, test_idx = split_idx["train"], split_idx["valid"], split_idx["test"]
-        if not torch.is_tensor(train_idx):
-            train_idx = torch.as_tensor(train_idx)
-            val_idx = torch.as_tensor(val_idx)
-            test_idx = torch.as_tensor(test_idx)
-        train_mask = torch.full((num_nodes,), False).index_fill_(0, train_idx, True)
-        val_mask = torch.full((num_nodes,), False).index_fill_(0, val_idx, True)
-        test_mask = torch.full((num_nodes,), False).index_fill_(0, test_idx, True)
-        graph.train_mask, graph.val_mask, graph.test_mask = train_mask, val_mask, test_mask
-        graph.y = graph.y.view(-1)
-        graph.x = scale_feats(graph.x)
+    # if dataset_name == "ogbn-arxiv":
+    #     dataset = PygNodePropPredDataset(name='ogbn-arxiv', root="./data")
+    #     graph = dataset[0]
+    #     num_nodes = graph.x.shape[0]
+    #     graph.edge_index = to_undirected(graph.edge_index)
+    #     graph.edge_index = remove_self_loops(graph.edge_index)[0]
+    #     graph.edge_index = add_self_loops(graph.edge_index)[0]
+    #     split_idx = dataset.get_idx_split()
+    #     train_idx, val_idx, test_idx = split_idx["train"], split_idx["valid"], split_idx["test"]
+    #     if not torch.is_tensor(train_idx):
+    #         train_idx = torch.as_tensor(train_idx)
+    #         val_idx = torch.as_tensor(val_idx)
+    #         test_idx = torch.as_tensor(test_idx)
+    #     train_mask = torch.full((num_nodes,), False).index_fill_(0, train_idx, True)
+    #     val_mask = torch.full((num_nodes,), False).index_fill_(0, val_idx, True)
+    #     test_mask = torch.full((num_nodes,), False).index_fill_(0, test_idx, True)
+    #     graph.train_mask, graph.val_mask, graph.test_mask = train_mask, val_mask, test_mask
+    #     graph.y = graph.y.view(-1)
+    #     graph.x = scale_feats(graph.x)
         
-        num_features = dataset.num_features
-        num_classes = dataset.num_classes
+    #     num_features = dataset.num_features
+    #     num_classes = dataset.num_classes
 
-    elif dataset_name == "custom_synthetic":
+    if dataset_name == "custom_synthetic":
         graph = load_processed_graph("data/synthetic/synthetic_graph.pt")
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1

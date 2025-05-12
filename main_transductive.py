@@ -3,6 +3,12 @@ import numpy as np
 from tqdm import tqdm
 import torch
 import time
+import h5py
+import pandas as pd
+import json
+from torch_geometric.data import Data
+from sklearn.model_selection import train_test_split
+import os
 
 from src.utils import (
     build_args,
@@ -11,8 +17,10 @@ from src.utils import (
     WBLogger,
     get_current_lr,
     load_best_configs,
+    load_config,
 )
 from src.datasets.data_util import load_dataset
+from src.datasets.build_graphs import load_h5_graph, load_h5_graph_with_external_edges, load_h5_graph_random_features, add_all_edges, randomize_edges
 from src.evaluation import node_classification_evaluation
 from src.models import build_model
 
@@ -74,11 +82,140 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
     return model
 
 
+def build_graph(dataset_name: str, experiment_type: str):
+    """
+    Build a graph based on the dataset name and experiment type.
+    
+    Parameters:
+        dataset_name (str): Name of the dataset to load
+        experiment_type (str): Type of experiment to run. Must be one of:
+            - "feature_ablations": For feature ablation experiments
+            - "edge_ablations": For edge ablation experiments
+            - "ppi_comparison": For PPI dataset comparison
+            - "predict_druggable_genes": For main druggable gene prediction task
+    
+    Returns:
+        Data: PyTorch Geometric Data object containing the graph
+        tuple: (num_features, num_classes, num_edge_types)
+    """
+    # Validate experiment type
+    valid_experiment_types = [
+        "feature_ablations",
+        "edge_ablations", 
+        "ppi_comparison",
+        "predict_druggable_genes"
+    ]
+    if experiment_type not in valid_experiment_types:
+        logging.warning(f"Invalid experiment type: {experiment_type}. Must be one of {valid_experiment_types}")
+
+    # Set up paths
+    PATH = 'data/real/smg_data'
+    LABEL_PATH = 'data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv'
+    NETWORK_PATH = 'data/real/networks'
+    SAVE_DIR = os.path.join('data/paper/graphs/', experiment_type)
+    
+    # Extract PPI name from dataset name
+    ppi = dataset_name.split('_')[0]
+    
+    # Validate PPI name
+    valid_ppis = ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'STRINGdb', 'PCNet']
+    if ppi not in valid_ppis:
+        logging.warning(f"Invalid PPI name: {ppi}. Must be one of {valid_ppis}")
+    
+    # Define valid edge types and special keywords
+    valid_edge_types = ['coexpression', 'GO', 'domain', 'sequence', 'pathway']
+    valid_special_keywords = ['noppi', 'random', 'preserve_types']
+    
+    # Build graph based on experiment type
+    if experiment_type == "feature_ablations":
+        # Handle feature ablation experiments
+        if "random" in dataset_name:
+            graph = load_h5_graph_random_features(PATH, LABEL_PATH, ppi, randomize_features=True)
+        else:
+            NETWORKS = ['coexpression', 'GO', 'domain', 'sequence', 'pathway']
+            # Extract modalities from dataset name
+            modalities = dataset_name.split('_')[2:]  # e.g., CPDB_cdgps_CNA_GE_METH -> ['CNA', 'GE', 'METH']
+            modalities = [modality.strip() for modality in modalities]
+            # Validate modalities
+            valid_modalities = ['CNA', 'GE', 'METH', 'MF']
+            for modality in modalities:
+                if modality not in valid_modalities:
+                    logging.warning(f"Invalid modality: {modality}. Must be one of {valid_modalities}")
+            graph = load_h5_graph(PATH, LABEL_PATH, ppi, modalities=modalities)
+            graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+            
+    elif experiment_type == "edge_ablations":
+        # Handle edge ablation experiments
+        parts = dataset_name.split('_')
+        ppi = parts[0]
+        
+        # Validate all parts of the dataset name
+        for part in parts[1:]:  # Skip the PPI part
+            if part not in valid_edge_types and part not in valid_special_keywords:
+                logging.warning(f"Invalid dataset name part: {part}. Must be one of {valid_edge_types + valid_special_keywords}")
+        
+        # Extract and sort edge types to ensure consistent ordering
+        edge_types = sorted([part for part in parts[1:] if part in valid_edge_types])
+        if len(edge_types) != len(set(edge_types)):
+            logging.warning(f"Dataset name contains repeated edge types: {dataset_name}")
+        
+        # Check if this is a noppi experiment
+        if "noppi" in parts:
+            # Get edge types excluding 'noppi' and 'random'
+            edge_types = [et for et in parts[1:] if et not in ['noppi', 'random']]
+            
+            # First build the graph with the specified edge types
+            graph = load_h5_graph_with_external_edges(PATH, LABEL_PATH, ppi, NETWORK_PATH, edge_types)
+            
+            # Handle randomization if needed
+            if "random" in parts:
+                preserve_types = "preserve_types" in parts
+                graph = randomize_edges(graph, preserve_edge_types=preserve_types)
+        else:
+            # Experiments WITH PPI edges
+            # Get edge types excluding 'random'
+            edge_types = [et for et in parts[1:] if et != 'random']
+            
+            # First load the base graph with PPI
+            graph = load_h5_graph(PATH, LABEL_PATH, ppi)
+            
+            # Then add the specified edge types
+            if edge_types:  # If there are additional edge types specified
+                graph = add_all_edges(graph, NETWORK_PATH, edge_types)
+            
+            # Handle randomization if needed
+            if "random" in parts:
+                preserve_types = "preserve_types" in parts
+                graph = randomize_edges(graph, preserve_edge_types=preserve_types)
+        
+    elif experiment_type == "ppi_comparison":
+        # Handle PPI dataset comparison
+        graph = load_h5_graph(PATH, LABEL_PATH, ppi)
+        #NETWORKS = ['coexpression', 'GO', 'domain', 'sequence', 'pathway']
+        #graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+        
+    elif experiment_type == "predict_druggable_genes":
+        # Handle main druggable gene prediction task
+        NETWORKS = ['coexpression', 'GO', 'domain', 'sequence', 'pathway']
+        graph = load_h5_graph(PATH, LABEL_PATH, ppi)
+        graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+    
+    # Create save directory if it doesn't exist
+    os.makedirs(SAVE_DIR, exist_ok=True)
+    
+    # Save the graph
+    save_path = os.path.join(SAVE_DIR, f"{dataset_name}.pt")
+    torch.save(graph, save_path)
+    logging.info(f"Saved graph to {save_path}")
+    
+    return graph, (graph.x.shape[1], graph.y.max().item() + 1, graph.num_edge_types)
+
 def main(args):
     start_time = time.time()  # Record the start time
     device = args.device if args.device >= 0 else "cpu"
     seeds = args.seeds
     dataset_name = args.dataset
+    experiment_type = args.experiment_type
     max_epoch = args.max_epoch
     max_epoch_f = args.max_epoch_f
     num_hidden = args.num_hidden
@@ -86,7 +223,6 @@ def main(args):
     encoder_type = args.encoder
     decoder_type = args.decoder
     replace_rate = args.replace_rate
-    num_edge_types = args.num_edge_types if args.num_edge_types is not None else 1
 
     optim_type = args.optimizer 
     loss_fn = args.loss_fn
@@ -101,10 +237,7 @@ def main(args):
     logs = args.logging
     use_scheduler = args.scheduler
 
-    graph, (num_features, num_classes) = load_dataset(dataset_name)
-    # print(graph)
-    args.num_features = num_features
-
+    # Initialize lists to store results
     acc_list = []
     estp_acc_list = []
     test_auc_list = []
@@ -116,84 +249,92 @@ def main(args):
     test_recall_list = []
     estp_recall_f_list = []
     
+    # For each seed, build a new graph and run 3 iterations
     for i, seed in enumerate(seeds):
-
         print(f"####### Run {i} for seed {seed}")
         set_random_seed(seed)
 
         run_start = time.time()
         
-        if logs:
-            logger = WBLogger(name=f"{dataset_name}_loss_{loss_fn}_rpr_{replace_rate}_nh_{num_hidden}_nl_{num_layers}_lr_{lr}_mp_{max_epoch}_mpf_{max_epoch_f}_wd_{weight_decay}_wdf_{weight_decay_f}_{encoder_type}_{decoder_type}")
-        else:
-            logger = None
+        # Build graph for this seed
+        graph, (num_features, num_classes, num_edge_types) = build_graph(dataset_name, experiment_type)
+        args.num_features = num_features
+        args.num_edge_types = num_edge_types  # Update args with the correct number of edge types
 
-        model = build_model(args)
-        model.to(device)
-        #print(model)
-        optimizer = create_optimizer(optim_type, model, lr, weight_decay)
+        # Run 3 iterations with the same graph
+        for iter_num in range(2):
+            print(f"####### Iteration {iter_num + 1} for seed {seed}")
+            
+            # Initialize logger for this iteration
+            if logs:
+                logger = WBLogger(name=f"{experiment_type}_{dataset_name}_loss_{loss_fn}_rpr_{replace_rate}_nh_{num_hidden}_nl_{num_layers}_lr_{lr}_mp_{max_epoch}_mpf_{max_epoch_f}_wd_{weight_decay}_wdf_{weight_decay_f}_{encoder_type}_{decoder_type}_seed_{seed}_iter_{iter_num}")
+            else:
+                logger = None
+            
+            model = build_model(args)
+            model.to(device)
+            optimizer = create_optimizer(optim_type, model, lr, weight_decay)
 
-        if use_scheduler:
-            logging.info("Use schedular")
-            scheduler = lambda epoch :( 1 + np.cos((epoch) * np.pi / max_epoch) ) * 0.5
-            # scheduler = lambda epoch: epoch / warmup_steps if epoch < warmup_steps \
-                    # else ( 1 + np.cos((epoch - warmup_steps) * np.pi / (max_epoch - warmup_steps))) * 0.5
-            scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=scheduler)
-        else:
-            scheduler = None
-        
-        x = graph.x
-        model_dtype = next(model.parameters()).dtype
-        x = x.to(model_dtype)
+            if use_scheduler:
+                logging.info("Use scheduler")
+                scheduler = lambda epoch :( 1 + np.cos((epoch) * np.pi / max_epoch) ) * 0.5
+                # scheduler = lambda epoch: epoch / warmup_steps if epoch < warmup_steps \
+                        # else ( 1 + np.cos((epoch - warmup_steps) * np.pi / (max_epoch - warmup_steps))) * 0.5
+                scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=scheduler)
+            else:
+                scheduler = None
+            
+            x = graph.x
+            model_dtype = next(model.parameters()).dtype
+            x = x.to(model_dtype)
 
-        if not load_model:
-            model = pretrain(model, graph, x, optimizer, max_epoch, device, scheduler, num_classes, lr_f, weight_decay_f, max_epoch_f, linear_prob, num_edge_types, logger)
-            model = model.cpu()
+            if not load_model:
+                model = pretrain(model, graph, x, optimizer, max_epoch, device, scheduler, num_classes, lr_f, weight_decay_f, max_epoch_f, linear_prob, num_edge_types, logger)
+                model = model.cpu()
 
-        if load_model:
-            logging.info("Loading Model ... ")
-            model.load_state_dict(torch.load("checkpoint.pt"))
-        if save_model:
-            logging.info("Saving Model ...")
-            torch.save(model.state_dict(), "checkpoint.pt")
-        
-        model = model.to(device)
-        model.eval()
+            if load_model:
+                logging.info("Loading Model ... ")
+                model.load_state_dict(torch.load("checkpoint.pt"))
+            if save_model:
+                logging.info("Saving Model ...")
+                torch.save(model.state_dict(), "checkpoint.pt")
+            
+            model = model.to(device)
+            model.eval()
 
-        (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_test_precision), (test_recall, estp_test_recall), (test_f1, estp_f1) = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False)
-        
-        logger.note({
-            "test_accuracy": test_acc,
-            "test_estp_accuracy": estp_test_acc,
-            "test_auc": test_auc,
-            "test_estp_auc": estp_test_auc,
-            "test_aupr": test_aupr,
-            "test_estp_aupr": estp_test_aupr,
-            "test_precision": test_precision,
-            "test_estp_precision": estp_test_precision,
-            "test_recall": test_recall,
-            "test_estp_recall": estp_test_recall,
-            "test_f1": test_f1,
-            "test_estp_f1": estp_f1
-            },
-            step=max_epoch)
-        
-        acc_list.append(test_acc)
-        estp_acc_list.append(estp_test_acc)
-        test_auc_list.append(test_auc)
-        estp_test_auc_list.append(estp_test_auc)
-        test_aupr_list.append(test_aupr)
-        estp_test_aupr_list.append(estp_test_aupr)
-        test_precision_list.append(test_precision)
-        estp_precision_f_list.append(estp_test_precision)
-        test_recall_list.append(test_recall)
-        estp_recall_f_list.append(estp_test_recall)
+            (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_test_precision), (test_recall, estp_test_recall), (test_f1, estp_f1) = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob)
+            
+            if logger is not None:
+                logger.note({
+                    "test_accuracy": test_acc,
+                    "test_estp_accuracy": estp_test_acc,
+                    "test_auc": test_auc,
+                    "test_estp_auc": estp_test_auc,
+                    "test_aupr": test_aupr,
+                    "test_estp_aupr": estp_test_aupr,
+                    "test_precision": test_precision,
+                    "test_estp_precision": test_precision,
+                    "test_recall": test_recall,
+                    "test_estp_recall": test_recall,
+                    "test_f1": test_f1,
+                    "test_estp_f1": estp_f1
+                    },
+                    step=max_epoch)
+                logger.finish()  # Finish the logger for this iteration
+            
+            acc_list.append(test_acc)
+            estp_acc_list.append(estp_test_acc)
+            test_auc_list.append(test_auc)
+            estp_test_auc_list.append(estp_test_auc)
+            test_aupr_list.append(test_aupr)
+            estp_test_aupr_list.append(estp_test_aupr)
+            test_precision_list.append(test_precision)
+            estp_precision_f_list.append(estp_test_precision)
+            test_recall_list.append(test_recall)
+            estp_recall_f_list.append(estp_test_recall)
 
         run_end = time.time()
         print(f"Run {i} total runtime: {run_end - run_start:.2f} seconds")
-
-        if logger is not None:
-            logger.finish()
 
     end_time = time.time()  # Record the end time after everything is done
     total_runtime = end_time - start_time
@@ -229,6 +370,16 @@ def main(args):
 if __name__ == "__main__":
     args = build_args()
     if args.use_cfg:
-        args = load_best_configs(args, "configs/configs.yml")
+        # Determine which config file to use based on experiment type
+        if args.experiment_type == "edge_ablations":
+            config_path = "configs/edge_ablations.yaml"
+        elif args.experiment_type == "feature_ablations":
+            config_path = "configs/feature_ablations.yaml"
+        elif args.experiment_type == "ppi_comparison":
+            config_path = "configs/ppi_comparison.yaml"
+        else:
+            config_path = "configs/main_task.yaml"
+        
+        args = load_config(args, config_path)
     print(args)
     main(args)
