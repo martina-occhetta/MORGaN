@@ -188,3 +188,15 @@ results/
 figures/
 random/
 paper/
+logs/
+
+*.log
+*.pt
+
+notebooks/archive/
+configs/archive/
+scripts/archive/
+
+checkpoint.pt
+
+main_graph.py

@@ -200,6 +200,12 @@ def build_graph(dataset_name: str, experiment_type: str):
         graph = load_h5_graph(PATH, LABEL_PATH, ppi)
         graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
     
+    elif experiment_type == "no_pretrain":
+        # Handle no pretrain task
+        NETWORKS = ['coexpression', 'GO', 'domain', 'sequence', 'pathway']
+        graph = load_h5_graph(PATH, LABEL_PATH, ppi)
+        graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+    
     # Create save directory if it doesn't exist
     os.makedirs(SAVE_DIR, exist_ok=True)
     
@@ -377,6 +383,8 @@ if __name__ == "__main__":
             config_path = "configs/feature_ablations.yaml"
         elif args.experiment_type == "ppi_comparison":
             config_path = "configs/ppi_comparison.yaml"
+        elif args.experiment_type == "no_pretrain":
+            config_path = "configs/no_pretrain.yaml"
         else:
             config_path = "configs/main_task.yaml"
         
