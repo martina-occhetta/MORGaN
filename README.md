@@ -1,6 +1,15 @@
-# MORGaN for Druggable Gene Prediction
+# MORGaN: self-supervised multi-relational graph learning for druggable gene discovery
 
-This repository contains code for predicting druggable genes using graph neural networks and multi-modal data integration.
+This repository provides the official implementation of **MORGaN**, a *masked autoencoder* designed for **self-supervised learning** on *heterogeneous* **m**ulti-**o**mic **g**ene **n**etworks. MORGaN leverages diverse biological relationships to learn expressive node embeddings and identify potential druggable genes with minimal supervision.
+
+🔍 What MORGaN does:
+
+MORGaN predicts druggable genes by integrating multi-omic features and multi-relational biological graphs through a three-stage pipeline:
+1. **Graph construction**: Assemble a six-relation gene graph using complementary biological data sources (e.g. PPI, co-expression, pathway co-occurrence).
+2. **Self-supervised pretraining**: A masked feature reconstruction task (GraphMAE) trains a relational GCN to learn informative embeddings without labels.
+3. **Fine-tuning for prediction**: A downstream MLP classifier uses the learned embeddings to predict druggable genes. Performance is evaluated using AUPR, AUROC, accuracy, and F1.
+
+![MORGaN pipeline](fig/morgan_overview.png)
 
 ## Setup
 
