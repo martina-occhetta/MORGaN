@@ -6,10 +6,10 @@ This repository contains code for predicting druggable genes using graph neural 
 
 1. Create and activate a virtual environment:
 ```bash
-python -m venv .dg_env
-source .dg_env/bin/activate  # On Unix/macOS
+python -m venv .MORGaN
+source .MORGaN/bin/activate  # On Unix/macOS
 # or
-.dg_env\Scripts\activate  # On Windows
+.MORGaN\Scripts\activate  # On Windows
 ```
 
 2. Install dependencies:
@@ -22,8 +22,8 @@ pip install -r requirements.txt
 The data should be organized as follows:
 ```
 data/
-├── real/
-│   ├── smg_data/          # Multi-modal gene features
+├── components/
+│   ├── features/          # Multi-modal gene features
 │   ├── labels/            # Druggable gene labels
 │   └── networks/          # Network files (PPI and other networks)
 └── paper/
@@ -112,7 +112,7 @@ If logging is enabled in the configuration files, experiments can be monitored t
 
 ## Notes
 
-- Each experiment runs with 3 different random seeds (0, 1, 2) for reproducibility
+- Each experiment runs with 2 different random seeds (0, 1), for 3 iterations, for reproducibility
 - The code automatically handles the dynamic number of edge types based on the experiment configuration
 - Make sure all required data files are in place before running experiments
 - For large experiments, consider using a compute cluster or GPU-enabled machine
