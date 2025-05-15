@@ -83,8 +83,8 @@ This will run experiments using different PPI networks:
 Runs the main prediction task using the best performing configuration.
 
 ```bash
-chmod +x scripts/run_main_task.sh
-./scripts/run_main_task.sh
+chmod +x scripts/run_druggable_genes.sh
+./scripts/run_druggable_genes.sh
 ```
 
 ## Configuration Files
