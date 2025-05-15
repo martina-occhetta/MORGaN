@@ -9,7 +9,7 @@ MORGaN predicts druggable genes by integrating multi-omic features and multi-rel
 2. **Self-supervised pretraining**: A masked feature reconstruction task (GraphMAE) trains a relational GCN to learn informative embeddings without labels.
 3. **Fine-tuning for prediction**: A downstream MLP classifier uses the learned embeddings to predict druggable genes. Performance is evaluated using AUPR, AUROC, accuracy, and F1.
 
-![MORGaN pipeline](fig/morgan_overview.png)
+![MORGaN pipeline](morgan_overview.png)
 
 ## Setup
 
