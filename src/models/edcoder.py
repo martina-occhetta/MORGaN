@@ -204,36 +204,55 @@ class PreModel(nn.Module):
             raise NotImplementedError
         return criterion
     
-    def encoding_mask_noise(self, graph, x, mask_rate=0.3):
-        #num_nodes = graph.num_nodes
-        num_nodes = x.shape[0]
+    def encoding_mask_noise(self, g, x, mask_rate=0.3):
+        """
+        Mask node features for encoding.
+        
+        Args:
+            g: Graph
+            x: Input features
+            mask_rate: Masking rate
+            
+        Returns:
+            g: Graph with masked features
+            x: Masked features
+            (mask_nodes, keep_nodes): Tuple of masked and kept node indices
+        """
+        num_nodes = g.num_nodes if hasattr(g, 'num_nodes') else x.size(0)
         perm = torch.randperm(num_nodes, device=x.device)
-        num_mask_nodes = int(mask_rate * num_nodes)
-
-        # random masking
-        num_mask_nodes = int(mask_rate * num_nodes)
-        mask_nodes = perm[: num_mask_nodes]
-        keep_nodes = perm[num_mask_nodes: ]
-
-        if self._replace_rate > 0:
-            num_noise_nodes = int(self._replace_rate * num_mask_nodes)
-            perm_mask = torch.randperm(num_mask_nodes, device=x.device)
-            token_nodes = mask_nodes[perm_mask[: int(self._mask_token_rate * num_mask_nodes)]]
-            noise_nodes = mask_nodes[perm_mask[-int(self._replace_rate * num_mask_nodes):]]
-            noise_to_be_chosen = torch.randperm(num_nodes, device=x.device)[:num_noise_nodes]
-
-            out_x = x.clone()
-            out_x[token_nodes] = 0.0
-            out_x[noise_nodes] = x[noise_to_be_chosen]
+        
+        # Ensure we mask at least one node
+        num_mask = max(1, int(mask_rate * num_nodes))
+        mask_nodes = perm[:num_mask]
+        keep_nodes = perm[num_mask:]
+        
+        out_x = x.clone()
+        
+        # For categorical features (like in MUTAG), we randomly change the atom type
+        if x.dtype == torch.float32 and x.sum(dim=1).mean() == 1.0:  # One-hot encoded features
+            # For each masked node, randomly select a different atom type
+            num_atom_types = x.size(1)
+            for node_idx in mask_nodes:
+                current_type = x[node_idx].argmax()
+                # Get all possible types except current
+                possible_types = list(range(num_atom_types))
+                possible_types.remove(current_type.item())
+                # Randomly select a new type
+                new_type = torch.tensor(possible_types)[torch.randint(len(possible_types), (1,))].item()
+                # Create new one-hot vector
+                new_feature = torch.zeros_like(x[node_idx])
+                new_feature[new_type] = 1
+                out_x[node_idx] = new_feature
         else:
-            out_x = x.clone()
-            token_nodes = mask_nodes
-            out_x[mask_nodes] = 0.0
-
-        out_x[token_nodes] += self.enc_mask_token
-        use_g = graph.clone()
-
-        return use_g, out_x, (mask_nodes, keep_nodes)
+            # For continuous features, use standard noise masking
+            noise_nodes = mask_nodes
+            num_noise = len(noise_nodes)
+            
+            if num_noise > 0:
+                noise_to_be_chosen = torch.randperm(num_noise)
+                out_x[noise_nodes] = x[noise_nodes[noise_to_be_chosen]]
+        
+        return g, out_x, (mask_nodes, keep_nodes)
 
     def forward(self, graph, x, num_edge_types=None):
         # ---- attribute reconstruction ----

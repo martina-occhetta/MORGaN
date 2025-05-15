@@ -19,7 +19,7 @@ from src.utils import (
     load_best_configs,
     load_config,
 )
-from src.datasets.data_util import load_dataset
+from src.datasets.data_util import load_dataset, load_mutag_dataset
 from src.datasets.build_graphs import load_h5_graph, load_h5_graph_with_external_edges, load_h5_graph_random_features, add_all_edges, randomize_edges
 from src.evaluation import node_classification_evaluation
 from src.models import build_model
@@ -93,6 +93,7 @@ def build_graph(dataset_name: str, experiment_type: str):
             - "edge_ablations": For edge ablation experiments
             - "ppi_comparison": For PPI dataset comparison
             - "predict_druggable_genes": For main druggable gene prediction task
+            - "mutag": For MUTAG chemical compound classification
     
     Returns:
         Data: PyTorch Geometric Data object containing the graph
@@ -103,12 +104,29 @@ def build_graph(dataset_name: str, experiment_type: str):
         "feature_ablations",
         "edge_ablations", 
         "ppi_comparison",
-        "predict_druggable_genes"
+        "predict_druggable_genes",
+        "mutag"
     ]
     if experiment_type not in valid_experiment_types:
         logging.warning(f"Invalid experiment type: {experiment_type}. Must be one of {valid_experiment_types}")
 
-    # Set up paths
+    if dataset_name.upper() == "MUTAG":
+        # For MUTAG, we don't need the complex graph building process
+        # Just load it directly and ensure it has the right attributes
+        graph = load_mutag_dataset()
+        
+        # Create save directory if it doesn't exist
+        SAVE_DIR = os.path.join('data/paper/graphs/', experiment_type)
+        os.makedirs(SAVE_DIR, exist_ok=True)
+        
+        # Save the graph
+        save_path = os.path.join(SAVE_DIR, f"{dataset_name}.pt")
+        torch.save(graph, save_path)
+        logging.info(f"Saved graph to {save_path}")
+        
+        return graph, (graph.x.shape[1], 2, len(torch.unique(graph.edge_type)))
+        
+    # Set up paths for other datasets
     PATH = 'data/real/smg_data'
     LABEL_PATH = 'data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv'
     NETWORK_PATH = 'data/real/networks'
@@ -385,6 +403,8 @@ if __name__ == "__main__":
             config_path = "configs/ppi_comparison.yaml"
         elif args.experiment_type == "no_pretrain":
             config_path = "configs/no_pretrain.yaml"
+        elif args.experiment_type == "mutag":
+            config_path = "configs/mutag.yaml"
         else:
             config_path = "configs/main_task.yaml"
         

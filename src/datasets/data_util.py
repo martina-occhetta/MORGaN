@@ -10,7 +10,6 @@ from torch_geometric.data import Data
 from torch_geometric.datasets import Planetoid, TUDataset
 from torch_geometric.utils import add_self_loops, remove_self_loops, to_undirected, degree
 from torch_geometric.data import Data, HeteroData
-
 from ogb.nodeproppred import PygNodePropPredDataset
 
 from sklearn.preprocessing import StandardScaler
@@ -169,6 +168,74 @@ def train_val_test_split(data, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15)
 
     return data
 
+def load_mutag_dataset():
+    """
+    Load the MUTAG dataset and convert it to a multi-relational format compatible with our model.
+    MUTAG has 4 edge types: single, double, triple bonds and aromatic bonds.
+    
+    Returns:
+        graph: PyTorch Geometric Data object with:
+            - x: Node features [num_nodes, num_features]
+            - edge_index: Edge indices [2, num_edges]
+            - edge_type: Edge types [num_edges]
+            - y: Graph labels
+            - train_mask, val_mask, test_mask: Data splits
+    """
+    from torch_geometric.datasets import TUDataset
+    import torch
+    
+    # Load MUTAG dataset
+    dataset = TUDataset(root="data", name="MUTAG")
+    data = dataset[0]
+    
+    # Create train/val/test masks (80/10/10 split)
+    num_nodes = data.x.size(0)
+    indices = torch.randperm(num_nodes)
+    
+    train_size = int(0.8 * num_nodes)
+    val_size = int(0.1 * num_nodes)
+    
+    # Create masks with proper shape [num_nodes]
+    train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    val_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    
+    train_mask[indices[:train_size]] = True
+    val_mask[indices[train_size:train_size+val_size]] = True
+    test_mask[indices[train_size+val_size:]] = True
+    
+    # Add masks to the data object with shape [num_nodes]
+    data.train_mask = train_mask
+    data.val_mask = val_mask
+    data.test_mask = test_mask
+    
+    # Convert edge attributes to edge types
+    if hasattr(data, 'edge_attr') and data.edge_attr is not None:
+        data.edge_type = data.edge_attr.argmax(dim=1)
+    else:
+        data.edge_type = torch.zeros(data.edge_index.size(1), dtype=torch.long)
+    
+    # Set number of edge types
+    data.num_edge_types = max(4, data.edge_type.max().item() + 1)  # At least 4 for MUTAG
+    
+    # Create triples for RGCN
+    triples = torch.stack([
+        data.edge_index[0],  # source nodes
+        data.edge_type,      # relation types
+        data.edge_index[1]   # target nodes
+    ], dim=0)
+    data.triples = triples
+    
+    # Ensure y has proper shape [num_nodes]
+    # Create node labels by repeating the graph label for all nodes
+    if hasattr(data, 'y'):
+        graph_label = data.y.item()  # Get the graph label
+        data.y = torch.full((num_nodes,), graph_label, dtype=torch.float)
+    else:
+        data.y = torch.zeros(num_nodes, dtype=torch.float)
+    
+    return data
+
 def load_dataset(dataset_name):
     # if dataset_name == "ogbn-arxiv":
     #     dataset = PygNodePropPredDataset(name='ogbn-arxiv', root="./data")
@@ -246,6 +313,12 @@ def load_dataset(dataset_name):
         graph = load_processed_graph(f'data/real/multidim_graph/6d/feature_ablations/{dataset_name}.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
+
+    elif dataset_name.upper() == "MUTAG":
+        graph = load_mutag_dataset()
+        num_features = graph.x.shape[1]
+        num_classes = 2  # MUTAG is binary classification
+        return graph, (num_features, num_classes)
 
     else:
         dataset = Planetoid("", dataset_name, transform=T.NormalizeFeatures())
