@@ -62,11 +62,11 @@ def parse_args():
 def main(args):
     seed_torch(args['seed'])
 
-    graph_path = os.path.join('/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/data/real/mdmni_data/network')
+    graph_path = os.path.join('/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/data/components/mdmni_data/network')
     if not os.path.exists(graph_path):
         os.makedirs(graph_path)
     file_save_path = os.path.join('results')
-    feature_path = os.path.join('/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/data/real/mdmni_data/feature')
+    feature_path = os.path.join('/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG/data/components/mdmni_data/feature')
 
     train_path = os.path.join(feature_path, str(args['train_name']) + '.csv')
     train_file = pd.read_csv(train_path)                                             

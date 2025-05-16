@@ -108,7 +108,7 @@ def main(args):
     dataset_name = args['dataset_name']
 
     if dataset_name in ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'PCNet', 'STRINGdb']:
-        multidim_graph = load_h5_graph(PATH='data/components/', LABEL_PATH='data/components/labels/NIHMS80906-small_mol-and-bio-druggable.tsv', ppi=dataset_name)
+        multidim_graph = load_h5_graph(PATH='data/components/features', LABEL_PATH='data/components/labels/NIHMS80906-small_mol-and-bio-druggable.tsv', ppi=dataset_name)
         num_features = multidim_graph.x.shape[1]
         num_classes = multidim_graph.y.max().item() + 1
 
