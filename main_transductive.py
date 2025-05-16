@@ -127,9 +127,9 @@ def build_graph(dataset_name: str, experiment_type: str):
         return graph, (graph.x.shape[1], 2, len(torch.unique(graph.edge_type)))
         
     # Set up paths for other datasets
-    PATH = 'data/real/smg_data'
-    LABEL_PATH = 'data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv'
-    NETWORK_PATH = 'data/real/networks'
+    PATH = 'data/components/'
+    LABEL_PATH = 'data/components/labels/NIHMS80906-small_mol-and-bio-druggable.tsv'
+    NETWORK_PATH = 'data/components/networks'
     SAVE_DIR = os.path.join('data/paper/graphs/', experiment_type)
     
     # Extract PPI name from dataset name

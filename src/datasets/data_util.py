@@ -276,12 +276,12 @@ def load_dataset(dataset_name):
         graph = train_val_test_split(graph, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15)
     
     elif dataset_name in ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'PCNet', 'STRINGdb']:
-        graph = load_h5_graph(PATH='data/real/smg_data', LABEL_PATH='data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv', ppi=dataset_name)
+        graph = load_h5_graph(PATH='data/components', LABEL_PATH='data/components/labels/NIHMS80906-small_mol-and-bio-druggable.tsv', ppi=dataset_name)
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
     elif dataset_name in ['CPDB_cdgps', 'IRefIndex_2015_cdgps', 'IRefIndex_cdgps', 'PCNet_cdgps', 'STRINGdb_cdgps', 'CPDB_cdgps_shuffled']:
-        graph = load_processed_graph(f'data/real/multidim_graph/6d/{dataset_name}_multiomics.pt')
+        graph = load_processed_graph(f'data/components/multidim_graph/6d/{dataset_name}_multiomics.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
@@ -290,27 +290,27 @@ def load_dataset(dataset_name):
         "CPDB_cdps", "IRefIndex_2015_cdps", "IRefIndex_cdps", "PCNet_cdps", "STRINGdb_cdps",
         "CPDB_cgps", "IRefIndex_2015_cgps", "IRefIndex_cgps", "PCNet_cgps", "STRINGdb_cgps",
         "CPDB_dgps", "IRefIndex_2015_dgps", "IRefIndex_dgps", "PCNet_dgps", "STRINGdb_dgps"]:
-        graph = load_processed_graph(f'data/real/multidim_graph/5d/{dataset_name}_multiomics.pt')
+        graph = load_processed_graph(f'data/components/multidim_graph/5d/{dataset_name}_multiomics.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
     elif dataset_name in ['CPDB_cdg', 'CPDB_cdp', 'CPDB_cds', 'CPDB_cgp', 'CPDB_cgs', 'CPDB_cps', 'CPDB_dgp', 'CPDB_dgs', 'CPDB_dps', 'CPDB_gps']:
-        graph = load_processed_graph(f'data/real/multidim_graph/4d/{dataset_name}_multiomics.pt')
+        graph = load_processed_graph(f'data/components/multidim_graph/4d/{dataset_name}_multiomics.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
     elif dataset_name in ['CPDB_cd','CPDB_cg','CPDB_cp','CPDB_cs','CPDB_dg','CPDB_dp','CPDB_ds','CPDB_gp','CPDB_gs','CPDB_ps']:
-        graph = load_processed_graph(f'data/real/multidim_graph/3d/{dataset_name}_multiomics.pt')
+        graph = load_processed_graph(f'data/components/multidim_graph/3d/{dataset_name}_multiomics.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
     elif dataset_name in ['CPDB_c', 'CPDB_d', 'CPDB_g', 'CPDB_p', 'CPDB_s']:
-        graph = load_processed_graph(f'data/real/multidim_graph/2d/{dataset_name}_multiomics.pt')
+        graph = load_processed_graph(f'data/components/multidim_graph/2d/{dataset_name}_multiomics.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 
     elif dataset_name in ['CPDB_cdgps_CNA_GE_METH', 'CPDB_cdgps_CNA_GE_MF', 'CPDB_cdgps_CNA_METH_MF', 'CPDB_cdgps_CNA', 'CPDB_cdgps_GE_METH_MF', 'CPDB_cdgps_GE', 'CPDB_cdgps_METH', 'CPDB_cdgps_MF', 'CPDB_cdgps_random_features']:
-        graph = load_processed_graph(f'data/real/multidim_graph/6d/feature_ablations/{dataset_name}.pt')
+        graph = load_processed_graph(f'data/components/multidim_graph/6d/feature_ablations/{dataset_name}.pt')
         num_features = graph.x.shape[1]
         num_classes = graph.y.max().item() + 1
 

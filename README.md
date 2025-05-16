@@ -22,8 +22,8 @@ pip install -r requirements.txt
 The data should be organized as follows:
 ```
 data/
-├── real/
-│   ├── smg_data/          # Multi-modal gene features
+├── components/
+│   ├── features/          # Multi-modal gene features
 │   ├── labels/            # Druggable gene labels
 │   └── networks/          # Network files (PPI and other networks)
 └── paper/

@@ -154,7 +154,7 @@ def main(args):
     # --- Load the dataset
     if dataset_name in ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'PCNet', 'STRINGdb']:
         multidim_graph = load_h5_graph(
-            PATH='data/real/smg_data',
+            PATH='data/components/',
             LABEL_PATH='data/real/labels/NIHMS80906-small_mol-and-bio-druggable.tsv',
             ppi=dataset_name
         )
