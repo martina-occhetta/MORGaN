@@ -1,15 +1,24 @@
-# MORGaN for Druggable Gene Prediction
+# MORGaN: self-supervised multi-relational graph learning for druggable gene discovery
 
-This repository contains code for predicting druggable genes using graph neural networks and multi-modal data integration.
+This repository provides the official implementation of **MORGaN**, a *masked autoencoder* designed for **self-supervised learning** on *heterogeneous* **m**ulti-**o**mic **g**ene **n**etworks. MORGaN leverages diverse biological relationships to learn expressive node embeddings and identify potential druggable genes with minimal supervision.
+
+🔍 What MORGaN does:
+
+MORGaN predicts druggable genes by integrating multi-omic features and multi-relational biological graphs through a three-stage pipeline:
+1. **Graph construction**: Assemble a six-relation gene graph using complementary biological data sources (e.g. PPI, co-expression, pathway co-occurrence).
+2. **Self-supervised pretraining**: A masked feature reconstruction task (GraphMAE) trains a relational GCN to learn informative embeddings without labels.
+3. **Fine-tuning for prediction**: A downstream MLP classifier uses the learned embeddings to predict druggable genes. Performance is evaluated using AUPR, AUROC, accuracy, and F1.
+
+![MORGaN pipeline](morgan_overview.png)
 
 ## Setup
 
 1. Create and activate a virtual environment:
 ```bash
-python -m venv .dg_env
-source .dg_env/bin/activate  # On Unix/macOS
+python -m venv .MORGaN
+source .MORGaN/bin/activate  # On Unix/macOS
 # or
-.dg_env\Scripts\activate  # On Windows
+.MORGaN\Scripts\activate  # On Windows
 ```
 
 2. Install dependencies:
@@ -83,8 +92,8 @@ This will run experiments using different PPI networks:
 Runs the main prediction task using the best performing configuration.
 
 ```bash
-chmod +x scripts/run_main_task.sh
-./scripts/run_main_task.sh
+chmod +x scripts/run_druggable_genes.sh
+./scripts/run_druggable_genes.sh
 ```
 
 ## Configuration Files
@@ -112,7 +121,7 @@ If logging is enabled in the configuration files, experiments can be monitored t
 
 ## Notes
 
-- Each experiment runs with 3 different random seeds (0, 1, 2) for reproducibility
+- Each experiment runs with 2 different random seeds (0, 1), for 3 iterations, for reproducibility
 - The code automatically handles the dynamic number of edge types based on the experiment configuration
 - Make sure all required data files are in place before running experiments
 - For large experiments, consider using a compute cluster or GPU-enabled machine
