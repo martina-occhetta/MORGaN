@@ -178,17 +178,16 @@ data/
 
 # logs
 wandb/
+logs/
 
 # model checkpoints
 checkpoints/
+checkpoint.pt
 
 .DS_Store
 
-results/
 figures/
-random/
 paper/
-logs/
 other/
 
 *.log
@@ -197,7 +196,3 @@ other/
 notebooks/archive/
 configs/archive/
 scripts/archive/
-
-checkpoint.pt
-
-main_graph.py
