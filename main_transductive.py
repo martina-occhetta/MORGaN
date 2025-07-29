@@ -201,7 +201,7 @@ def build_graph(dataset_name: str, experiment_type: str):
     ppi = dataset_name.split("_")[0]
 
     # Validate PPI name
-    valid_ppis = ["CPDB", "IRefIndex_2015", "IRefIndex", "STRINGdb", "PCNet", "obgn"]
+    valid_ppis = ["CPDB", "IRefIndex_2015", "IRefIndex", "STRINGdb", "PCNet", "ogbn"]
     if ppi not in valid_ppis:
         logging.warning(f"Invalid PPI name: {ppi}. Must be one of {valid_ppis}")
 
@@ -438,24 +438,44 @@ def main(args):
             model = model.to(device)
             model.eval()
 
-            (
-                (test_acc, estp_test_acc),
-                (test_auc, estp_test_auc),
-                (test_aupr, estp_test_aupr),
-                (test_precision, estp_test_precision),
-                (test_recall, estp_test_recall),
-                (test_f1, estp_f1),
-            ) = node_classification_eval(
-                model,
-                graph,
-                x,
-                num_classes,
-                lr_f,
-                weight_decay_f,
-                max_epoch_f,
-                device,
-                linear_prob,
-            )
+            if graph.y.dim() > 1 and graph.y.size(1) > 1:
+                (
+                    (test_acc, estp_test_acc),
+                    (test_auc, estp_test_auc),
+                    (test_aupr, estp_test_aupr),
+                    (test_precision, estp_test_precision),
+                    (test_recall, estp_test_recall),
+                    (test_f1, estp_f1),
+                ) = multilabel_node_classification_eval(
+                    model,
+                    graph,
+                    x,
+                    num_classes,
+                    lr_f,
+                    weight_decay_f,
+                    max_epoch_f,
+                    device,
+                    linear_prob,
+                )
+            else:
+                (
+                    (test_acc, estp_test_acc),
+                    (test_auc, estp_test_auc),
+                    (test_aupr, estp_test_aupr),
+                    (test_precision, estp_test_precision),
+                    (test_recall, estp_test_recall),
+                    (test_f1, estp_f1),
+                ) = node_classification_eval(
+                    model,
+                    graph,
+                    x,
+                    num_classes,
+                    lr_f,
+                    weight_decay_f,
+                    max_epoch_f,
+                    device,
+                    linear_prob,
+                )
 
             if logger is not None:
                 logger.note(
