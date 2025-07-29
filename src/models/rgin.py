@@ -124,13 +124,11 @@ class RGIN(nn.Module):
         for conv in self.layers:
             h = F.dropout(h, p=self.dropout, training=self.training)
             h = conv(graph, h, edge_index, num_edge_types, num_nodes, triples)
-            if self.activation is not None:
-                h = self.activation(h)
             hiddens.append(h)
 
         out = self.head(h)
         return (out, hiddens) if return_hidden else out
-    
+
     def reset_classifier(self, num_classes, concat=False, datas_dim=0):
         param_dtype = next(self.parameters()).dtype  # Get the current dtype.
         if concat:
@@ -145,8 +143,9 @@ class RGIN(nn.Module):
             ).to(param_dtype)
         else:
             self.head = nn.Sequential(nn.Linear(self.out_channels, 1)).to(param_dtype)
-        self.link_head = nn.Sequential(nn.Linear(self.out_channels, 128)).to(param_dtype)
-
+        self.link_head = nn.Sequential(nn.Linear(self.out_channels, 128)).to(
+            param_dtype
+        )
 
 
 class RGINConv(MessagePassing):
@@ -222,7 +221,7 @@ class RGINConv(MessagePassing):
         else:
             self.register_parameter("bias", None)
 
-        act = self.activation if self.activation is not None else nn.Identity()
+        act = self.activation if self.activation is not None else create_activation("relu")
 
         # 2‐layer MLP
         self.mlp = nn.Sequential(
@@ -275,24 +274,27 @@ class RGINConv(MessagePassing):
 
         if self.vertical_stacking:
             from src.utils import stack_matrices, sum_sparse
-            # build a big (R*N × N) sparse adjacency
-            adj_idx, adj_size = stack_matrices(
-                triples, num_nodes, num_edge_types,
-                vertical_stacking=True, device=x.device
-            )
-            vals = torch.ones(adj_idx.size(0), device=x.device, dtype=x.dtype)
-            deg = sum_sparse(adj_idx, vals, adj_size, row_normalisation=True, device=x.device)
-            vals = vals / deg
 
-            # build a sparse tensor
+            adj_idx, adj_size = stack_matrices(
+                triples,
+                num_nodes,
+                num_edge_types,
+                vertical_stacking=True,
+                device=x.device,
+            )
+            vals = torch.ones(adj_idx.size(0), dtype=x.dtype, device=x.device)
+            deg = sum_sparse(
+                adj_idx, vals, adj_size, row_normalisation=self.vertical_stacking, device=x.device
+            )
+            vals = vals / deg
             adj = torch.sparse.FloatTensor(adj_idx.t(), vals, adj_size)
 
-            # transform all node‐features per relation at once
-            # fw shape: (R, N, out); then flatten to (R*N, out)
-            fw = torch.einsum('ni, rio->rno', x, W).reshape(-1, self.out_channels)
+            #    adj: (R*N, N),   x: (N, in) --> ag: (R*N, in)
+            ag = torch.spmm(adj, x)
 
-            out_msgs = torch.spmm(adj, fw)
-            out_msgs = out_msgs.view(num_edge_types, num_nodes, self.out_channels).sum(dim=0)
+            ag = ag.view(num_edge_types, num_nodes, self.in_channels)
+
+            out_msgs = torch.einsum("rio,rni->no", W, ag)
 
         else:
             # fallback to standard MessagePassing per‐edge
@@ -300,25 +302,23 @@ class RGINConv(MessagePassing):
                 edge_index,
                 x=x,
                 weights=W,
-                edge_type=triples[:,1],
-                size=(num_nodes, num_nodes)
+                edge_type=triples[:, 1],
+                size=(num_nodes, num_nodes),
             )
 
         # injective update with learnable eps:
         #   (1 + eps) * x  +  sum_{u in N(v)} W_{r(u,v)} x_u
-        h_total = (1. + self.eps) * x + out_msgs
+        h_total = (1.0 + self.eps) * x + out_msgs
 
-        # optional bias
-        if self.bias is not None:
-            h_total = h_total + self.bias
-
-        # MLP + norm
         out = self.mlp(h_total)
+
+        if self.bias is not None:
+            out = out + self.bias
+
         if self.norm is not None:
             out = self.norm(out)
 
         return out
-
 
     def message(self, x_j: Tensor, weights: Tensor, edge_type: Tensor) -> Tensor:
         """
