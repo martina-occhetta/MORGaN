@@ -189,6 +189,7 @@ figures/
 random/
 paper/
 logs/
+other/
 
 *.log
 *.pt
