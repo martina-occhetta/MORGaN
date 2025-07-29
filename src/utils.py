@@ -5,6 +5,7 @@ import yaml
 import logging
 from functools import partial
 import numpy as np
+import json 
 
 import torch
 import torch.nn as nn
@@ -94,7 +95,7 @@ def build_args():
     parser.add_argument("--drop_edge_rate", type=float, default=0.0)
     parser.add_argument("--replace_rate", type=float, default=0.0)
     parser.add_argument("--num_edge_types", type=int, default=None)
-    parser.add_argument("--weight_decomposition", type=str, default=None)
+    parser.add_argument("--weight_decomposition", type=json.loads, default=None)
     parser.add_argument("--vertical_stacking", type=bool, default=True)
 
     parser.add_argument("--encoder", type=str, default="gat")

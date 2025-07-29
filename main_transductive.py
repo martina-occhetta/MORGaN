@@ -3,11 +3,6 @@ import numpy as np
 from tqdm import tqdm
 import torch
 import time
-import h5py
-import pandas as pd
-import json
-from torch_geometric.data import Data
-from sklearn.model_selection import train_test_split
 import os
 
 from src.utils import (
@@ -16,7 +11,6 @@ from src.utils import (
     set_random_seed,
     WBLogger,
     get_current_lr,
-    load_best_configs,
     load_config,
 )
 from src.datasets.data_util import load_dataset, load_mutag_dataset
@@ -301,7 +295,8 @@ def main(args):
 
             if use_scheduler:
                 logging.info("Use scheduler")
-                scheduler = lambda epoch :( 1 + np.cos((epoch) * np.pi / max_epoch) ) * 0.5
+                def scheduler(epoch):
+                    return ( 1 + np.cos((epoch) * np.pi / max_epoch) ) * 0.5
                 # scheduler = lambda epoch: epoch / warmup_steps if epoch < warmup_steps \
                         # else ( 1 + np.cos((epoch - warmup_steps) * np.pi / (max_epoch - warmup_steps))) * 0.5
                 scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=scheduler)
@@ -403,8 +398,6 @@ if __name__ == "__main__":
             config_path = "configs/ppi_comparison.yaml"
         elif args.experiment_type == "no_pretrain":
             config_path = "configs/no_pretrain.yaml"
-        elif args.experiment_type == "mutag":
-            config_path = "configs/mutag.yaml"
         else:
             config_path = "configs/main_task.yaml"
         

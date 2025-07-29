@@ -9,21 +9,24 @@ from torch_geometric.nn.conv import MessagePassing
 from src.utils import create_activation, block_diag, stack_matrices, sum_sparse
 import math
 
+
 class RGCN(nn.Module):
-    def __init__(self, 
-                 in_channels: int, 
-                 hidden_channels: int, 
-                 out_channels: int, 
-                 num_edge_types: int, 
-                 num_layers: int, 
-                 dropout: float, 
-                 activation: str, 
-                 residual=True, 
-                 norm=None, 
-                 encoding=False,
-                 decomposition = None,
-                 diagonal_weight_matrix: bool = False,
-                 vertical_stacking = True):
+    def __init__(
+        self,
+        in_channels: int,
+        hidden_channels: int,
+        out_channels: int,
+        num_edge_types: int,
+        num_layers: int,
+        dropout: float,
+        activation: str,
+        residual=True,
+        norm=None,
+        encoding=False,
+        decomposition=None,
+        diagonal_weight_matrix: bool = False,
+        vertical_stacking=True,
+    ):
         """
         A multi-layer RGCN model that uses the custom RGCNConv layer.
 
@@ -46,52 +49,80 @@ class RGCN(nn.Module):
         # stack of RGCNConv layers
         self.rgcn_layers = nn.ModuleList()
         self.num_edge_types = num_edge_types
-        
+
         self.dropout = dropout
 
         self.activation = create_activation(activation)
         last_activation = create_activation(activation) if encoding else None
-        last_residual = (encoding and residual)
+        last_residual = encoding and residual
         last_norm = norm if encoding else None
 
         if num_layers == 1:
-            self.rgcn_layers.append(RGCNConv(
-                in_channels, out_channels, 
-                num_edge_types, dropout=dropout, activation=last_activation,
-                residual=last_residual, norm=last_norm, 
-                decomposition=decomposition,
-                diagonal_weight_matrix=diagonal_weight_matrix,
-                vertical_stacking=vertical_stacking))
-        else:
-            # input projection
-            self.rgcn_layers.append(RGCNConv(in_channels, 
-                    hidden_channels, num_edge_types, dropout=dropout,
-                    activation=create_activation(activation),
-                    residual=residual, norm=norm,
-                    decomposition=decomposition,
-                    diagonal_weight_matrix=diagonal_weight_matrix,
-                    vertical_stacking=vertical_stacking))          
-            
-            #hidden layers
-            for l in range(1, num_layers - 1):
-                self.rgcn_layers.append(RGCNConv(hidden_channels, 
-                    hidden_channels, num_edge_types, dropout=dropout,
-                    activation=create_activation(activation),
-                    residual=residual, norm=norm, decomposition=decomposition,
-                    diagonal_weight_matrix=diagonal_weight_matrix,
-                    vertical_stacking=vertical_stacking))
-            # output projection
-            self.rgcn_layers.append(RGCNConv(hidden_channels, 
-                    out_channels, num_edge_types, 
+            self.rgcn_layers.append(
+                RGCNConv(
+                    in_channels,
+                    out_channels,
+                    num_edge_types,
                     dropout=dropout,
                     activation=last_activation,
-                    residual=last_residual, norm=last_norm,
+                    residual=last_residual,
+                    norm=last_norm,
                     decomposition=decomposition,
                     diagonal_weight_matrix=diagonal_weight_matrix,
-                    vertical_stacking=vertical_stacking))       
-        
+                    vertical_stacking=vertical_stacking,
+                )
+            )
+        else:
+            # input projection
+            self.rgcn_layers.append(
+                RGCNConv(
+                    in_channels,
+                    hidden_channels,
+                    num_edge_types,
+                    dropout=dropout,
+                    activation=create_activation(activation),
+                    residual=residual,
+                    norm=norm,
+                    decomposition=decomposition,
+                    diagonal_weight_matrix=diagonal_weight_matrix,
+                    vertical_stacking=vertical_stacking,
+                )
+            )
+
+            # hidden layers
+            for _ in range(1, num_layers - 1):
+                self.rgcn_layers.append(
+                    RGCNConv(
+                        hidden_channels,
+                        hidden_channels,
+                        num_edge_types,
+                        dropout=dropout,
+                        activation=create_activation(activation),
+                        residual=residual,
+                        norm=norm,
+                        decomposition=decomposition,
+                        diagonal_weight_matrix=diagonal_weight_matrix,
+                        vertical_stacking=vertical_stacking,
+                    )
+                )
+            # output projection
+            self.rgcn_layers.append(
+                RGCNConv(
+                    hidden_channels,
+                    out_channels,
+                    num_edge_types,
+                    dropout=dropout,
+                    activation=last_activation,
+                    residual=last_residual,
+                    norm=last_norm,
+                    decomposition=decomposition,
+                    diagonal_weight_matrix=diagonal_weight_matrix,
+                    vertical_stacking=vertical_stacking,
+                )
+            )
+
         self.head = nn.Identity()
-    
+
     def forward(self, graph, x, num_edge_types, return_hidden=False):
         """
         Args:
@@ -99,37 +130,36 @@ class RGCN(nn.Module):
             edge_index (LongTensor): Edge indices of shape [2, E].
             edge_type (LongTensor): Edge type tensor of shape [E].
             return_hidden (bool): If True, also return hidden representations from each layer.
-            
+
         Returns:
             Tensor: Final node representations.
             (optional) List[Tensor]: List of hidden representations per layer.
         """
         # Extract edge_index and edge_type from the graph.
         edge_index = graph.edge_index  # shape: [2, E]
-        edge_type = graph.edge_type    # shape: [E]
+        edge_type = graph.edge_type  # shape: [E]
         num_nodes = graph.num_nodes
         h = x
 
         # Compute triples: stack [source, edge_type, destination].
         triples = torch.stack([edge_index[0], edge_type, edge_index[1]], dim=1)
-        
+
         hidden_list = []
         for l in range(self.num_layers):
             h = F.dropout(h, p=self.dropout, training=self.training)
-            h = self.rgcn_layers[l](graph, h, edge_index, num_edge_types, num_nodes, triples)
+            h = self.rgcn_layers[l](
+                graph, h, edge_index, num_edge_types, num_nodes, triples
+            )
             if self.activation is not None:
                 h = self.activation(h)
             hidden_list.append(h)
         out = self.head(h)
-        # Squeeze the output if out_channels == 1.
-        #if self.out_channels == 1:
-        #out = out.squeeze(1)
         if return_hidden:
             return out, hidden_list
         else:
             return out
-    
-    def reset_classifier(self, num_classes, concat = False, datas_dim = 0):
+
+    def reset_classifier(self, num_classes, concat=False, datas_dim=0):
         dtype = next(self.parameters()).dtype  # Get the current dtype.
         if concat:
             self.head = nn.Sequential(
@@ -139,35 +169,32 @@ class RGCN(nn.Module):
                 nn.Linear(256, 64),
                 nn.ReLU(),
                 nn.Dropout(0.2),
-                nn.Linear(64, 1)
+                nn.Linear(64, 1),
             ).to(dtype)
         else:
-            self.head = nn.Sequential(
-                nn.Linear(self.out_channels, 1)
-            ).to(dtype)
-        self.link_head = nn.Sequential(
-            nn.Linear(self.out_channels, 128)
-        ).to(dtype)
+            self.head = nn.Sequential(nn.Linear(self.out_channels, 1)).to(dtype)
+        self.link_head = nn.Sequential(nn.Linear(self.out_channels, 128)).to(dtype)
+
 
 class RGCNConv(MessagePassing):
-    def __init__(self, 
-                 in_channels: Union[int, Tuple[int,int]], 
-                 out_channels: int, 
-                 num_edge_types: Optional[int] = 1, 
-                 dropout: float = 0.0,
-                 bias: bool = True,
-                 activation = None,
-                 residual=False, 
-                 norm=None,
-                 decomposition: Optional[dict] = None,
-                 diagonal_weight_matrix: bool = False,
-                 vertical_stacking: bool = False,
-                 #reset_mode: str = 'glorot_uniform',
-                 **kwargs
-                ):
+    def __init__(
+        self,
+        in_channels: Union[int, Tuple[int, int]],
+        out_channels: int,
+        num_edge_types: Optional[int] = 1,
+        dropout: float = 0.0,
+        bias: bool = True,
+        activation=None,
+        residual=False,
+        norm=None,
+        decomposition: Optional[dict] = None,
+        diagonal_weight_matrix: bool = False,
+        vertical_stacking: bool = False,
+        **kwargs,
+    ):
         """
         A relational graph convolution layer for homogeneous graphs with integer-encoded edge types.
-        
+
         Args:
             in_channels (int): Dimension of input node features.
             out_channels (int): Dimension of output node features.
@@ -176,99 +203,103 @@ class RGCNConv(MessagePassing):
             norm (callable or None): Normalization layer constructor.
             bias (bool): Whether to include a bias term.
         """
-        kwargs.setdefault('aggr', 'add')
+        kwargs.setdefault("aggr", "add")
         super().__init__(node_dim=0, **kwargs)
-        #super(RGCNConv, self).__init__(aggr='add')
+        # super(RGCNConv, self).__init__(aggr='add')
 
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.num_edge_types = num_edge_types
-       
+
         self.dropout = dropout
 
         self.vertical_stacking = vertical_stacking
 
         self.activation = activation
 
-        self.weight_decomposition = decomposition['type'] if decomposition is not None and 'type' in decomposition else None
-        self.num_bases = decomposition['num_bases'] if decomposition is not None and 'num_bases' in decomposition else None
-        self.num_blocks = decomposition['num_blocks'] if decomposition is not None and 'num_blocks' in decomposition else None
+        self.weight_decomposition = (
+            decomposition["type"]
+            if decomposition is not None and "type" in decomposition
+            else None
+        )
+        self.num_bases = (
+            decomposition["num_bases"]
+            if decomposition is not None and "num_bases" in decomposition
+            else None
+        )
+        self.num_blocks = (
+            decomposition["num_blocks"]
+            if decomposition is not None and "num_blocks" in decomposition
+            else None
+        )
         self.diagonal_weight_matrix = diagonal_weight_matrix
-        
+
         if self.diagonal_weight_matrix:
-            self.weights = torch.nn.Parameter(torch.empty(num_edge_types, in_channels, out_channels))
+            self.weights = torch.nn.Parameter(
+                torch.empty(num_edge_types, in_channels, out_channels)
+            )
             self.out_channels = self.in_channels
             self.weight_decomposition = None
             bias = None
         elif self.weight_decomposition is None:
-            self.weights = nn.Parameter(torch.Tensor(num_edge_types, in_channels, out_channels))
-        elif self.weight_decomposition == 'basis':
+            self.weights = nn.Parameter(
+                torch.Tensor(num_edge_types, in_channels, out_channels)
+            )
+        elif self.weight_decomposition == "basis":
             # Weight regularisation using basis decomposition.
-            assert self.num_bases > 0, 'Number of bases must be greater than 0.'
-            self.bases = nn.Parameter(torch.Tensor(self.num_bases, in_channels, out_channels))
+            assert self.num_bases > 0, "Number of bases must be greater than 0."
+            self.bases = nn.Parameter(
+                torch.Tensor(self.num_bases, in_channels, out_channels)
+            )
             self.comps = nn.Parameter(torch.Tensor(num_edge_types, self.num_bases))
-        elif self.weight_decomposition == 'block':
+        elif self.weight_decomposition == "block":
             # Weight regularisation using block decomposition.
-            assert self.num_blocks > 0, 'Number of blocks must be greater than 0.'
-            assert in_channels % self.num_blocks == 0, f'Number of input channels {in_channels} must be divisible by the number of blocks {self.num_blocks}.'
-            assert out_channels % self.num_blocks == 0, f'Number of output channels {out_channels} must be divisible by the number of blocks {self.num_blocks}.'
-            self.blocks = nn.Parameter(torch.Tensor(num_edge_types, self.num_blocks, in_channels // self.num_blocks, out_channels // self.num_blocks))
+            assert self.num_blocks > 0, "Number of blocks must be greater than 0."
+            assert in_channels % self.num_blocks == 0, (
+                f"Number of input channels {in_channels} must be divisible by the number of blocks {self.num_blocks}."
+            )
+            assert out_channels % self.num_blocks == 0, (
+                f"Number of output channels {out_channels} must be divisible by the number of blocks {self.num_blocks}."
+            )
+            self.blocks = nn.Parameter(
+                torch.Tensor(
+                    num_edge_types,
+                    self.num_blocks,
+                    in_channels // self.num_blocks,
+                    out_channels // self.num_blocks,
+                )
+            )
         else:
-            raise NotImplementedError(f'Unknown weight decomposition type: {self.weight_decomposition}. Must be one of "basis", "block", or None.')
-        
-        # Set up weight for self-loop transformation.      
-        # Self-loop (or root) transformation.
-        # self.self_weight = nn.Parameter(torch.Tensor(in_channels, out_channels))
-            
-        # Set up residual connection.
-        #self.residual = residual
-        # if residual:
-        #     if self.in_channels != out_channels:
-        #         self.res_fc = nn.Linear(self.in_channels, out_channels, bias=False)
-        #     else:
-        #         self.res_fc = nn.Identity()
-        # else:
-        #     self.res_fc = None
-        
-        # Set up normalization layer.
+            raise NotImplementedError(
+                f'Unknown weight decomposition type: {self.weight_decomposition}. Must be one of "basis", "block", or None.'
+            )
         self.norm = norm(out_channels) if norm is not None else None
 
         if bias:
             self.bias = nn.Parameter(torch.Tensor(out_channels))
         else:
-            self.register_parameter('bias', None)
+            self.register_parameter("bias", None)
 
         # self.fc = nn.Linear(in_channels, out_channels) # In case extra linear transformation required
         self.reset_parameters()
-    
-    def reset_parameters(self, reset_mode='glorot_uniform'):
-        if reset_mode == 'glorot_uniform':
-            if self.weight_decomposition == 'block':
-                xavier_uniform_(self.blocks, gain=nn.init.calculate_gain('relu'))
-            elif self.weight_decomposition == 'basis':
-                xavier_uniform_(self.bases, gain=nn.init.calculate_gain('relu'))
-                xavier_uniform_(self.comps, gain=nn.init.calculate_gain('relu'))
+
+    def reset_parameters(self, reset_mode="glorot_uniform"):
+        if reset_mode == "glorot_uniform":
+            if self.weight_decomposition == "block":
+                xavier_uniform_(self.blocks, gain=nn.init.calculate_gain("relu"))
+            elif self.weight_decomposition == "basis":
+                xavier_uniform_(self.bases, gain=nn.init.calculate_gain("relu"))
+                xavier_uniform_(self.comps, gain=nn.init.calculate_gain("relu"))
             else:
-                xavier_uniform_(self.weights, gain=nn.init.calculate_gain('relu'))
+                xavier_uniform_(self.weights, gain=nn.init.calculate_gain("relu"))
 
             if self.bias is not None:
                 zeros_(self.bias)
-        # elif reset_mode == 'schlichtkrull':
-        #     if self.weight_decomposition == 'block':
-        #         xavier_uniform_(self.blocks, gain=nn.init.calculate_gain('relu'))
-        #     elif self.weight_decomposition == 'basis':
-        #         xavier_uniform_(self.bases, gain=nn.init.calculate_gain('relu'))
-        #         xavier_uniform_(self.comps, gain=nn.init.calculate_gain('relu'))
-        #     else:
-        #         xavier_uniform_(self.weights, gain=nn.init.calculate_gain('relu'))
-
-        #     if self.bias is not None:
-        #         zeros_(self.bias)
-        elif reset_mode == 'uniform':
+        elif reset_mode == "uniform":
             stdv = 1.0 / math.sqrt(self.weights.size(1))
-            if self.weight_decomposition == 'block':
+            if self.weight_decomposition == "block":
                 self.blocks.data.uniform_(-stdv, stdv)
-            elif self.weight_decomposition == 'basis':
+            elif self.weight_decomposition == "basis":
                 self.bases.data.uniform_(-stdv, stdv)
                 self.comps.data.uniform_(-stdv, stdv)
             else:
@@ -277,24 +308,19 @@ class RGCNConv(MessagePassing):
             if self.bias is not None:
                 self.bias.data.uniform_(-stdv, stdv)
         else:
-            raise NotImplementedError(f'{reset_mode} parameter initialisation method has not been implemented')
+            raise NotImplementedError(
+                f"{reset_mode} parameter initialisation method has not been implemented"
+            )
 
-        # self.fc.reset_parameters()
-        # xavier_uniform_(self.weight) # TODO check difference between xavier uniform and xavier normal
-        # xavier_uniform_(self.self_weight)
-
-        # if self.res_fc is not None and not isinstance(self.res_fc, nn.Identity):
-        #     xavier_uniform_(self.res_fc.weight)
-
-        # if self.bias is not None:
-        #     zeros_(self.bias)
-    
-    def forward(self, graph, 
-                x: Union[Tensor, OptPairTensor], 
-                edge_index: Adj, 
-                num_edge_types,
-                num_nodes,
-                triples):
+    def forward(
+        self,
+        graph,
+        x: Union[Tensor, OptPairTensor],
+        edge_index: Adj,
+        num_edge_types,
+        num_nodes,
+        triples,
+    ):
         """
         Perform a single pass of message propagation.
 
@@ -308,72 +334,77 @@ class RGCNConv(MessagePassing):
         Returns:
             Tensor: Updated node features of shape [N, out_channels].
         """
-        x = x.to(next(self.parameters()).dtype) # Ensure the input features have the same dtype as the model parameters.
-        
-        general_edge_count = int((triples.size(0) - num_nodes)/2)
+        x = x.to(
+            next(self.parameters()).dtype
+        )  # Ensure the input features have the same dtype as the model parameters.
+
+        general_edge_count = int((triples.size(0) - num_nodes) / 2)
 
         # Choose weights
         if self.weight_decomposition is None:
             weights = self.weights
-        elif self.weight_decomposition == 'basis':
-            weights = torch.einsum('rb, bio -> rio', self.comps, self.bases)
-        elif self.weight_decomposition == 'block':
+        elif self.weight_decomposition == "basis":
+            weights = torch.einsum("rb, bio -> rio", self.comps, self.bases)
+        elif self.weight_decomposition == "block":
             weights = block_diag(self.blocks)
         else:
-            raise NotImplementedError(f'Unknown weight decomposition type: {self.weight_decomposition}. Must be one of "basis", "block", or None.')
+            raise NotImplementedError(
+                f'Unknown weight decomposition type: {self.weight_decomposition}. Must be one of "basis", "block", or None.'
+            )
 
         # Stack adjancency matrices
-        adj_indices, adj_size = stack_matrices(triples, num_nodes, 
-                                               num_edge_types, 
-                                               vertical_stacking=self.vertical_stacking, 
-                                               device=x.device)
+        adj_indices, adj_size = stack_matrices(
+            triples,
+            num_nodes,
+            num_edge_types,
+            vertical_stacking=self.vertical_stacking,
+            device=x.device,
+        )
 
         num_triples = adj_indices.size(0)
 
-        vals = torch.ones(num_triples, dtype=next(self.parameters()).dtype, device=x.device)
+        vals = torch.ones(
+            num_triples, dtype=next(self.parameters()).dtype, device=x.device
+        )
 
         # Normalisation
-        sums = sum_sparse(adj_indices, vals, adj_size, row_normalisation=self.vertical_stacking, device=x.device)
+        sums = sum_sparse(
+            adj_indices,
+            vals,
+            adj_size,
+            row_normalisation=self.vertical_stacking,
+            device=x.device,
+        )
         if not self.vertical_stacking:
             n = general_edge_count
             i = num_nodes
-            sums = torch.cat([sums[n:2 * n], sums [:n], sums[-i:]], dim=0)
+            sums = torch.cat([sums[n : 2 * n], sums[:n], sums[-i:]], dim=0)
 
         vals = vals / sums
 
         # Construct adj matrix
-        if x.device.type == 'cuda':
+        if x.device.type == "cuda":
             adj = torch.cuda.sparse.FloatTensor(adj_indices.t(), vals, adj_size)
         else:
             adj = torch.sparse.FloatTensor(adj_indices.t(), vals, adj_size)
 
         # Perform message passing
         if self.diagonal_weight_matrix:
-            fw = torch.einsum('ij,kj -> kij', x, weights)
+            fw = torch.einsum("ij,kj -> kij", x, weights)
             fw = torch.reshape(fw, (num_edge_types * num_nodes, self.in_channels))
             out = torch.mm(adj, fw)
         elif self.vertical_stacking:
             af = torch.spmm(adj, x)
             af = af.view(num_edge_types, num_nodes, self.in_channels)
-            out = torch.einsum('rio, rni -> no', weights, af)
+            out = torch.einsum("rio, rni -> no", weights, af)
         else:
-            fw = torch.einsum('ni, rio -> rno', x, weights).contiguous()
+            fw = torch.einsum("ni, rio -> rno", x, weights).contiguous()
             out = torch.mm(adj, fw.view(num_edge_types * num_nodes, self.out_channels))
 
         assert out.size() == (num_nodes, self.out_channels)
-        
+
         # Add bias if provided
         if self.bias is not None:
             out = torch.add(out, self.bias)
-        
+
         return out
-    
-    # def message(self, x_j, edge_type):
-    #     # For each edge, select its corresponding weight matrix.
-    #     # x_j: shape [E, in_channels]
-    #     # edge_type: shape [E]
-    #     weight = self.weight[edge_type]  # shape [E, in_channels, out_channels]
-    #     # Multiply each source node feature by the corresponding weight.
-    #     # Unsqueeze x_j to shape [E, 1, in_channels] then batch multiply.
-    #     msg = torch.bmm(x_j.unsqueeze(1), weight)  # shape [E, 1, out_channels]
-    #     return msg.squeeze(1)
