@@ -5,6 +5,8 @@ import torch
 import time
 import os
 
+from torch_geometric.data import Data
+
 from src.utils import (
     build_args,
     create_optimizer,
@@ -15,7 +17,8 @@ from src.utils import (
 )
 from src.datasets.data_util import load_dataset, load_mutag_dataset
 from src.datasets.build_graphs import load_h5_graph, load_h5_graph_with_external_edges, load_h5_graph_random_features, add_all_edges, randomize_edges
-from src.evaluation import node_classification_evaluation
+from src.evaluation import node_classification_eval
+from src.evaluation_multilabel import multilabel_node_classification_eval
 from src.models import build_model
 
 
@@ -53,7 +56,11 @@ def pretrain(model, graph, feat, optimizer, max_epoch, device, scheduler, num_cl
             logger.note(loss_dict, step=epoch)
 
         if (epoch + 1) % 200 == 0:
-            (acc, estp_acc), (auc, estp_auc), (aupr, estp_aupr), (precision, estp_precision), (recall, estp_recall), (f1, estp_f1) = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False) 
+            if graph.y.dim() > 1 and graph.y.size(1) > 1:
+                (acc, estp_acc), (auc, estp_auc), (aupr, estp_aupr), (precision, estp_precision), (recall, estp_recall), (f1, estp_f1) = multilabel_node_classification_eval(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False)
+
+            else:
+                (acc, estp_acc), (auc, estp_auc), (aupr, estp_aupr), (precision, estp_precision), (recall, estp_recall), (f1, estp_f1) = node_classification_eval(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob=False) 
             logger.note({
                 **loss_dict,
                 "accuracy": acc,
@@ -88,6 +95,7 @@ def build_graph(dataset_name: str, experiment_type: str):
             - "ppi_comparison": For PPI dataset comparison
             - "predict_druggable_genes": For main druggable gene prediction task
             - "mutag": For MUTAG chemical compound classification
+            - "ogbn_proteins": For OGBN-Proteins dataset
     
     Returns:
         Data: PyTorch Geometric Data object containing the graph
@@ -99,7 +107,9 @@ def build_graph(dataset_name: str, experiment_type: str):
         "edge_ablations", 
         "ppi_comparison",
         "predict_druggable_genes",
-        "mutag"
+        "mutag",
+        "ogbn_proteins",
+        "no_pretrain"
     ]
     if experiment_type not in valid_experiment_types:
         logging.warning(f"Invalid experiment type: {experiment_type}. Must be one of {valid_experiment_types}")
@@ -130,7 +140,7 @@ def build_graph(dataset_name: str, experiment_type: str):
     ppi = dataset_name.split('_')[0]
     
     # Validate PPI name
-    valid_ppis = ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'STRINGdb', 'PCNet']
+    valid_ppis = ['CPDB', 'IRefIndex_2015', 'IRefIndex', 'STRINGdb', 'PCNet', 'obgn']
     if ppi not in valid_ppis:
         logging.warning(f"Invalid PPI name: {ppi}. Must be one of {valid_ppis}")
     
@@ -218,6 +228,12 @@ def build_graph(dataset_name: str, experiment_type: str):
         graph = load_h5_graph(PATH, LABEL_PATH, ppi)
         graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
     
+    elif experiment_type == "ogbn_proteins":
+       graph = torch.load('data/ogbn_proteins/ogbn_proteins_synthetic.pt', weights_only=False)
+       if not isinstance(graph, Data):
+           raise ValueError("Loaded graph is not a PyTorch Geometric Data object")
+       return graph, (graph.x.shape[1], graph.y.size(1), graph.edge_attr.shape[1])
+
     # Create save directory if it doesn't exist
     os.makedirs(SAVE_DIR, exist_ok=True)
     
@@ -321,7 +337,7 @@ def main(args):
             model = model.to(device)
             model.eval()
 
-            (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_test_precision), (test_recall, estp_test_recall), (test_f1, estp_f1) = node_classification_evaluation(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob)
+            (test_acc, estp_test_acc), (test_auc, estp_test_auc), (test_aupr, estp_test_aupr), (test_precision, estp_test_precision), (test_recall, estp_test_recall), (test_f1, estp_f1) = node_classification_eval(model, graph, x, num_classes, lr_f, weight_decay_f, max_epoch_f, device, linear_prob)
             
             if logger is not None:
                 logger.note({
@@ -398,6 +414,8 @@ if __name__ == "__main__":
             config_path = "configs/ppi_comparison.yaml"
         elif args.experiment_type == "no_pretrain":
             config_path = "configs/no_pretrain.yaml"
+        elif args.experiment_type == "ogbn_proteins":
+            config_path = "configs/ogbn_proteins.yaml"
         else:
             config_path = "configs/main_task.yaml"
         
