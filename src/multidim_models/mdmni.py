@@ -5,19 +5,30 @@ from torch_geometric.nn import GraphConv, GATConv, SAGEConv, GraphSAGE
 from torch.nn.parameter import Parameter
 import numpy as np
 import math
-#from torch_sparse import spmm
+
+# from torch_sparse import spmm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class GAT_SAGE(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, dropout, num_heads=2):
         super(GAT_SAGE, self).__init__()
-        #print("num_heads:", num_heads)
+        # print("num_heads:", num_heads)
         assert hidden_dim % num_heads == 0
 
-        self.gat1 = GATConv(in_channels=input_dim, out_channels=hidden_dim, heads=num_heads, dropout=dropout)
-        self.gat2 = GATConv(in_channels=hidden_dim * num_heads, out_channels=hidden_dim, heads=num_heads, dropout=dropout)
-        
+        self.gat1 = GATConv(
+            in_channels=input_dim,
+            out_channels=hidden_dim,
+            heads=num_heads,
+            dropout=dropout,
+        )
+        self.gat2 = GATConv(
+            in_channels=hidden_dim * num_heads,
+            out_channels=hidden_dim,
+            heads=num_heads,
+            dropout=dropout,
+        )
+
         self.sage1 = SAGEConv(hidden_dim * num_heads, hidden_dim)
         self.sage2 = SAGEConv(hidden_dim, output_dim)
 
@@ -43,33 +54,32 @@ class GAT_SAGE(nn.Module):
         x = self.batchnorm(x_sage)
         return x
 
+
 class Attention(nn.Module):
     def __init__(self, in_size, hidden_size=8):
         super(Attention, self).__init__()
         self.project = nn.Sequential(
-            nn.Linear(in_size, hidden_size),    
-            nn.Tanh(),                               
-            nn.Linear(hidden_size, 1, bias=False)    
+            nn.Linear(in_size, hidden_size),
+            nn.Tanh(),
+            nn.Linear(hidden_size, 1, bias=False),
         )
-    def forward(self, z):
-        w = self.project(z)                          
-        beta = torch.softmax(w, dim=1)               
-        return (beta * z).sum(1), beta               
 
+    def forward(self, z):
+        w = self.project(z)
+        beta = torch.softmax(w, dim=1)
+        return (beta * z).sum(1), beta
 
 
 class MDMNI_DGD(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, dropout):
         super(MDMNI_DGD, self).__init__()
 
-        self.gat_sage = GAT_SAGE(input_dim, hidden_dim, output_dim, dropout)      
-        self.attn = Attention(output_dim)                                         
-        self.MLP = nn.Linear(output_dim, 1)                                       
+        self.gat_sage = GAT_SAGE(input_dim, hidden_dim, output_dim, dropout)
+        self.attn = Attention(output_dim)
+        self.MLP = nn.Linear(output_dim, 1)
         self.dropout = dropout
 
-
     def forward(self, graphs):
-
         old_emb2 = []
         for i in range(len(graphs)):
             emb = self.gat_sage(graphs[i])

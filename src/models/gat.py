@@ -16,22 +16,23 @@ from src.utils import create_activation
 
 
 class GAT(nn.Module):
-    def __init__(self,
-                 in_dim,
-                 num_hidden,
-                 out_dim,
-                 num_layers,
-                 nhead,
-                 nhead_out,
-                 activation,
-                 feat_drop,
-                 attn_drop,
-                 negative_slope,
-                 residual,
-                 norm,
-                 concat_out=False,
-                 encoding=False
-                 ):
+    def __init__(
+        self,
+        in_dim,
+        num_hidden,
+        out_dim,
+        num_layers,
+        nhead,
+        nhead_out,
+        activation,
+        feat_drop,
+        attn_drop,
+        negative_slope,
+        residual,
+        norm,
+        concat_out=False,
+        encoding=False,
+    ):
         super(GAT, self).__init__()
         self.out_dim = out_dim
         self.num_heads = nhead
@@ -44,29 +45,68 @@ class GAT(nn.Module):
 
         self.activation = create_activation(activation)
         last_activation = create_activation(activation) if encoding else None
-        last_residual = (encoding and residual)
+        last_residual = encoding and residual
         last_norm = norm if encoding else None
-        
+
         if num_layers == 1:
-            self.gat_layers.append(GATConv(
-                in_dim, out_dim, nhead_out,
-                concat=concat_out,negative_slope=negative_slope, dropout=attn_drop,residual=last_residual, norm=last_norm,))
+            self.gat_layers.append(
+                GATConv(
+                    in_dim,
+                    out_dim,
+                    nhead_out,
+                    concat=concat_out,
+                    negative_slope=negative_slope,
+                    dropout=attn_drop,
+                    residual=last_residual,
+                    norm=last_norm,
+                )
+            )
         else:
             # input projection (no residual)
-            self.gat_layers.append(GATConv(
-                in_dim, num_hidden, nhead,
-                concat=concat_out, negative_slope=negative_slope, dropout=attn_drop, activation=create_activation(activation),residual=residual, norm=norm))
+            self.gat_layers.append(
+                GATConv(
+                    in_dim,
+                    num_hidden,
+                    nhead,
+                    concat=concat_out,
+                    negative_slope=negative_slope,
+                    dropout=attn_drop,
+                    activation=create_activation(activation),
+                    residual=residual,
+                    norm=norm,
+                )
+            )
             # hidden layers
             for l in range(1, num_layers - 1):
                 # due to multi-head, the in_dim = num_hidden * num_heads
-                self.gat_layers.append(GATConv(
-                    num_hidden * nhead, num_hidden, nhead,
-                    concat=concat_out, negative_slope=negative_slope, dropout=attn_drop, activation=create_activation(activation), residual=residual, norm=norm))
+                self.gat_layers.append(
+                    GATConv(
+                        num_hidden * nhead,
+                        num_hidden,
+                        nhead,
+                        concat=concat_out,
+                        negative_slope=negative_slope,
+                        dropout=attn_drop,
+                        activation=create_activation(activation),
+                        residual=residual,
+                        norm=norm,
+                    )
+                )
             # output projection
-            self.gat_layers.append(GATConv(
-                num_hidden * nhead, out_dim, nhead_out,
-                concat=concat_out,negative_slope=negative_slope, dropout=attn_drop, activation=last_activation, residual=last_residual, norm=last_norm))
-    
+            self.gat_layers.append(
+                GATConv(
+                    num_hidden * nhead,
+                    out_dim,
+                    nhead_out,
+                    concat=concat_out,
+                    negative_slope=negative_slope,
+                    dropout=attn_drop,
+                    activation=last_activation,
+                    residual=last_residual,
+                    norm=last_norm,
+                )
+            )
+
         self.head = nn.Identity()
 
     def forward(self, graph, x, return_hidden=False):
@@ -85,7 +125,7 @@ class GAT(nn.Module):
             return self.head(h)
 
     def reset_classifier(self, num_classes, concat=False, datas_dim=0):
-        #self.head = nn.Linear(self.num_heads * self.out_dim, num_classes)
+        # self.head = nn.Linear(self.num_heads * self.out_dim, num_classes)
         dtype = next(self.parameters()).dtype  # Get the current dtype.
         # print("num_heads:", self.num_heads)
         # print("out_dim:", self.out_dim)
@@ -98,15 +138,13 @@ class GAT(nn.Module):
                 nn.Linear(256, 64),
                 nn.ReLU(),
                 nn.Dropout(0.2),
-                nn.Linear(64, 1)
+                nn.Linear(64, 1),
             ).to(dtype)
         else:
-            self.head = nn.Sequential(
-                nn.Linear(self.num_heads*self.out_dim, 1)
-            ).to(dtype)
-        self.link_head = nn.Sequential(
-            nn.Linear(self.out_dim, 128)
-        ).to(dtype)
+            self.head = nn.Sequential(nn.Linear(self.num_heads * self.out_dim, 1)).to(
+                dtype
+            )
+        self.link_head = nn.Sequential(nn.Linear(self.out_dim, 128)).to(dtype)
 
 
 class GATConv(MessagePassing):
@@ -119,14 +157,14 @@ class GATConv(MessagePassing):
         negative_slope: float = 0.2,
         dropout: float = 0.0,
         edge_dim: Optional[int] = None,
-        fill_value: Union[float, Tensor, str] = 'mean',
+        fill_value: Union[float, Tensor, str] = "mean",
         bias: bool = True,
-        activation = None,
-        residual = False,
-        norm = None,
+        activation=None,
+        residual=False,
+        norm=None,
         **kwargs,
     ):
-        kwargs.setdefault('aggr', 'add')
+        kwargs.setdefault("aggr", "add")
         super().__init__(node_dim=0, **kwargs)
 
         self.in_channels = in_channels
@@ -143,24 +181,31 @@ class GATConv(MessagePassing):
         if residual:
             if self.in_channels != out_channels * heads:
                 self.res_fc = nn.Linear(
-                    self.in_channels, heads * out_channels, bias=False)
+                    self.in_channels, heads * out_channels, bias=False
+                )
             else:
                 self.res_fc = nn.Identity()
         else:
-            self.register_buffer('res_fc', None)
+            self.register_buffer("res_fc", None)
 
         # In case we are operating in bipartite graphs, we apply separate
         # transformations 'lin_src' and 'lin_dst' to source and target nodes:
         if isinstance(in_channels, int):
-            self.lin_src = Linear(in_channels, heads * out_channels,
-                                  bias=False, weight_initializer='glorot')
+            self.lin_src = Linear(
+                in_channels,
+                heads * out_channels,
+                bias=False,
+                weight_initializer="glorot",
+            )
             self.lin_dst = self.lin_src
         else:
-            self.lin_src = Linear(in_channels[0], heads * out_channels, False,
-                                  weight_initializer='glorot')
-            self.lin_dst = Linear(in_channels[1], heads * out_channels, False,
-                                  weight_initializer='glorot')
-        
+            self.lin_src = Linear(
+                in_channels[0], heads * out_channels, False, weight_initializer="glorot"
+            )
+            self.lin_dst = Linear(
+                in_channels[1], heads * out_channels, False, weight_initializer="glorot"
+            )
+
         self.norm = norm
         if norm is not None:
             self.norm = norm(heads * out_channels)
@@ -169,19 +214,20 @@ class GATConv(MessagePassing):
         self.att_dst = Parameter(torch.Tensor(1, heads, out_channels))
 
         if edge_dim is not None:
-            self.lin_edge = Linear(edge_dim, heads * out_channels, bias=False,
-                                   weight_initializer='glorot')
+            self.lin_edge = Linear(
+                edge_dim, heads * out_channels, bias=False, weight_initializer="glorot"
+            )
             self.att_edge = Parameter(torch.Tensor(1, heads, out_channels))
         else:
             self.lin_edge = None
-            self.register_parameter('att_edge', None)
+            self.register_parameter("att_edge", None)
 
         if bias and concat:
             self.bias = Parameter(torch.Tensor(heads * out_channels))
         elif bias and not concat:
             self.bias = Parameter(torch.Tensor(out_channels))
         else:
-            self.register_parameter('bias', None)
+            self.register_parameter("bias", None)
 
         self.reset_parameters()
 
@@ -196,9 +242,14 @@ class GATConv(MessagePassing):
         if isinstance(self.res_fc, nn.Linear):
             nn.init.xavier_normal_(self.res_fc.weight, gain=1.414)
 
-    def forward(self, x: Union[Tensor, OptPairTensor], edge_index: Adj,
-                edge_attr: OptTensor = None, size: Size = None,
-                return_attention_weights=None):
+    def forward(
+        self,
+        x: Union[Tensor, OptPairTensor],
+        edge_index: Adj,
+        edge_attr: OptTensor = None,
+        size: Size = None,
+        return_attention_weights=None,
+    ):
         r"""
         Args:
             return_attention_weights (bool, optional): If set to :obj:`True`,
@@ -246,7 +297,7 @@ class GATConv(MessagePassing):
 
         if self.bias is not None:
             out = out + self.bias
-        
+
         if self.norm is not None:
             out = self.norm(out)
 
@@ -257,13 +308,19 @@ class GATConv(MessagePassing):
             if isinstance(edge_index, Tensor):
                 return out, (edge_index, alpha)
             elif isinstance(edge_index, SparseTensor):
-                return out, edge_index.set_value(alpha, layout='coo')
+                return out, edge_index.set_value(alpha, layout="coo")
         else:
             return out
 
-    def edge_update(self, alpha_j: Tensor, alpha_i: OptTensor,
-                    edge_attr: OptTensor, index: Tensor, ptr: OptTensor,
-                    size_i: Optional[int]) -> Tensor:
+    def edge_update(
+        self,
+        alpha_j: Tensor,
+        alpha_i: OptTensor,
+        edge_attr: OptTensor,
+        index: Tensor,
+        ptr: OptTensor,
+        size_i: Optional[int],
+    ) -> Tensor:
         # Given edge-level attention coefficients for source and target nodes,
         # we simply need to sum them up to "emulate" concatenation:
         alpha = alpha_j if alpha_i is None else alpha_j + alpha_i
@@ -285,5 +342,7 @@ class GATConv(MessagePassing):
         return alpha.unsqueeze(-1) * x_j
 
     def __repr__(self) -> str:
-        return (f'{self.__class__.__name__}({self.in_channels}, '
-                f'{self.out_channels}, heads={self.heads})')
+        return (
+            f"{self.__class__.__name__}({self.in_channels}, "
+            f"{self.out_channels}, heads={self.heads})"
+        )

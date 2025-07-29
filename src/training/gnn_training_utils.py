@@ -1,9 +1,9 @@
 """
-    Graph Neural Network training utility methods
+Graph Neural Network training utility methods
 
-    :author: Afan Secic (main developer), Anna Saranti (corrections and refactoring)
-    :copyright: © 2020 HCI-KDD (ex-AI) group
-    :date: 2020-12-01
+:author: Afan Secic (main developer), Anna Saranti (corrections and refactoring)
+:copyright: © 2020 HCI-KDD (ex-AI) group
+:date: 2020-12-01
 """
 
 import networkx as nx
@@ -11,7 +11,8 @@ import copy
 import numpy as np
 import torch
 
-#class gnn_training_utils:
+# class gnn_training_utils:
+
 
 def check_if_graph_is_connected(edge_index):
     if type(edge_index) == torch.Tensor:
@@ -27,7 +28,7 @@ def check_if_graph_is_connected(edge_index):
 
     edges = [(row[0].item(), row[1].item()) for row in edges.T]
     graph.add_edges_from(edges)
-    
+
     return nx.is_connected(graph)
 
 
@@ -45,12 +46,13 @@ def _plain_bfs(G, source):
                 seen.add(v)
                 nextlevel.update(G_adj[v])
 
-def pass_data_iteratively(model, graphs, minibatch_size = 32):
+
+def pass_data_iteratively(model, graphs, minibatch_size=32):
     model.eval()
     output = []
     idx = np.arange(len(graphs))
     for i in range(0, len(graphs), minibatch_size):
-        sampled_idx = idx[i:i+minibatch_size]
+        sampled_idx = idx[i : i + minibatch_size]
         if len(sampled_idx) == 0:
             continue
         output.append(model([graphs[j] for j in sampled_idx]).detach())

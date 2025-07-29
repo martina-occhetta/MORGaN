@@ -7,19 +7,20 @@ from src.utils import create_activation, NormLayer, create_norm
 
 
 class GIN(nn.Module):
-    def __init__(self,
-                 in_dim,
-                 num_hidden,
-                 out_dim,
-                 num_layers,
-                 dropout,
-                 activation,
-                 residual,
-                 norm,
-                 encoding=False,
-                 learn_eps=False,
-                 aggr="sum",
-                 ):
+    def __init__(
+        self,
+        in_dim,
+        num_hidden,
+        out_dim,
+        num_layers,
+        dropout,
+        activation,
+        residual,
+        norm,
+        encoding=False,
+        learn_eps=False,
+        aggr="sum",
+    ):
         super(GIN, self).__init__()
         self.out_dim = out_dim
         self.num_layers = num_layers
@@ -30,27 +31,57 @@ class GIN(nn.Module):
         last_activation = create_activation(activation) if encoding else None
         last_residual = encoding and residual
         last_norm = norm if encoding else None
-        
+
         if num_layers == 1:
-            apply_func = MLP(2, in_dim, num_hidden, out_dim, activation=activation, norm=norm)
+            apply_func = MLP(
+                2, in_dim, num_hidden, out_dim, activation=activation, norm=norm
+            )
             if last_norm:
                 apply_func = ApplyNodeFunc(apply_func, norm=norm, activation=activation)
             self.layers.append(GINConv(nn=apply_func, train_eps=False))
         else:
             # input projection (no residual)
-            self.layers.append(GINConv(
-                nn=ApplyNodeFunc(MLP(2, in_dim, num_hidden, num_hidden, activation=activation, norm=norm), activation=activation, norm=norm), 
-                train_eps=False)
+            self.layers.append(
+                GINConv(
+                    nn=ApplyNodeFunc(
+                        MLP(
+                            2,
+                            in_dim,
+                            num_hidden,
+                            num_hidden,
+                            activation=activation,
+                            norm=norm,
+                        ),
+                        activation=activation,
+                        norm=norm,
+                    ),
+                    train_eps=False,
                 )
+            )
             # hidden layers
             for l in range(1, num_layers - 1):
                 # due to multi-head, the in_dim = num_hidden * num_heads
-                self.layers.append(GINConv(
-                    nn=ApplyNodeFunc(MLP(2, num_hidden, num_hidden, num_hidden, activation=activation, norm=norm), activation=activation, norm=norm), 
-                    train_eps=False)
+                self.layers.append(
+                    GINConv(
+                        nn=ApplyNodeFunc(
+                            MLP(
+                                2,
+                                num_hidden,
+                                num_hidden,
+                                num_hidden,
+                                activation=activation,
+                                norm=norm,
+                            ),
+                            activation=activation,
+                            norm=norm,
+                        ),
+                        train_eps=False,
+                    )
                 )
             # output projection
-            apply_func = MLP(2, num_hidden, num_hidden, out_dim, activation=activation, norm=norm)
+            apply_func = MLP(
+                2, num_hidden, num_hidden, out_dim, activation=activation, norm=norm
+            )
             if last_norm:
                 apply_func = ApplyNodeFunc(apply_func, activation=activation, norm=norm)
 
@@ -77,6 +108,7 @@ class GIN(nn.Module):
 
 class ApplyNodeFunc(nn.Module):
     """Update the node feature hv with MLP, BN and ReLU."""
+
     def __init__(self, mlp, norm="batchnorm", activation="relu"):
         super(ApplyNodeFunc, self).__init__()
         self.mlp = mlp
@@ -96,7 +128,16 @@ class ApplyNodeFunc(nn.Module):
 
 class MLP(nn.Module):
     """MLP with linear output"""
-    def __init__(self, num_layers, input_dim, hidden_dim, output_dim, activation="relu", norm="batchnorm"):
+
+    def __init__(
+        self,
+        num_layers,
+        input_dim,
+        hidden_dim,
+        output_dim,
+        activation="relu",
+        norm="batchnorm",
+    ):
         super(MLP, self).__init__()
         self.linear_or_not = True  # default is linear model
         self.num_layers = num_layers

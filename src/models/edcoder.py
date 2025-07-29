@@ -14,6 +14,7 @@ from .rgcn import RGCN
 from .rgin import RGIN
 from .loss_func import sce_loss
 
+
 def setup_module(
     m_type,
     enc_dec,

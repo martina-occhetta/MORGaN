@@ -221,7 +221,11 @@ class RGINConv(MessagePassing):
         else:
             self.register_parameter("bias", None)
 
-        act = self.activation if self.activation is not None else create_activation("relu")
+        act = (
+            self.activation
+            if self.activation is not None
+            else create_activation("relu")
+        )
 
         # 2‐layer MLP
         self.mlp = nn.Sequential(
@@ -284,7 +288,11 @@ class RGINConv(MessagePassing):
             )
             vals = torch.ones(adj_idx.size(0), dtype=x.dtype, device=x.device)
             deg = sum_sparse(
-                adj_idx, vals, adj_size, row_normalisation=self.vertical_stacking, device=x.device
+                adj_idx,
+                vals,
+                adj_size,
+                row_normalisation=self.vertical_stacking,
+                device=x.device,
             )
             vals = vals / deg
             adj = torch.sparse.FloatTensor(adj_idx.t(), vals, adj_size)

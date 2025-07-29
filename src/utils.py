@@ -5,7 +5,7 @@ import yaml
 import logging
 from functools import partial
 import numpy as np
-import json 
+import json
 
 import torch
 import torch.nn as nn
@@ -19,7 +19,9 @@ from math import floor, sqrt
 import random
 import torch
 
-logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
+)
 
 
 def accuracy(y_pred, y_true):
@@ -29,6 +31,7 @@ def accuracy(y_pred, y_true):
     correct = preds.eq(y_true).double().sum().item()
     return correct / len(y_true)
 
+
 def result(pred, true):
     aa = torch.sigmoid(pred)
     # precision, recall, _thresholds = metrics.precision_recall_curve(true, aa)
@@ -36,14 +39,15 @@ def result(pred, true):
     # return metrics.roc_auc_score(true, aa), area, precision, recall
     precision, recall, _thresholds = metrics.precision_recall_curve(true, aa)
     aupr = metrics.auc(recall, precision)
-    
+
     # Compute binary predictions using a threshold of 0.5
-    pred_labels = (aa >= 0.5)
+    pred_labels = aa >= 0.5
     f1 = metrics.f1_score(true, pred_labels)
-    
+
     roc_auc = metrics.roc_auc_score(true, aa)
-    
+
     return roc_auc, aupr, precision, recall, f1
+
 
 def set_random_seed(seed):
     random.seed(seed)
@@ -63,33 +67,47 @@ def build_args():
     parser.add_argument("--seeds", type=int, nargs="+", default=[0])
     parser.add_argument("--dataset", type=str, default="cora")
     parser.add_argument("--device", type=int, default=-1)
-    parser.add_argument("--max_epoch", type=int, default=200,
-                        help="number of training epochs")
+    parser.add_argument(
+        "--max_epoch", type=int, default=200, help="number of training epochs"
+    )
     parser.add_argument("--warmup_steps", type=int, default=-1)
-    parser.add_argument("--experiment_type", type=str, default="predict_druggable_genes",
-                        help="Type of experiment to run: 'feature_ablations', 'edge_ablations', 'ppi_datasets', or 'predict_druggable_genes'")
+    parser.add_argument(
+        "--experiment_type",
+        type=str,
+        default="predict_druggable_genes",
+        help="Type of experiment to run: 'feature_ablations', 'edge_ablations', 'ppi_datasets', or 'predict_druggable_genes'",
+    )
 
-    parser.add_argument("--num_heads", type=int, default=4,
-                        help="number of hidden attention heads")
-    parser.add_argument("--num_out_heads", type=int, default=1,
-                        help="number of output attention heads")
-    parser.add_argument("--num_layers", type=int, default=2,
-                        help="number of hidden layers")
-    parser.add_argument("--num_hidden", type=int, default=256,
-                        help="number of hidden units")
-    parser.add_argument("--residual", action="store_true", default=False,
-                        help="use residual connection")
-    parser.add_argument("--in_drop", type=float, default=.2,
-                        help="input feature dropout")
-    parser.add_argument("--attn_drop", type=float, default=.1,
-                        help="attention dropout")
+    parser.add_argument(
+        "--num_heads", type=int, default=4, help="number of hidden attention heads"
+    )
+    parser.add_argument(
+        "--num_out_heads", type=int, default=1, help="number of output attention heads"
+    )
+    parser.add_argument(
+        "--num_layers", type=int, default=2, help="number of hidden layers"
+    )
+    parser.add_argument(
+        "--num_hidden", type=int, default=256, help="number of hidden units"
+    )
+    parser.add_argument(
+        "--residual", action="store_true", default=False, help="use residual connection"
+    )
+    parser.add_argument(
+        "--in_drop", type=float, default=0.2, help="input feature dropout"
+    )
+    parser.add_argument(
+        "--attn_drop", type=float, default=0.1, help="attention dropout"
+    )
     parser.add_argument("--norm", type=str, default=None)
-    parser.add_argument("--lr", type=float, default=0.005,
-                        help="learning rate")
-    parser.add_argument("--weight_decay", type=float, default=5e-4,
-                        help="weight decay")
-    parser.add_argument("--negative_slope", type=float, default=0.2,
-                        help="the negative slope of leaky relu for GAT")
+    parser.add_argument("--lr", type=float, default=0.005, help="learning rate")
+    parser.add_argument("--weight_decay", type=float, default=5e-4, help="weight decay")
+    parser.add_argument(
+        "--negative_slope",
+        type=float,
+        default=0.2,
+        help="the negative slope of leaky relu for GAT",
+    )
     parser.add_argument("--activation", type=str, default="prelu")
     parser.add_argument("--mask_rate", type=float, default=0.5)
     parser.add_argument("--drop_edge_rate", type=float, default=0.0)
@@ -101,14 +119,20 @@ def build_args():
     parser.add_argument("--encoder", type=str, default="gat")
     parser.add_argument("--decoder", type=str, default="gat")
     parser.add_argument("--loss_fn", type=str, default="sce")
-    parser.add_argument("--alpha_l", type=float, default=2, help="`pow`coefficient for `sce` loss")
+    parser.add_argument(
+        "--alpha_l", type=float, default=2, help="`pow`coefficient for `sce` loss"
+    )
     parser.add_argument("--optimizer", type=str, default="adam")
-    
+
     parser.add_argument("--max_epoch_f", type=int, default=30)
-    parser.add_argument("--lr_f", type=float, default=0.001, help="learning rate for evaluation")
-    parser.add_argument("--weight_decay_f", type=float, default=0.0, help="weight decay for evaluation")
+    parser.add_argument(
+        "--lr_f", type=float, default=0.001, help="learning rate for evaluation"
+    )
+    parser.add_argument(
+        "--weight_decay_f", type=float, default=0.0, help="weight decay for evaluation"
+    )
     parser.add_argument("--linear_prob", action="store_true", default=False)
-    
+
     parser.add_argument("--load_model", action="store_true")
     parser.add_argument("--save_model", action="store_true")
     parser.add_argument("--use_cfg", action="store_true")
@@ -118,7 +142,12 @@ def build_args():
 
     # for graph classification
     parser.add_argument("--pooling", type=str, default="mean")
-    parser.add_argument("--deg4feat", action="store_true", default=False, help="use node degree as input feature")
+    parser.add_argument(
+        "--deg4feat",
+        action="store_true",
+        default=False,
+        help="use node degree as input feature",
+    )
     parser.add_argument("--batch_size", type=int, default=32)
     args = parser.parse_args()
     return args
@@ -150,7 +179,9 @@ def create_norm(name):
         return nn.Identity
 
 
-def create_optimizer(opt, model, lr, weight_decay, get_num_layer=None, get_layer_scale=None):
+def create_optimizer(
+    opt, model, lr, weight_decay, get_num_layer=None, get_layer_scale=None
+):
     opt_lower = opt.lower()
 
     parameters = model.parameters()
@@ -177,19 +208,20 @@ def create_optimizer(opt, model, lr, weight_decay, get_num_layer=None, get_layer
 
 # -------------------
 
+
 def load_config(args, config_path):
     """Load configuration from a YAML file and update args."""
     with open(config_path, "r") as f:
         config = yaml.load(f, yaml.FullLoader)
-    
+
     logging.info(f"Loading configuration from {config_path}")
-    
+
     # Update args with configuration values
     for section, params in config.items():
         if section == "experiment_type":
             setattr(args, section, params)
             continue
-            
+
         # Handle both dictionary and non-dictionary cases
         if isinstance(params, dict):
             # Handle dictionary case
@@ -201,9 +233,9 @@ def load_config(args, config_path):
                         # Convert string values to appropriate types
                         if isinstance(nested_value, str):
                             try:
-                                if nested_value.lower() == 'true':
+                                if nested_value.lower() == "true":
                                     nested_value = True
-                                elif nested_value.lower() == 'false':
+                                elif nested_value.lower() == "false":
                                     nested_value = False
                                 else:
                                     # Try to convert to float first (handles scientific notation)
@@ -222,9 +254,9 @@ def load_config(args, config_path):
                     # Convert string values to appropriate types
                     if isinstance(value, str):
                         try:
-                            if value.lower() == 'true':
+                            if value.lower() == "true":
                                 value = True
-                            elif value.lower() == 'false':
+                            elif value.lower() == "false":
                                 value = False
                             else:
                                 # Try to convert to float first (handles scientific notation)
@@ -243,9 +275,9 @@ def load_config(args, config_path):
             # Convert string values to appropriate types
             if isinstance(params, str):
                 try:
-                    if params.lower() == 'true':
+                    if params.lower() == "true":
                         params = True
-                    elif params.lower() == 'false':
+                    elif params.lower() == "false":
                         params = False
                     else:
                         # Try to convert to float first (handles scientific notation)
@@ -259,16 +291,17 @@ def load_config(args, config_path):
                 except:
                     pass  # Keep original value if any conversion fails
             setattr(args, section, params)
-    
+
     return args
+
 
 def load_best_configs(args, path):
     """Legacy function for backward compatibility."""
     logging.warning("load_best_configs is deprecated. Please use load_config instead.")
     return load_config(args, path)
 
-def drop_edge(data, drop_rate, return_edges = False):
 
+def drop_edge(data, drop_rate, return_edges=False):
     """
     Drops edges from the input graph with probability drop_rate and adds self-loops.
 
@@ -309,10 +342,12 @@ def drop_edge(data, drop_rate, return_edges = False):
         return new_data, dropped_edge_index
     return new_data
 
+
 # ------ logging ------
 
+
 class WBLogger(object):
-    def __init__(self, log_path="./wandb", name="run", project='MORGaN'):
+    def __init__(self, log_path="./wandb", name="run", project="MORGaN"):
         """
         Initializes a Weights & Biases run. The log_path is ignored in wandb,
         but kept for compatibility.
@@ -320,7 +355,22 @@ class WBLogger(object):
         wandb.init(project=project, name=name)
         self.last_step = 0
 
-    def note(self, metrics, step=None, accuracy=None, estp_accuracy= None, auc=None, estp_auc = None, aupr = None, estp_aupr = None, precision=None, estp_precision = None, recall=None, estp_recall = None, f1=None):
+    def note(
+        self,
+        metrics,
+        step=None,
+        accuracy=None,
+        estp_accuracy=None,
+        auc=None,
+        estp_auc=None,
+        aupr=None,
+        estp_aupr=None,
+        precision=None,
+        estp_precision=None,
+        recall=None,
+        estp_recall=None,
+        f1=None,
+    ):
         if step is None:
             step = self.last_step
         metrics["step"] = step
@@ -368,7 +418,7 @@ class NormLayer(nn.Module):
             self.mean_scale = nn.Parameter(torch.ones(hidden_dim))
         else:
             raise NotImplementedError
-        
+
     def forward(self, graph, x):
         tensor = x
         if self.norm is not None and type(self.norm) != str:
@@ -379,8 +429,12 @@ class NormLayer(nn.Module):
         batch_list = graph.batch_num_nodes
         batch_size = len(batch_list)
         batch_list = torch.Tensor(batch_list).long().to(tensor.device)
-        batch_index = torch.arange(batch_size).to(tensor.device).repeat_interleave(batch_list)
-        batch_index = batch_index.view((-1,) + (1,) * (tensor.dim() - 1)).expand_as(tensor)
+        batch_index = (
+            torch.arange(batch_size).to(tensor.device).repeat_interleave(batch_list)
+        )
+        batch_index = batch_index.view((-1,) + (1,) * (tensor.dim() - 1)).expand_as(
+            tensor
+        )
         mean = torch.zeros(batch_size, *tensor.shape[1:]).to(tensor.device)
         mean = mean.scatter_add_(0, batch_index, tensor)
         mean = (mean.T / batch_list).T
@@ -394,7 +448,8 @@ class NormLayer(nn.Module):
         std = std.repeat_interleave(batch_list, dim=0)
         return self.weight * sub / std + self.bias
 
-#----------------------------------------
+
+# ----------------------------------------
 # RGCN Utils
 
 
@@ -409,7 +464,9 @@ def block_diag(m):
     You can also give a list of matrices.
     """
 
-    device = 'cuda' if m.is_cuda else 'cpu'  # Note: Using cuda status of m as proxy to decide device
+    device = (
+        "cuda" if m.is_cuda else "cpu"
+    )  # Note: Using cuda status of m as proxy to decide device
 
     if type(m) is list:
         m = torch.cat([m1.unsqueeze(-3) for m1 in m], -3)
@@ -424,14 +481,16 @@ def block_diag(m):
 
     eye = attach_dim(torch.eye(n, device=device).unsqueeze(-2), dim - 3, 1)
 
-    return (m2 * eye).reshape(
-        siz0 + torch.Size(torch.tensor(siz1) * n)
-    )
+    return (m2 * eye).reshape(siz0 + torch.Size(torch.tensor(siz1) * n))
+
 
 def attach_dim(v, n_dim_to_prepend=0, n_dim_to_append=0):
-    return v.reshape(torch.Size([1] * n_dim_to_prepend) + v.shape + torch.Size([1] * n_dim_to_append))
+    return v.reshape(
+        torch.Size([1] * n_dim_to_prepend) + v.shape + torch.Size([1] * n_dim_to_append)
+    )
 
-def stack_matrices(triples, num_nodes, num_rels, vertical_stacking=True, device='cpu'):
+
+def stack_matrices(triples, num_nodes, num_rels, vertical_stacking=True, device="cpu"):
     """
     Computes a sparse adjacency matrix for the given graph (the adjacency matrices of all
     relations are stacked vertically).
@@ -451,12 +510,13 @@ def stack_matrices(triples, num_nodes, num_rels, vertical_stacking=True, device=
     indices = torch.cat([fr[:, None], to[:, None]], dim=1).to(device)
 
     assert indices.size(0) == triples.size(0)
-    assert indices[:, 0].max() < size[0], f'{indices[0, :].max()}, {size}, {r}'
-    assert indices[:, 1].max() < size[1], f'{indices[1, :].max()}, {size}, {r}'
+    assert indices[:, 0].max() < size[0], f"{indices[0, :].max()}, {size}, {r}"
+    assert indices[:, 1].max() < size[1], f"{indices[1, :].max()}, {size}, {r}"
 
     return indices, size
 
-def sum_sparse(indices, values, size, row_normalisation=True, device='cpu'):
+
+def sum_sparse(indices, values, size, row_normalisation=True, device="cpu"):
     """
     Sum the rows or columns of a sparse matrix, and redistribute the
     results back to the non-sparse row/column entries
@@ -475,7 +535,7 @@ def sum_sparse(indices, values, size, row_normalisation=True, device='cpu'):
         size = size[1], size[0]
 
     ones = torch.ones((size[1], 1), device=device)
-    if device == 'cuda':
+    if device == "cuda":
         values = torch.cuda.sparse.FloatTensor(indices.t(), values, torch.Size(size))
     else:
         values = torch.sparse.FloatTensor(indices.t(), values, torch.Size(size))

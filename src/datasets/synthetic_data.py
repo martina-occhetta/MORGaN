@@ -7,31 +7,34 @@ from torch_geometric.data import Data, HeteroData
 from torch_geometric.utils import from_networkx
 from itertools import combinations
 
-def generate_synthetic_graph(num_nodes=500,
-                             num_expr_features=498,
-                             num_methylation_features=486,
-                             num_cnv_features=491,
-                             druggable_ratio=0.33,
-                             seed=42,
-                             multidim_edges=False,
-                             hetero=False):
+
+def generate_synthetic_graph(
+    num_nodes=500,
+    num_expr_features=498,
+    num_methylation_features=486,
+    num_cnv_features=491,
+    druggable_ratio=0.33,
+    seed=42,
+    multidim_edges=False,
+    hetero=False,
+):
     """
     Generates a synthetic graph dataset with biologically inspired multiomic features.
-    
+
     Each node represents a gene with a feature vector composed of:
       - Gene Expression: Simulated via a log-normal distribution.
       - Methylation: Simulated via a beta distribution.
       - CNV: Simulated as integer copy number variations between -2 and 2.
       - SNVs: Simulated via a Poisson distribution.
-    
+
     Druggable genes (label=1) are simulated by embedding a distinct multiomic signature:
       - Increased gene expression
       - Decreased methylation
       - Increased CNV
       (The SNV feature is left unmodified.)
-      
+
     Additionally, node names are assigned as "GENE1", "GENE2", ..., "GENEn".
-    
+
     If multidim_edges is False (default), a single edge type (PPI, type 0) is used.
     If multidim_edges is True, edges are generated for five dimensions:
       0: PPI (base graph from Barabási–Albert + extra connectivity among druggable genes)
@@ -39,7 +42,7 @@ def generate_synthetic_graph(num_nodes=500,
       2: Semantic similarity
       3: Co-expression
       4: Pathway co-occurrence
-    
+
     Args:
         num_nodes (int): Number of genes/nodes.
         num_expr_features (int): Number of gene expression features.
@@ -48,7 +51,7 @@ def generate_synthetic_graph(num_nodes=500,
         druggable_ratio (float): Proportion of nodes labeled as druggable.
         seed (int): Random seed for reproducibility.
         multidim_edges (bool): If True, generate graph with multiple edge dimensions.
-    
+
     Returns:
         Data: A PyTorch Geometric Data object containing the synthetic graph.
     """
@@ -57,54 +60,67 @@ def generate_synthetic_graph(num_nodes=500,
     # 1. Generate a base graph using the Barabási–Albert model.
     m = 3  # Each new node attaches to m existing nodes.
     G = nx.barabasi_albert_graph(n=num_nodes, m=m, seed=seed)
-    
+
     # 2. Simulate multiomic features.
     # Gene Expression: Log-normal distribution then standardize.
-    expr = np.random.lognormal(mean=1.0, sigma=0.5, size=(num_nodes, num_expr_features)).astype(np.float32)
+    expr = np.random.lognormal(
+        mean=1.0, sigma=0.5, size=(num_nodes, num_expr_features)
+    ).astype(np.float32)
     expr = (expr - expr.mean(axis=0)) / expr.std(axis=0)
-    
+
     # Methylation: Beta distribution then standardize.
-    meth = np.random.beta(a=2, b=5, size=(num_nodes, num_methylation_features)).astype(np.float32)
+    meth = np.random.beta(a=2, b=5, size=(num_nodes, num_methylation_features)).astype(
+        np.float32
+    )
     meth = (meth - meth.mean(axis=0)) / meth.std(axis=0)
-    
+
     # CNV: Integers between -2 and 2 then standardize.
-    cnv = np.random.randint(low=-2, high=3, size=(num_nodes, num_cnv_features)).astype(np.float32)
+    cnv = np.random.randint(low=-2, high=3, size=(num_nodes, num_cnv_features)).astype(
+        np.float32
+    )
     cnv = (cnv - cnv.mean(axis=0)) / cnv.std(axis=0)
-    
+
     # SNVs: Simulated via a Poisson distribution (one extra feature) then standardize.
     snv = np.random.poisson(lam=2, size=(num_nodes, 1)).astype(np.float32)
     snv = (snv - snv.mean(axis=0)) / snv.std(axis=0)
-    
+
     # Concatenate all features.
     raw_features = np.concatenate([expr, meth, cnv, snv], axis=1)
-    
+
     # 3. Identify druggable genes and embed a multiomic signal.
     num_druggables = int(num_nodes * druggable_ratio)
     druggable_indices = np.random.choice(num_nodes, num_druggables, replace=False)
-    
+
     # Signals for each modality (do not alter SNVs)
-    signal_expr = 2.0   # Increase gene expression.
+    signal_expr = 2.0  # Increase gene expression.
     signal_meth = -1.0  # Decrease methylation.
-    signal_cnv  = 1.0   # Increase CNV.
-    
+    signal_cnv = 1.0  # Increase CNV.
+
     idx_expr_end = num_expr_features
     idx_meth_end = idx_expr_end + num_methylation_features
     idx_cnv_end = idx_meth_end + num_cnv_features
     raw_features[druggable_indices, :idx_expr_end] += signal_expr
     raw_features[druggable_indices, idx_expr_end:idx_meth_end] += signal_meth
     raw_features[druggable_indices, idx_meth_end:idx_cnv_end] += signal_cnv
-    
+
     # 4. Create labels: 1 for druggable, 0 otherwise.
     labels = np.zeros(num_nodes, dtype=np.int64)
     labels[druggable_indices] = 1
-    
+
     if multidim_edges:
-        np.savetxt('data/synthetic/synthetic_labels_multidim.tsv', labels, delimiter='\t', fmt='%d')
-        np.save('data/synthetic/synthetic_features_multidim.npy', raw_features)
+        np.savetxt(
+            "data/synthetic/synthetic_labels_multidim.tsv",
+            labels,
+            delimiter="\t",
+            fmt="%d",
+        )
+        np.save("data/synthetic/synthetic_features_multidim.npy", raw_features)
     else:
-        np.savetxt('data/synthetic/synthetic_labels.tsv', labels, delimiter='\t', fmt='%d')
-        np.save('data/synthetic/synthetic_features.npy', raw_features)
-    
+        np.savetxt(
+            "data/synthetic/synthetic_labels.tsv", labels, delimiter="\t", fmt="%d"
+        )
+        np.save("data/synthetic/synthetic_features.npy", raw_features)
+
     # 5. Enhance connectivity among druggable genes (applied to the base graph).
     extra_edge_prob = 0.1
     for i in druggable_indices:
@@ -112,19 +128,19 @@ def generate_synthetic_graph(num_nodes=500,
             if i < j and not G.has_edge(i, j):
                 if np.random.rand() < extra_edge_prob:
                     G.add_edge(i, j)
-    
+
     # 6. Assign node features, labels, and node names.
     for i in range(num_nodes):
-        G.nodes[i]['x'] = raw_features[i]
-        G.nodes[i]['y'] = int(labels[i])
+        G.nodes[i]["x"] = raw_features[i]
+        G.nodes[i]["y"] = int(labels[i])
         # G.nodes[i]['name'] = f"GENE{i+1}"
-    
+
     if not multidim_edges:
         # Use the base graph edges as PPI edges; assign edge_type = 0 for all.
         for u, v in G.edges():
-            G.edges[u, v]['edge_type'] = 0
+            G.edges[u, v]["edge_type"] = 0
         # Convert NetworkX graph to a PyTorch Geometric Data object.
-        data = from_networkx(G, group_node_attrs=['x', 'y'])
+        data = from_networkx(G, group_node_attrs=["x", "y"])
         data.x = torch.tensor(raw_features, dtype=torch.float)
         data.y = torch.tensor(labels, dtype=torch.long)
     else:
@@ -153,9 +169,9 @@ def generate_synthetic_graph(num_nodes=500,
 
             # Create the HeteroData object and assign node attributes under the "gene" node type.
             data = HeteroData()
-            data['gene'].x = torch.tensor(raw_features, dtype=torch.float)
-            data['gene'].y = torch.tensor(labels, dtype=torch.long)
-            data['gene'].name = [f"GENE{i+1}" for i in range(num_nodes)]
+            data["gene"].x = torch.tensor(raw_features, dtype=torch.float)
+            data["gene"].y = torch.tensor(labels, dtype=torch.long)
+            data["gene"].name = [f"GENE{i + 1}" for i in range(num_nodes)]
 
             # Mapping from numeric edge type to a relation name.
             relation_mapping = {
@@ -163,9 +179,9 @@ def generate_synthetic_graph(num_nodes=500,
                 1: "seq_sim",
                 2: "sem_sim",
                 3: "coexpr",
-                4: "pathway_cooc"
+                4: "pathway_cooc",
             }
-            
+
             # For each edge type, convert the list to a tensor and assign it under its relation key.
             for etype, relation in relation_mapping.items():
                 edges = edge_index_by_type[etype]
@@ -174,52 +190,52 @@ def generate_synthetic_graph(num_nodes=500,
                 else:
                     # Create an empty edge index if no edges were sampled for this type.
                     edge_index = torch.empty((2, 0), dtype=torch.long)
-                data['gene', relation, 'gene'].edge_index = edge_index
+                data["gene", relation, "gene"].edge_index = edge_index
         else:
             # multidim_edges == True: generate multi-dimensional edges.
             # if hetero is == False, generate a Data object with multidimensional edges
-            
+
             # --------------------------------------------------------
             # DIMENSION 0: PPI edges (the base graph)
             # --------------------------------------------------------
             base_edges = list(G.edges())
             edge_index_list = []
             edge_type_list = []
-            
+
             # Add base PPI edges as undirected (both directions)
             for u, v in base_edges:
                 edge_index_list.append([u, v])
                 edge_index_list.append([v, u])
                 edge_type_list.append(0)  # PPI edge type
                 edge_type_list.append(0)
-            
+
             # --------------------------------------------------------
             # Additional Dimensions & Their Probabilities
             # --------------------------------------------------------
             # Want the approximate order:
-            #   Domain similarity < Sequence similarity < Co-expression 
+            #   Domain similarity < Sequence similarity < Co-expression
             #   < Pathway co-occurrence < Semantic similarity
             #
-            # Probabilities can be adjusted to get the 
+            # Probabilities can be adjusted to get the
             # sparsity/density you want for ~500 nodes.
             # --------------------------------------------------------
-            
+
             # Dimension IDs
             # DIM_DOMAIN = 1
             DIM_SEQUENCE = 1
             DIM_COEXPR = 2
             DIM_PATHWAY = 3
             DIM_SEMANTIC = 4
-            
+
             # Probabilities for adding an undirected edge in each dimension
             edge_probs = {
                 # DIM_DOMAIN:   0.002,  # Domain similarity   (very sparse)
                 DIM_SEQUENCE: 0.003,  # Sequence similarity (very sparse)
-                DIM_COEXPR:   0.01,   # Co-expression       (moderate)
-                DIM_PATHWAY:  0.02,   # Pathway co-occurrence
-                DIM_SEMANTIC: 0.04,   # Semantic similarity (largest)
+                DIM_COEXPR: 0.01,  # Co-expression       (moderate)
+                DIM_PATHWAY: 0.02,  # Pathway co-occurrence
+                DIM_SEMANTIC: 0.04,  # Semantic similarity (largest)
             }
-            
+
             # For each dimension above, randomly sample edges
             for etype, prob in edge_probs.items():
                 for i in range(num_nodes):
@@ -229,30 +245,34 @@ def generate_synthetic_graph(num_nodes=500,
                             edge_index_list.append([j, i])
                             edge_type_list.append(etype)
                             edge_type_list.append(etype)
-            
+
             # Create edge_index and edge_type tensors
-            edge_index = torch.tensor(edge_index_list, dtype=torch.long).t().contiguous()
+            edge_index = (
+                torch.tensor(edge_index_list, dtype=torch.long).t().contiguous()
+            )
             edge_type = torch.tensor(edge_type_list, dtype=torch.long)
-            
+
             # Create the PyG Data object
             data = Data(
                 x=torch.tensor(raw_features, dtype=torch.float),
                 y=torch.tensor(labels, dtype=torch.long),
                 edge_index=edge_index,
-                edge_type=edge_type
+                edge_type=edge_type,
             )
-            
+
             # Optionally store node names (strings) in a list attribute
-            data.name = [f"GENE{i+1}" for i in range(num_nodes)]
-    
+            data.name = [f"GENE{i + 1}" for i in range(num_nodes)]
+
     if multidim_edges and hetero:
-        torch.save(data, 'data/synthetic/synthetic_graph_multidim_hetero.pt')
-        print("Synthetic data saved to 'data/synthetic/synthetic_graph_multidim_hetero.pt'")
+        torch.save(data, "data/synthetic/synthetic_graph_multidim_hetero.pt")
+        print(
+            "Synthetic data saved to 'data/synthetic/synthetic_graph_multidim_hetero.pt'"
+        )
     elif multidim_edges:
-        torch.save(data, 'data/synthetic/synthetic_graph_multidim.pt')
+        torch.save(data, "data/synthetic/synthetic_graph_multidim.pt")
         print("Synthetic data saved to 'data/synthetic/synthetic_graph_multidim.pt'")
     else:
-        torch.save(data, 'data/synthetic/synthetic_graph.pt')
+        torch.save(data, "data/synthetic/synthetic_graph.pt")
         print("Synthetic data saved to 'data/synthetic/synthetic_graph.pt'")
 
     print(f"Number of nodes: {data.num_nodes}")
@@ -264,9 +284,9 @@ def generate_synthetic_graph(num_nodes=500,
         print(f"Number of edge types: {data.num_edge_types}")
     return data
 
+
 if __name__ == "__main__":
     # Generate the synthetic multiomic graph dataset and print its summary.
     data = generate_synthetic_graph(multidim_edges=True, hetero=False)
     print("Synthetic Multiomic Graph Data Summary:")
     print(data)
-    

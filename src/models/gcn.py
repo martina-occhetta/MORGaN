@@ -15,16 +15,18 @@ from src.utils import create_activation
 
 
 class GCN(nn.Module):
-    def __init__(self,
-                 in_dim,
-                 num_hidden,
-                 out_dim,
-                 num_layers,
-                 dropout,
-                 activation,
-                 residual,
-                 norm,
-                 encoding=False):
+    def __init__(
+        self,
+        in_dim,
+        num_hidden,
+        out_dim,
+        num_layers,
+        dropout,
+        activation,
+        residual,
+        norm,
+        encoding=False,
+    ):
         """
         in_dim: Dimension of input features.
         num_hidden: Hidden layer dimension.
@@ -54,19 +56,47 @@ class GCN(nn.Module):
         last_norm = norm if encoding else None
 
         if num_layers == 1:
-            self.gcn_layers.append(GraphConv(in_dim, out_dim, norm=last_norm, activation=last_activation,
-                                               residual=last_residual))
+            self.gcn_layers.append(
+                GraphConv(
+                    in_dim,
+                    out_dim,
+                    norm=last_norm,
+                    activation=last_activation,
+                    residual=last_residual,
+                )
+            )
         else:
             # Input projection (no residual for the very first layer if desired).
-            self.gcn_layers.append(GraphConv(in_dim, num_hidden, norm=norm, activation=create_activation(activation),
-                                               residual=residual))
+            self.gcn_layers.append(
+                GraphConv(
+                    in_dim,
+                    num_hidden,
+                    norm=norm,
+                    activation=create_activation(activation),
+                    residual=residual,
+                )
+            )
             # Hidden layers.
             for l in range(1, num_layers - 1):
-                self.gcn_layers.append(GraphConv(num_hidden, num_hidden, norm=norm,
-                                                   activation=create_activation(activation), residual=residual))
+                self.gcn_layers.append(
+                    GraphConv(
+                        num_hidden,
+                        num_hidden,
+                        norm=norm,
+                        activation=create_activation(activation),
+                        residual=residual,
+                    )
+                )
             # Output projection.
-            self.gcn_layers.append(GraphConv(num_hidden, out_dim, norm=last_norm, activation=last_activation,
-                                               residual=last_residual))
+            self.gcn_layers.append(
+                GraphConv(
+                    num_hidden,
+                    out_dim,
+                    norm=last_norm,
+                    activation=last_activation,
+                    residual=last_residual,
+                )
+            )
 
         # If extra normalization is desired outside of each layer, you might add it here.
         self.norms = None  # Not used here since each GraphConv handles normalization.
@@ -95,26 +125,19 @@ class GCN(nn.Module):
                 nn.Linear(256, 64),
                 nn.ReLU(),
                 nn.Dropout(0.2),
-                nn.Linear(64, 1)
+                nn.Linear(64, 1),
             ).to(dtype)
         else:
-            self.head = nn.Sequential(
-                nn.Linear(self.out_dim, 1)
-            ).to(dtype)
-        self.link_head = nn.Sequential(
-            nn.Linear(self.out_dim, 128)
-        ).to(dtype)
+            self.head = nn.Sequential(nn.Linear(self.out_dim, 1)).to(dtype)
+        self.link_head = nn.Sequential(nn.Linear(self.out_dim, 128)).to(dtype)
 
 
 class GraphConv(MessagePassing):
-    def __init__(self, 
-                 in_channels, 
-                 out_channels, 
-                 norm=None, 
-                 activation=None, 
-                 residual=True):
+    def __init__(
+        self, in_channels, out_channels, norm=None, activation=None, residual=True
+    ):
         # We use 'add' aggregation to mimic the sum aggregation in DGL (in og GraphMAE implementation).
-        super(GraphConv, self).__init__(aggr='add')
+        super(GraphConv, self).__init__(aggr="add")
         self.in_channels = in_channels
         self.out_channels = out_channels
 
@@ -131,7 +154,7 @@ class GraphConv(MessagePassing):
                 self.res_fc = nn.Identity()
                 print("! Identity Residual !")
         else:
-            self.register_buffer('res_fc', None)
+            self.register_buffer("res_fc", None)
         # Optionally include a normalization layer (e.g. nn.BatchNorm1d or nn.LayerNorm)
         self.norm_layer = norm(out_channels) if norm is not None else None
 
@@ -150,13 +173,13 @@ class GraphConv(MessagePassing):
         x: Node feature tensor of shape [N, in_channels]
         edge_index: Graph connectivity in COO format with shape [2, E]
         """
-        
-        #x = graph.x
+
+        # x = graph.x
 
         # Ensure the input features have the same dtype as the model parameters
         x = x.to(next(self.parameters()).dtype)
 
-        #edge_index = graph.edge_index
+        # edge_index = graph.edge_index
         # Compute degrees for pre- and post-normalization.
         row, col = edge_index
         # Out-degree normalization for source nodes.
