@@ -10,7 +10,7 @@ from sklearn.metrics import (
     recall_score,
 )
 from src.utils import create_optimizer
-from src.evaluation import LogisticRegression
+from src.eval.evaluation import LogisticRegression
 
 
 def multilabel_eval(pred_logits, labels, mask, threshold=0.5):

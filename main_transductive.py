@@ -1,4 +1,5 @@
 import logging
+import re 
 import numpy as np
 from tqdm import tqdm
 import torch
@@ -15,16 +16,18 @@ from src.utils import (
     get_current_lr,
     load_config,
 )
-from src.datasets.data_util import load_dataset, load_mutag_dataset
+from src.datasets.data_util import load_mutag_dataset, map_cancer_types
 from src.datasets.build_graphs import (
     load_h5_graph,
     load_h5_graph_with_external_edges,
     load_h5_graph_random_features,
+    load_h5_graph_with_external_features,
+    filter_graph_to_features,
     add_all_edges,
     randomize_edges,
 )
-from src.evaluation import node_classification_eval
-from src.evaluation_multilabel import multilabel_node_classification_eval
+from src.eval.evaluation import node_classification_eval
+from src.eval.evaluation_multilabel import multilabel_node_classification_eval
 from src.models import build_model
 
 
@@ -164,11 +167,14 @@ def build_graph(dataset_name: str, experiment_type: str):
     valid_experiment_types = [
         "feature_ablations",
         "edge_ablations",
+        "cancer_ablations",
         "ppi_comparison",
         "predict_druggable_genes",
         "mutag",
         "ogbn_proteins",
         "no_pretrain",
+        "predict_essential_genes",
+        "alzheimers",
     ]
     if experiment_type not in valid_experiment_types:
         logging.warning(
@@ -289,10 +295,51 @@ def build_graph(dataset_name: str, experiment_type: str):
         # NETWORKS = ['coexpression', 'GO', 'domain', 'sequence', 'pathway']
         # graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
 
+    elif experiment_type in "cancer_ablations":
+        system_key = re.split(r"_|\.", dataset_name)[1]
+        print(system_key)
+        cancer_types = map_cancer_types(system_key, "system")
+        print(cancer_types)
+        valid_cancer_types = [
+            "KIRC",
+            "BRCA",
+            "READ",
+            "PRAD",
+            "STAD",
+            "HNSC",
+            "LUAD",
+            "THCA",
+            "BLCA",
+            "ESCA",
+            "LIHC",
+            "UCEC",
+            "COAD",
+            "LUSC",
+            "CESC",
+            "KIRP",
+        ]
+        for cancer in cancer_types:
+            if cancer not in valid_cancer_types:
+                logging.warning(
+                    f"Invalid cancer type: {cancer}. Must be one of {valid_cancer_types}"
+                )
+        NETWORKS = ["coexpression", "GO", "domain", "sequence", "pathway"]
+        graph = load_h5_graph(PATH, LABEL_PATH, ppi, modalities=cancer_types)
+        graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+        print(graph.x.shape, graph.y.shape)
+
     elif experiment_type == "predict_druggable_genes":
         # Handle main druggable gene prediction task
         NETWORKS = ["coexpression", "GO", "domain", "sequence", "pathway"]
         graph = load_h5_graph(PATH, LABEL_PATH, ppi)
+        graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+
+    elif experiment_type == "predict_essential_genes":
+        # Handle main druggable gene prediction task
+        EG_PATH = "data/components/essential_genes"
+        NETWORKS = ["coexpression", "GO", "domain", "sequence", "pathway"]
+        EG_LABEL_PATH = "data/components/labels/journal.pcbi.1012076.s003_essential.csv"
+        graph = load_h5_graph(EG_PATH, EG_LABEL_PATH, f"{ppi}_essential")
         graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
 
     elif experiment_type == "no_pretrain":
@@ -300,6 +347,14 @@ def build_graph(dataset_name: str, experiment_type: str):
         NETWORKS = ["coexpression", "GO", "domain", "sequence", "pathway"]
         graph = load_h5_graph(PATH, LABEL_PATH, ppi)
         graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+
+    elif experiment_type == "alzheimers":
+        FEAT = "data/components/features/OT_alzheimer_association_scores_zero.tsv"
+        # ALZ_LABEL_PATH = "data/components/labels/OT_alzheimer_association_scores_positive.tsv"
+        NETWORKS = ["coexpression", "GO", "domain", "sequence", "pathway"]
+        graph = load_h5_graph_with_external_features(PATH, LABEL_PATH, ppi, new_features=FEAT)
+        graph = add_all_edges(graph, NETWORK_PATH, NETWORKS)
+        graph = filter_graph_to_features(graph, FEAT)
 
     elif experiment_type == "ogbn_proteins":
         graph = torch.load(
@@ -475,6 +530,7 @@ def main(args):
                     max_epoch_f,
                     device,
                     linear_prob,
+                    out_dir=f"results/{experiment_type}/{dataset_name}/seed_{seed}/iter_{iter_num}",
                 )
 
             if logger is not None:
@@ -551,12 +607,16 @@ if __name__ == "__main__":
             config_path = "configs/edge_ablations.yaml"
         elif args.experiment_type == "feature_ablations":
             config_path = "configs/feature_ablations.yaml"
+        elif args.experiment_type == "cancer_ablations":
+            config_path = "configs/cancer_ablations.yaml"
         elif args.experiment_type == "ppi_comparison":
             config_path = "configs/ppi_comparison.yaml"
         elif args.experiment_type == "no_pretrain":
             config_path = "configs/no_pretrain.yaml"
-        elif args.experiment_type == "ogbn_proteins":
-            config_path = "configs/ogbn_proteins.yaml"
+        elif args.experiment_type == "predict_essential_genes":
+            config_path = "configs/essential_genes.yaml"
+        elif args.experiment_type == "alzheimers":
+            config_path = "configs/alzheimers.yaml"
         else:
             config_path = "configs/main_task.yaml"
 

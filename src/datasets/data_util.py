@@ -1,4 +1,4 @@
-from collections import namedtuple, Counter
+from collections import Counter, defaultdict
 import numpy as np
 import pandas as pd
 
@@ -520,3 +520,57 @@ def load_graph_classification_dataset(dataset_name, deg4feat=False):
         f"******** # Num Graphs: {len(dataset)}, # Num Feat: {feature_dim}, # Num Classes: {num_classes} ********"
     )
     return dataset, (feature_dim, num_classes)
+
+def map_cancer_types(key: str, map_type):
+    CANCER_SYSTEM_MAP = {
+        'ESCA': 'gastro',
+        'STAD': 'gastro',
+        'LIHC': 'gastro',
+        'COAD': 'gastro',
+        'READ': 'gastro',
+        'LUAD': 'respiratory',
+        'LUSC': 'respiratory',
+        'KIRC': 'genitourinary',
+        'KIRP': 'genitourinary',
+        'BLCA': 'genitourinary',
+        'PRAD': 'genitourinary',
+        'UCEC': 'reproductive',
+        'CESC': 'reproductive',
+        'BRCA': 'reproductive',
+        'THCA': 'endocrine',
+        'HNSC': 'headneck',
+    }
+
+    CANCER_TISSUE_MAP = {
+        'KIRC': 'kidney',
+        'KIRP': 'kidney',
+        'BRCA': 'breast',
+        'COAD': 'colon',
+        'READ': 'rectum',
+        'PRAD': 'prostate',
+        'STAD': 'stomach',
+        'HNSC': 'headneck',
+        'LUAD': 'lung',
+        'LUSC': 'lung',
+        'THCA': 'thyroid',
+        'BLCA': 'bladder',
+        'ESCA': 'esophagus',
+        'LIHC': 'liver',
+        'UCEC': 'uterus',
+        'CESC': 'cervix',
+    }
+
+    tissue_to_cancer = defaultdict(list)
+    for code, tissue in CANCER_TISSUE_MAP.items():
+        tissue_to_cancer[tissue].append(code)
+
+    system_to_cancers = defaultdict(list)
+    for code, system in CANCER_SYSTEM_MAP.items():
+        system_to_cancers[system].append(code)
+    
+    if map_type == "system":
+        return system_to_cancers[key]
+    elif map_type == "tissue":
+        return tissue_to_cancer[key]
+    else:
+        raise ValueError(f"unknown map_type: {map_type}")

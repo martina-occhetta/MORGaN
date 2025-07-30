@@ -1,11 +1,12 @@
-import torch_geometric
-from torch_geometric.data import Data
-import torch
-import pandas as pd
-import numpy as np
+from pathlib import Path
+
 import h5py
-from torch_geometric.utils import add_self_loops
+import numpy as np
+import pandas as pd
+import torch
 from sklearn.model_selection import train_test_split
+from torch_geometric.data import Data
+from torch_geometric.utils import add_self_loops, subgraph
 
 
 def load_h5_graph(
@@ -48,14 +49,13 @@ def load_h5_graph(
         selected_indices = [
             i
             for i, name in enumerate(feature_names)
-            if any(name.startswith(mod) for mod in modalities)
+            if any(mod in name for mod in modalities)
         ]
         # Slice the features to keep only the selected ones
         features = features[:, selected_indices]
         # Optionally, update the feature_names list too
         feature_names = [feature_names[i] for i in selected_indices]
     x = torch.from_numpy(features)
-    num_nodes = x.size(0)
     node_name = f["gene_names"][..., -1].astype(str)
 
     # Retrieve gene names and create a mapping: gene name -> node index
@@ -63,7 +63,8 @@ def load_h5_graph(
     gene_map = {g: i for i, g in enumerate(gene_name)}  # gene name -> node index
 
     # Load the labels and determine positive and negative nodes
-    label_df = pd.read_csv(LABEL_PATH, sep="\t").astype(str)
+    sep = "\t" if "essential" not in LABEL_PATH else ","
+    label_df = pd.read_csv(LABEL_PATH, sep=sep).astype(str)
     label_symbols = label_df["symbol"].tolist()
 
     # Determine positive nodes: indices that appear in both the label file and gene_name list
@@ -533,7 +534,7 @@ def load_h5_graph_with_external_edges(
     gene_to_index = {gene: idx for idx, gene in enumerate(node_names)}
 
     # Read labels from the LABEL_PATH file.
-    label_df = pd.read_csv(LABEL_PATH, sep="\t").astype(str)
+    label_df = pd.read_csv(LABEL_PATH).astype(str)
     label_symbols = label_df["symbol"].tolist()
 
     # Identify positive nodes (gene symbols common to both the label file and node_names)
@@ -601,6 +602,156 @@ def load_h5_graph_with_external_edges(
 
     return data
 
+def load_h5_graph_with_external_features(
+    h5_dir: str,
+    label_path: str,
+    ppi: str,
+    new_features: pd.DataFrame | str
+) -> Data:
+    """
+    Load a PPI graph from an HDF5 file, drop genes without external features,
+    and attach external features as node attributes.
+
+    Parameters
+    ----------
+    h5_dir : str
+        Directory containing the HDF5 file (expects f"{h5_dir}/{ppi}_multiomics.h5").
+    label_path : str
+        Tab-separated file with a "symbol" column listing positive genes.
+    ppi : str
+        Filename prefix (e.g. "STRING" for "STRING_multiomics.h5").
+    new_features : pd.DataFrame or str
+        Either a DataFrame indexed by gene symbol, or a path to a TSV with genes as the first column.
+
+    Returns
+    -------
+    data : torch_geometric.data.Data
+        - x: [num_nodes, num_external_features]
+        - edge_index, edge_type
+        - y: [num_nodes,1] binary labels
+        - train_mask, val_mask, test_mask: boolean masks
+        - name: list of gene symbols in node order
+    """
+    if isinstance(new_features, (str, Path)):
+        feat_df = pd.read_csv(new_features, sep="\t", index_col=0, dtype=str)
+    else:
+        feat_df = new_features.copy()
+    feat_df.index = feat_df.index.str.upper().str.strip()
+
+    with h5py.File(f"{h5_dir}/{ppi}_multiomics.h5", "r") as f:
+        adj = f["network"][()]
+        raw_genes = [g.decode("utf-8") if isinstance(g, bytes) else str(g)
+                     for g in f["gene_names"][:, -1]]
+
+    raw_genes = [g.upper().strip() for g in raw_genes]
+    total_nodes = len(raw_genes)
+
+    available = set(feat_df.index)
+    keep_genes = [g for g in raw_genes if g in available]
+    old2new = -np.ones(total_nodes, dtype=int)
+    for new_i, gene in enumerate(keep_genes):
+        old_i = raw_genes.index(gene)
+        old2new[old_i] = new_i
+
+    src, dst = np.nonzero(adj)
+    src_new = old2new[src]
+    dst_new = old2new[dst]
+    mask = (src_new >= 0) & (dst_new >= 0)
+    edge_index = torch.tensor(np.vstack((src_new[mask], dst_new[mask])), dtype=torch.long)
+    edge_type = torch.zeros(edge_index.size(1), dtype=torch.long)
+
+    features_mat = feat_df.loc[keep_genes].astype(float).values
+    x = torch.from_numpy(features_mat).float()
+
+    labels_df = pd.read_csv(label_path, sep="\t", dtype=str)
+    positives = set(labels_df["symbol"].str.upper().str.strip())
+    pos_idx = [i for i, g in enumerate(keep_genes) if g in positives]
+
+    num_nodes = len(keep_genes)
+    all_idx = set(range(num_nodes))
+    neg_cand = np.array(list(all_idx - set(pos_idx)))
+    np.random.seed(42)
+    neg_idx = np.random.choice(neg_cand, size=len(pos_idx), replace=False).tolist()
+
+    y = torch.zeros(num_nodes, dtype=torch.float)
+    y[pos_idx] = 1.0
+    y = y.unsqueeze(1)
+
+    selected = pos_idx + neg_idx
+    labels_sel = y[selected].squeeze(1).numpy()
+    train_and, test_idx, _, _ = train_test_split(
+        selected, labels_sel,
+        test_size=0.2,
+        stratify=labels_sel,
+        random_state=42
+    )
+    train_idx, val_idx, _, _ = train_test_split(
+        train_and,
+        y[train_and].squeeze(1).numpy(),
+        test_size=0.2,
+        stratify=y[train_and].squeeze(1).numpy(),
+        random_state=42
+    )
+
+    # 9) Build boolean masks
+    def make_mask(indices, size):
+        m = torch.zeros(size, dtype=torch.bool)
+        m[indices] = True
+        return m.unsqueeze(1)
+
+    train_mask = make_mask(train_idx, num_nodes)
+    val_mask = make_mask(val_idx, num_nodes)
+    test_mask = make_mask(test_idx, num_nodes)
+
+    # 10) Return Data object
+    data = Data(x=x, edge_index=edge_index, edge_type=edge_type, y=y)
+    data.train_mask = train_mask
+    data.val_mask = val_mask
+    data.test_mask = test_mask
+    data.name = keep_genes
+    return data
+
+def filter_graph_to_features(data, feat_path):
+    """
+    Given a PyG Data object with:
+      - data.name    : list of gene symbols (in node order)
+      - data.edge_index, data.edge_type
+      - data.x, data.y, data.train_mask / val_mask / test_mask
+
+    and feat_index (an iterable of gene symbols you actually have features for),
+    return a new Data object containing only the nodes in feat_index
+    (in the same relative order) and all edges between them.
+    """
+    feat_index = pd.read_csv(feat_path, sep="\t", index_col=0, dtype=str).index
+
+    graph_genes = [g.upper().strip() for g in data.name]
+    feat_set    = {g.upper().strip() for g in feat_index}
+
+    keep = [i for i, g in enumerate(graph_genes) if g in feat_set]
+    if not keep:
+        raise ValueError("No overlap between graph nodes and feature index!")
+
+    keep_tensor = torch.tensor(keep, dtype=torch.long)
+
+    new_edge_index, _, edge_mask = subgraph(
+        keep_tensor,
+        data.edge_index,
+        relabel_nodes=True,
+        return_edge_mask=True
+    )
+
+    out = type(data)(  # same class (Data or a subclass)
+        x           = data.x[keep_tensor],
+        edge_index  = new_edge_index,
+        edge_type   = data.edge_type[edge_mask],
+        y           = data.y[keep_tensor]
+    )
+    out.train_mask = data.train_mask[keep_tensor]
+    out.val_mask   = data.val_mask[keep_tensor]
+    out.test_mask  = data.test_mask[keep_tensor]
+    out.name       = [data.name[i] for i in keep]
+
+    return out
 
 def randomize_edges(graph: Data, preserve_edge_types: bool = True) -> Data:
     """
@@ -614,8 +765,8 @@ def randomize_edges(graph: Data, preserve_edge_types: bool = True) -> Data:
     Returns:
         Data: New graph with randomized edges
     """
-    import torch
     import numpy as np
+    import torch
 
     # Create a copy of the graph to avoid modifying the original
     new_graph = Data(

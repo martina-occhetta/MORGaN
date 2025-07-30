@@ -1,10 +1,15 @@
 import copy
-from tqdm import tqdm
+import os
+import time
+from pathlib import Path
+
+import numpy as np
 import torch
 import torch.nn as nn
 from sklearn import metrics
-from src.utils import create_optimizer, accuracy, result
-import time
+from tqdm import tqdm
+
+from src.utils import accuracy, create_optimizer, result
 
 
 def node_classification_eval(
@@ -18,6 +23,7 @@ def node_classification_eval(
     device,
     linear_prob=True,
     mute=False,
+    out_dir: str | Path = None,
 ):
     model.eval()
     if linear_prob:
@@ -51,7 +57,7 @@ def node_classification_eval(
         (test_recall, estp_recall_f),
         (test_f1, estp_f1),
     ) = linear_probing_for_transductive_node_classifcation(
-        encoder, graph, x, optimizer_f, max_epoch_f, device, mute
+        encoder, graph, x, optimizer_f, max_epoch_f, device, mute, out_dir=out_dir
     )
     return (
         (test_acc, estp_test_acc),
@@ -64,7 +70,7 @@ def node_classification_eval(
 
 
 def linear_probing_for_transductive_node_classifcation(
-    model, graph, feat, optimizer, max_epoch, device, mute=False
+    model, graph, feat, optimizer, max_epoch, device, mute=False, out_dir: str | Path = None
 ):
     graph = graph.to(device)
     x = feat.to(device)
@@ -210,6 +216,23 @@ def linear_probing_for_transductive_node_classifcation(
         print(
             f"--- TestAUPR: {test_aupr:.4f}, early-stopping-TestAUPR: {estp_test_aupr:.4f}, Best ValAUPR: {best_val_aupr:.4f} in epoch {best_val_epoch_aupr} --- "
         )
+
+    y_proba = torch.sigmoid(pred[test_mask]).cpu().numpy()
+    y_true  = labels[test_mask].cpu().numpy()
+    y_pred = pred[test_mask].cpu().numpy()
+
+    if out_dir is not None:
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        np.save(os.path.join(out_dir, "y_true.npy"), y_true)
+        np.save(os.path.join(out_dir, "y_pred.npy"), y_pred)
+        np.save(os.path.join(out_dir, "y_proba.npy"), y_proba)
+
+    if hasattr(graph, "name"):
+        names_arr = np.asarray(graph.name)
+        mask_np   = test_mask.cpu().numpy().astype(bool)
+        test_gene_names = names_arr[mask_np]
+        np.save(out_dir / "test_gene_names.npy", test_gene_names)
 
     return (
         (test_acc, estp_test_acc),
