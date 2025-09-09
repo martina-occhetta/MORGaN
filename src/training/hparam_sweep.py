@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-import wandb
 import main_transductive
+import wandb
 
-# Define the sweep configuration
 sweep_config = {
     "method": "bayes",
     "metric": {
-        "name": "test_auc",  # metric to optimize
+        "name": "test_auc",
         "goal": "maximize",
     },
     "parameters": {
@@ -20,20 +19,16 @@ sweep_config = {
         "mask_rate": {"values": [0.1, 0.3, 0.5]},
         "activation": {"values": ["relu", "prelu"]},
         "linear_prob": {"values": [True, False]},
-        # Add or modify parameters as needed
+        "alpha_l": {"values": [0.5, 1.0, 2.0, 3.0, 5.0]},
+        "mask_rate_f": {"values": [0.05, 0.1, 0.3, 0.5]},
     },
 }
 
 
 def sweep_run():
-    # Initialize a new wandb run; wandb.config will contain the hyperparameters for this run.
     wandb.init()
     config = wandb.config
 
-    # args.use_cfg = True
-
-    # Use your build_args() to get the default arguments,
-    # then override with hyperparameters from the sweep.
     args = main_transductive.build_args()
     args.dataset = "CPDB_cdgps"
     args.lr = config.lr
@@ -45,6 +40,7 @@ def sweep_run():
     args.mask_rate = config.mask_rate
     args.activation = config.activation
     args.linear_prob = config.linear_prob
+    args.alpha_l = config.alpha_l
     args.use_scheduler = True
     args.logging = True
     args.encoder = "rgcn"
@@ -58,7 +54,5 @@ def sweep_run():
 
 
 if __name__ == "__main__":
-    # Create the sweep on wandb and get the sweep_id.
     sweep_id = wandb.sweep(sweep_config, project="graphMAE-DG-sweep")
-    # Run the agent; count specifies how many runs to execute.
     wandb.agent(sweep_id, function=sweep_run, count=200)
