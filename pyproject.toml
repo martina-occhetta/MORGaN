@@ -18,6 +18,7 @@ dependencies = [
   "h5py",
   "ipykernel",
   "matplotlib",
+  "torch>=2.2,<2.7",
   "networkx",
   "numpy",
   "pandas",
@@ -43,7 +44,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Optional internet-dependent analysis extras
 bio = [
   "gseapy>=0.13.0",
   "mygene>=3.2.2",
@@ -57,11 +57,8 @@ dev = [
 ]
 
 [tool.setuptools]
-package-dir = {"" = "morgan"}
+packages = ["morgan"]
 include-package-data = true
-
-[tool.setuptools.packages.find]
-where = ["src"]
 
 [tool.black]
 line-length = 100
