@@ -3,16 +3,15 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "smg-dg"
+name = "morgan"
 version = "0.1.0"
 description = "Multi-dimensional GNNs and analysis helpers for druggable genes"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
-authors = [{ name = "SMG-DG Authors" }]
+authors = [{ name = "Martina Occhetta" }]
 keywords = ["graph-neural-network", "drug-discovery", "bioinformatics", "multi-omics"]
 
-# Dependencies mirrored from requirements.txt to make the package installable
 dependencies = [
   "anndata",
   "contourpy",
@@ -70,4 +69,3 @@ target-version = ["py39", "py310", "py311", "py312"]
 
 [tool.isort]
 profile = "black"
-
