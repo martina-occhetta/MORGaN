@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smg-dg"
+version = "0.1.0"
+description = "Multi-dimensional GNNs and analysis helpers for druggable genes"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "SMG-DG Authors" }]
+keywords = ["graph-neural-network", "drug-discovery", "bioinformatics", "multi-omics"]
+
+# Dependencies mirrored from requirements.txt to make the package installable
+dependencies = [
+  "anndata",
+  "contourpy",
+  "h5py",
+  "ipykernel",
+  "matplotlib",
+  "networkx",
+  "numpy",
+  "pandas",
+  "plotly",
+  "requests",
+  "scanpy",
+  "scikit-learn",
+  "scipy",
+  "seaborn",
+  "tqdm",
+  "einops",
+  "gitdb",
+  "gitpython",
+  "matplotlib-venn",
+  "pydantic",
+  "pypalettes",
+  "rotary-embedding-torch",
+  "sentry-sdk",
+  "setproctitle",
+  "typing-extensions",
+  "wandb",
+  "pyyaml",
+]
+
+[project.optional-dependencies]
+# Optional internet-dependent analysis extras
+bio = [
+  "gseapy>=0.13.0",
+  "mygene>=3.2.2",
+]
+dev = [
+  "pytest",
+  "black",
+  "isort",
+  "mypy",
+  "ruff",
+]
+
+[tool.setuptools]
+package-dir = {"" = "morgan"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+
