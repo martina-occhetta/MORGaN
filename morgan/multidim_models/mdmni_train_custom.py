@@ -1,42 +1,28 @@
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.optim import lr_scheduler
-from torch_geometric.utils import from_networkx
 
 from torch_geometric.data import Data
 import argparse
 import os
 import random
 import numpy as np
-import pandas as pd
-import networkx as nx
-import scipy
-import matplotlib.pyplot as plt
 import sklearn.metrics as metrics
-from sklearn.model_selection import KFold
 from sklearn.metrics import (
-    accuracy_score,
-    roc_auc_score,
+
     average_precision_score,
     recall_score,
     f1_score,
 )
-import faulthandler
-from datetime import datetime
+
 import time
 
 from mdmni import MDMNI_DGD
 from mdmni_network import generate_graph
 from mdmni_utils import *
 
-import sys
-
-sys.path.append(
-    "/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG"
-)
-from src.datasets.data_util import load_processed_graph, load_dataset, load_h5_graph
-from src.utils import set_random_seed
+from morgan.datasets.data_util import load_processed_graph, load_h5_graph
+from morgan.utils import set_random_seed
 
 # cuda = torch.cuda.is_available()
 # torch.cuda.empty_cache()

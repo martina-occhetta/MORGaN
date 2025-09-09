@@ -16,10 +16,10 @@ sys.path.append(
     "/Users/bty416/Library/CloudStorage/OneDrive-QueenMary,UniversityofLondon/martina/01_PhD/05_Projects/04_Druggable-genes/SMG-DG"
 )
 
-from src.multidim_models.modig import MODIG
-from src.multidim_models.modig_utils import *
-from src.datasets.data_util import load_processed_graph, load_h5_graph
-from src.utils import set_random_seed
+from morgan.multidim_models.modig import MODIG
+from morgan.multidim_models.modig_utils import *
+from morgan.datasets.data_util import load_processed_graph, load_h5_graph
+from morgan.utils import set_random_seed
 
 # --- wandb import
 import wandb

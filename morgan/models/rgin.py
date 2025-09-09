@@ -7,7 +7,7 @@ from torch import Tensor, dtype
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.typing import Adj
 
-from src.utils import block_diag, create_activation
+from morgan.utils import block_diag, create_activation
 
 
 class RGIN(nn.Module):
@@ -277,7 +277,7 @@ class RGINConv(MessagePassing):
             W = self.weights
 
         if self.vertical_stacking:
-            from src.utils import stack_matrices, sum_sparse
+            from morgan.utils import stack_matrices, sum_sparse
 
             adj_idx, adj_size = stack_matrices(
                 triples,

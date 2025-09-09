@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.init import xavier_uniform_, zeros_
 from torch_geometric.nn.conv import MessagePassing
-from src.utils import create_activation, block_diag, stack_matrices, sum_sparse
+from morgan.utils import create_activation, block_diag, stack_matrices, sum_sparse
 import math
 
 

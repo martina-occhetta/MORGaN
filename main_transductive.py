@@ -8,7 +8,7 @@ import os
 
 from torch_geometric.data import Data
 
-from src.utils import (
+from morgan.utils import (
     build_args,
     create_optimizer,
     set_random_seed,
@@ -16,8 +16,8 @@ from src.utils import (
     get_current_lr,
     load_config,
 )
-from src.datasets.data_util import load_mutag_dataset, map_cancer_types
-from src.datasets.build_graphs import (
+from morgan.datasets.data_util import load_mutag_dataset, map_cancer_types
+from morgan.datasets.build_graphs import (
     load_h5_graph,
     load_h5_graph_with_external_edges,
     load_h5_graph_random_features,
@@ -26,9 +26,9 @@ from src.datasets.build_graphs import (
     add_all_edges,
     randomize_edges,
 )
-from src.eval.evaluation import node_classification_eval
-from src.eval.evaluation_multilabel import multilabel_node_classification_eval
-from src.models import build_model
+from morgan.eval.evaluation import node_classification_eval
+from morgan.eval.evaluation_multilabel import multilabel_node_classification_eval
+from morgan.models import build_model
 
 
 logging.basicConfig(

@@ -9,8 +9,8 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from src.utils import create_optimizer
-from src.eval.evaluation import LogisticRegression
+from morgan.utils import create_optimizer
+from morgan.eval.evaluation import LogisticRegression
 
 
 def multilabel_eval(pred_logits, labels, mask, threshold=0.5):

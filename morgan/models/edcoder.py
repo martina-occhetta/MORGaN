@@ -5,7 +5,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-from src.utils import create_norm, drop_edge
+from morgan.utils import create_norm, drop_edge
 
 from .gat import GAT
 from .gcn import GCN

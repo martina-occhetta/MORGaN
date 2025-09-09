@@ -11,7 +11,7 @@ from torch_geometric.typing import Adj, OptPairTensor, OptTensor, Size, SparseTe
 from torch_geometric.utils import softmax, degree, negative_sampling
 from torch_geometric.nn.inits import glorot, zeros
 
-from src.utils import create_activation
+from morgan.utils import create_activation
 
 
 class GCN(nn.Module):

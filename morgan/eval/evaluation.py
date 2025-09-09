@@ -9,7 +9,7 @@ import torch.nn as nn
 from sklearn import metrics
 from tqdm import tqdm
 
-from src.utils import accuracy, create_optimizer, result
+from morgan.utils import accuracy, create_optimizer, result
 
 
 def node_classification_eval(
