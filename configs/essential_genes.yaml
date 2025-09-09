@@ -1,7 +1,7 @@
-experiment_type: predict_druggable_genes
+experiment_type: predict_essential_genes
 
 datasets:
-  - name: CPDB_cdgps
+  - name: CPDB_essential
     description: CPDB PPI network with all features and edge types
 
 # Model parameters
@@ -33,8 +33,8 @@ loss_fn: sce
 optimizer: adam
 scheduler: "False"
 logging: "True"
-norm: batch
-residual: True
+# norm: batch
+# residual: True
 
 # Data parameters
 # batch_size: 64

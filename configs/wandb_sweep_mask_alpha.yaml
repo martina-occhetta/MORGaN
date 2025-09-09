@@ -1,0 +1,28 @@
+# configs/wandb_sensitivity.yaml
+controller:
+  type: local
+
+command:
+  - python
+  - main_transductive.py
+  - --experiment_type "predict_druggable_genes"
+  - --use_cfg
+  - --mask_rate={{mask_rate}}
+  - --alpha_l={{alpha_l}}
+
+method: grid
+
+metric:
+  name: test_aupr # make sure your training script logs this metric
+  goal: maximize
+
+project: MORGaN_sensitivity
+name: mask_alpha_sweep
+
+parameters:
+  mask_rate:
+    values: [0.05, 0.10, 0.20, 0.30, 0.50]
+  alpha_l:
+    values: [0.5, 1.0, 2.0, 3.0, 5.0]
+  training.seed:
+    values: [0, 1]

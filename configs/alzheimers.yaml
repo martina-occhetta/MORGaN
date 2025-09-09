@@ -1,8 +1,8 @@
-experiment_type: predict_druggable_genes
+experiment_type: alzheimers
 
 datasets:
-  - name: CPDB_cdgps
-    description: CPDB PPI network with all features and edge types
+  - name: CPDB_cdgps_alzheimers_ot
+    description: CPDB PPI network with all edge types and OT associations for Alzheimer's disease as features
 
 # Model parameters
 num_hidden: 64

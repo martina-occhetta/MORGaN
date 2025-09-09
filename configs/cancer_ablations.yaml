@@ -1,0 +1,57 @@
+experiment_type: cancer_ablations
+base_ppi: CPDB
+
+datasets:
+  - name: CPDB_endocrine
+    description: Cancer types of endocrine system (THCA)
+  - name: CPDB_gastro
+    description: Cancer types of gastrointestinal system (ESCA, STAD, LIHC, COAD, READ)
+  - name: CPDB_genitourinary
+    description: Cancer types of genitourinary system (BLCA, KIRC, KIRP, PRAD)
+  - name: CPDB_head_neck
+    description: Cancer of head and neck (HNSC)
+  - name: CPDB_reproductive
+    description: Cancer types of reproductive system (UCEC, CESC, BRCA)
+  - name: CPDB_respiratory
+    description: Cancer types of respiratory system (LUAD, LUSC)
+
+# Model parameters
+num_hidden: 64
+num_heads: 4
+num_layers: 2
+encoder: rgcn
+decoder: rgcn
+activation: prelu
+in_drop: 0.2
+attn_drop: 0.1
+weight_decomposition: {"type": "basis", "num_bases": 2}
+vertical_stacking: "True"
+num_edge_types: 6
+
+# Training parameters
+lr: 0.01
+lr_f: 0.005
+weight_decay: 1e-3
+weight_decay_f: 1e-4
+max_epoch: 100
+max_epoch_f: 200
+mask_rate: 0.5
+drop_edge_rate: 0.0
+replace_rate: 0.05
+alpha_l: 3
+linear_prob: "False"
+loss_fn: sce
+optimizer: adam
+scheduler: "False"
+logging: "True"
+
+# Model saving parameters
+save_model: "True"
+save_dir: "checkpoints"
+
+# Data parameters
+# batch_size: 64
+# validation_split: 0.2
+# test_split: 0.2
+# seeds: [0,1,2]
+# num_iterations: 3
