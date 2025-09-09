@@ -19,10 +19,9 @@ run_experiment() {
     echo "Running experiment for dataset: $dataset_name"
     python main_transductive.py \
         --dataset "$dataset_name" \
-        --experiment_type "predict_druggable_genes" \
+        --experiment_type "predict_essential_genes" \
         --use_cfg \
-        --seeds 0 1 \
-        --weight_decomposition None
+        --seeds 1234 261 62784
 }
 
 # Run experiments for each PPI
