@@ -20,7 +20,7 @@ dependencies = [
   "matplotlib",
   "torch>=2.2,<2.7",
   "networkx",
-  "numpy",
+  "numpy<2.3",
   "pandas",
   "plotly",
   "requests",
