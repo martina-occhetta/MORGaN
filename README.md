@@ -21,9 +21,10 @@ source .MORGaN/bin/activate  # On Unix/macOS
 .MORGaN\Scripts\activate  # On Windows
 ```
 
-2. Install dependencies:
+2. Navigate to your project directory and install the package using:
+
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 
 ## Data Structure
